@@ -1,0 +1,23 @@
+{
+  "tap":           {"seconds": 0.5, "gain": -9, "text": "A single soft, friendly UI button tap: a short rounded wooden 'tock', dry, no reverb"},
+  "key":           {"seconds": 0.5, "gain": -12, "text": "A single tiny soft keyboard click, light and bubbly, very short, dry"},
+  "nav":           {"seconds": 0.5, "gain": -9, "text": "A gentle two-note rising marimba blip for a menu selection, short and dry"},
+  "correct":       {"seconds": 1.0, "gain": -5, "text": "A bright cheerful 'correct answer' chime for a children's game: three quick rising glockenspiel notes with a sparkle"},
+  "combo":         {"seconds": 1.2, "gain": -5, "text": "An excited rising run of five sparkling glockenspiel notes ending in a magical twinkle, children's game combo reward"},
+  "wrong":         {"seconds": 0.6, "gain": -10, "text": "A gentle, kind 'try again' sound for a children's game: two soft low wooden marimba notes going down, not harsh, not a buzzer"},
+  "pop":           {"seconds": 0.5, "gain": -4, "text": "A single satisfying cartoon bubble pop, juicy and bright, dry"},
+  "star":          {"seconds": 0.8, "gain": -6, "text": "A single bright magical star ding with a short shimmer, children's game collectable"},
+  "crystal":       {"seconds": 2.5, "gain": -4, "text": "A magical crystal being collected: shimmering glassy chimes swelling into a bright sparkling chord, wondrous and warm"},
+  "jump":          {"seconds": 0.5, "gain": -8, "text": "A cute cartoon jump 'boing' whoosh rising in pitch, soft and playful, short"},
+  "swim":          {"seconds": 0.8, "gain": -8, "text": "A quick underwater swoosh with a few bubbles, like a friendly sea creature darting forward"},
+  "whoosh":        {"seconds": 0.6, "gain": -9, "text": "A soft airy magical whoosh passing by, light and quick"},
+  "crack":         {"seconds": 1.0, "gain": -5, "text": "A large egg shell cracking open in three quick crunchy cracks, cartoon style"},
+  "chirp":         {"seconds": 1.0, "gain": -6, "text": "A tiny baby dragon giving two happy squeaky chirps, adorable cartoon creature"},
+  "portal":        {"seconds": 1.5, "gain": -7, "text": "A magical portal opening: a rising shimmering swirl of sparkles and soft synth, friendly and wondrous"},
+  "guardian":      {"seconds": 1.0, "gain": -7, "text": "A big goofy cartoon creature going 'bwomp' with a silly wobbly low tuba note, funny not scary"},
+  "plank":         {"seconds": 0.5, "gain": -6, "text": "A single wooden plank dropping snugly into place with a solid friendly 'clonk'"},
+  "unlock":        {"seconds": 1.5, "gain": -5, "text": "A treasure being unlocked: a small click followed by a warm rising harp flourish and sparkle"},
+  "friendship":    {"seconds": 2.5, "gain": -4, "text": "A joyful magical power-up for a children's game: a rising harp glissando and sparkling chimes bursting into a bright triumphant rainbow chord"},
+  "levelComplete": {"seconds": 2.5, "gain": -4, "text": "A short happy level-complete fanfare for a children's game played on xylophone, glockenspiel and a soft brass section, ending on a bright chord"},
+  "victory":       {"seconds": 3.5, "gain": -4, "text": "A triumphant, joyful victory fanfare for a children's adventure game with bright brass, bells and a cymbal swell, ending on a big happy chord"}
+}

@@ -10,3 +10,7 @@ tools/reference/
 tools/raw/
 .env
 __pycache__/
+.env.local
+.env.*
+node_modules/
+tools/sfx/raw/

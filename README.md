@@ -114,9 +114,26 @@ never used at runtime and nothing in the app talks to the network. `tools/raw` a
 
 ## Audio
 
-`python3 tools/synth_audio.py` synthesises all 21 effects and 4 music loops from scratch (pure
-Python plus macOS `afconvert`). They are original but simple, and are intended as placeholders:
-replace any `.m4a` in `OtterAndMosey/Resources/Audio` with a file of the same name.
+**Sound effects** are generated with ElevenLabs (model `eleven_text_to_sound_v3`) from the
+prompts in `tools/sfx/sounds.json`:
+
+```bash
+cd tools/sfx && npm install
+npm run generate              # anything missing
+npm run generate -- pop star  # just these
+npm run generate -- --force   # everything again
+```
+
+The script reads `ELEVENLABS_API_KEY` from the git-ignored `.env.local` at the repository root
+(create it with `npx -y @elevenlabs/cli@latest onboard init`), trims and levels each clip, and
+encodes it into `OtterAndMosey/Resources/Audio` with macOS `afconvert`. Edit a prompt, its
+`seconds` or its `gain` (dB) in `sounds.json` and regenerate that sound to change it.
+Nothing in the app calls ElevenLabs.
+
+**Music** is four loops synthesised by `python3 tools/synth_audio.py` (pure Python plus
+`afconvert`). They are simple placeholders: replace any `music_*.m4a` with a file of the same
+name. `python3 tools/synth_audio.py --effects` also writes basic synthesised effects, which
+overwrites the ElevenLabs ones.
 
 ## Debug launch arguments (Debug builds only)
 
@@ -129,7 +146,7 @@ replace any `.m4a` in `OtterAndMosey/Resources/Audio` with a file of the same na
 
 ## Known limitations
 
-- Sound effects and music are synthesised placeholders.
+- The four music loops are synthesised placeholders.
 - Characters are animated by swapping painted poses and moving them in code. There are no
   frame-by-frame sprite sheets.
 - Typing speed is only recorded when a hardware keyboard is attached. The hardware keyboard path

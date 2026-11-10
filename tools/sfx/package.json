@@ -1,0 +1,12 @@
+{
+  "name": "lost-islands-sfx",
+  "private": true,
+  "type": "module",
+  "description": "Development-time sound effect generation for Otter & Mosey using ElevenLabs. Not part of the app.",
+  "scripts": {
+    "generate": "node --env-file=../../.env.local generate.mjs"
+  },
+  "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.77.0"
+  }
+}
