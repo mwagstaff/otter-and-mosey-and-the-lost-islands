@@ -1,0 +1,430 @@
+{
+ "styles": {
+  "sprite": "Art style: premium children's storybook video-game art, soft painterly cel shading, clean confident dark-brown outlines, rounded friendly shapes, gentle rim light, rich saturated colours. Full subject visible and centred with generous empty margin on every side. Fully transparent background, no ground, no cast shadow, no text, no border.",
+  "scene": "Art style: premium children's storybook video-game background, soft painterly rendering, rich saturated colours, gentle atmospheric depth, soft lighting, rounded friendly shapes. No characters, no animals, no text, no logos, no borders.",
+  "scene_with_characters": "Art style: premium children's storybook video-game art, soft painterly cel shading, rich saturated colours, soft lighting.",
+  "logo": "Art style: premium children's video-game logo, glossy, bold and friendly. Fully transparent background, no scenery, no characters, no extra words."
+ },
+ "assets": [
+  {
+   "name": "otter_ref",
+   "refs": [
+    "tools/reference/otter_photo.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Turn this plush toy into a 2D cartoon game hero called Otter: a lovable, mischievous brown river otter. Keep the toy's identity: deep chocolate-brown curly fluffy fur, a wide cream muzzle and cream tummy, a big shiny black nose, small rounded ears, chunky short arms and legs. Give him large expressive friendly dark eyes with bright highlights, cute whiskers, a long thick otter tail, and a teal adventurer's scarf tied round his neck. No t-shirt. He stands upright on two feet in a relaxed happy pose, three-quarter view facing right, whole body visible, warm cheeky smile."
+  },
+  {
+   "name": "mosey_ref",
+   "refs": [
+    "tools/reference/mosey_photo.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Redraw this plush toy as ONE single 2D cartoon character illustration (one figure only: not a character sheet, no extra poses, no labels, no scenery, no water). She is a cute, friendly female mosasaur, a prehistoric sea reptile (not a land dinosaur, whale, shark or dolphin). Keep the toy's identity: bright ocean-blue body, a soft pale-grey bobbly frill running along her back and a second frill along her side, pale turquoise belly, golden-amber eyes, exactly four long paddle-shaped swimming flippers edged with pale frill, and a long aquatic tail ending in a fluke. Rounded friendly snout, gentle closed-mouth smile with no teeth showing, large expressive eyes with bright highlights and little eyelashes, and a small golden star charm on a cord round her neck. Relaxed floating pose, side-on three-quarter view with her head pointing to the RIGHT of the picture, whole body including tail and all four flippers visible."
+  },
+  {
+   "name": "otter_blink",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Otter. Draw exactly the same character: same chocolate-brown curly fur, cream muzzle and tummy, big black nose, whiskers, teal scarf, same proportions and art style. One figure only. New pose: identical standing pose to the reference, but with both eyes closed in a happy contented blink."
+  },
+  {
+   "name": "otter_cheer",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Otter. Draw exactly the same character: same chocolate-brown curly fur, cream muzzle and tummy, big black nose, whiskers, teal scarf, same proportions and art style. One figure only. New pose: jumping for joy with both arms thrown high in the air, mouth wide open laughing, scarf flying, feet off the ground."
+  },
+  {
+   "name": "otter_think",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Otter. Draw exactly the same character: same chocolate-brown curly fur, cream muzzle and tummy, big black nose, whiskers, teal scarf, same proportions and art style. One figure only. New pose: standing and thinking hard, one paw scratching the top of his head, eyes looking up, mouth in a small puzzled twist."
+  },
+  {
+   "name": "otter_oops",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Otter. Draw exactly the same character: same chocolate-brown curly fur, cream muzzle and tummy, big black nose, whiskers, teal scarf, same proportions and art style. One figure only. New pose: a funny sheepish 'oops' reaction: wide surprised eyes, both paws on his cheeks, tiny embarrassed grin."
+  },
+  {
+   "name": "otter_run",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Otter. Draw exactly the same character: same chocolate-brown curly fur, cream muzzle and tummy, big black nose, whiskers, teal scarf, same proportions and art style. One figure only. New pose: running fast towards the right in a full side view, mid-stride, leaning forward, scarf streaming behind, determined happy grin."
+  },
+  {
+   "name": "mosey_blink",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: identical floating pose to the reference, but with her eyes closed in a happy contented blink."
+  },
+  {
+   "name": "mosey_cheer",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: leaping upward with joy, body curved in a happy arc, front flippers raised high, mouth open in a big friendly laugh (rounded, no sharp teeth)."
+  },
+  {
+   "name": "mosey_think",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: floating upright and thinking, one front flipper touching her chin, eyes looking up, curious little smile."
+  },
+  {
+   "name": "mosey_oops",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: a funny surprised 'oops' reaction: very wide eyes, one flipper over her mouth, slightly leaning back."
+  },
+  {
+   "name": "mosey_swim",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: swimming fast towards the right in a full side view, body stretched long and streamlined, flippers swept back, tail mid-swish, happy determined smile."
+  },
+  {
+   "name": "duo_ride",
+   "refs": [
+    "tools/raw/otter_ref.png",
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "These are Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace). Draw exactly these two characters together as one isolated sticker-style sprite in the same art style: Otter sits on Mosey's back riding her, holding on with one paw and punching the air with the other, scarf streaming behind; Mosey is stretched out swimming fast towards the right in full side view, both grinning with delight. Mosey is much bigger than Otter. Only the two figures: absolutely no water, no waves, no splashes, no sky, no scenery.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "app_icon",
+   "refs": [
+    "tools/raw/otter_ref.png",
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "App icon artwork, square, full-bleed: close-up of Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills) cheek to cheek, grinning at the viewer, in front of a glowing rainbow crystal and a turquoise tropical sea. Same characters and art style as the references. Bold, simple, readable at small size. No text, no border, no rounded corners.",
+   "background": "opaque",
+   "style": "scene_with_characters"
+  },
+  {
+   "name": "logo",
+   "quality": "high",
+   "prompt": "A playful video-game title logo that reads exactly: 'Otter & Mosey' on the top line in big chunky rounded letters, and 'The Lost Islands' beneath in smaller letters on a curved ribbon. Warm cream and golden letters with a thick dark-teal outline, small rainbow crystal shards and a tiny palm leaf as decoration. Spelling must be exact.",
+   "size": "1536x1024",
+   "style": "logo"
+  },
+  {
+   "name": "bg_title",
+   "quality": "high",
+   "prompt": "A beautiful magical tropical home island at golden morning: a calm turquoise lagoon in the foreground, palm trees, a waterfall, flowers everywhere, and on a stone pedestal on a small hill in the distance a huge glowing Rainbow Crystal sending soft rainbow light into the sky. The lower middle of the picture is open calm water and sand.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_woods",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Whispering Woods: an enchanted forest glade with giant glowing spotted mushrooms, ancient mossy trees, drifting fireflies, a sparkling magical stream, shafts of soft green-gold light.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_bay",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Bubble Bay: a bright underwater coral reef with glowing jellyfish far away, a sunken treasure chest, an old shipwreck in the hazy distance, sea plants, light rays shining down through turquoise water, sandy sea floor.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_dragon",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Dragonfire Mountain: a friendly volcano landscape at dusk with glowing lava rivers, warm orange light, purple crystal caves, dark rounded rocks and a few dragon nests of straw.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_cloud",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Cloud Castle: a dreamy sky world with fluffy cloud platforms, floating grassy islands, rainbow bridges, and a fairy-tale castle on a cloud in the distance, soft pink and blue sky.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_candy",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Candy Kingdom: a chocolate river, candy-cane and lollipop trees, a biscuit castle with icing roofs, gumdrop hills, pastel pink sky with candyfloss clouds.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_star",
+   "quality": "high",
+   "prompt": "Wide side-view game background. Keep the middle band of the picture open and uncluttered for gameplay, with the ground or floor along the bottom fifth. Starlight Island: a cosmic night island with glowing planets, swirling nebula, floating luminous crystals, sparkling star-dust paths and round magical portals, deep indigo and violet.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "bg_map",
+   "quality": "high",
+   "prompt": "A stylised illustrated sea chart seen from high above: open sparkling turquoise ocean filling the whole picture with gentle painted waves, lighter shallows, a few soft cloud shadows and tiny wave crests. No land, no islands, no ships, no compass.",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene"
+  },
+  {
+   "name": "guardian_tree",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A grumpy but lovable talking oak tree with a wrinkly bark face, huge bushy leaf eyebrows, a pouty frown, and branch arms folded crossly. A little bird's nest sits wonkily on his head."
+  },
+  {
+   "name": "guardian_octopus",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A gigantic, very confused purple-pink octopus with big dizzy swirly eyes, a tiny upside-down sailor hat, and tentacles tangled into a silly knot; one tentacle scratching her head."
+  },
+  {
+   "name": "guardian_dragon",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A silly chubby red-orange dragon wearing baggy patched blue trousers with a tiny flame flickering on the seat of them, looking back at it with a startled 'uh-oh' face, little wings."
+  },
+  {
+   "name": "guardian_wizard",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A mischievous little cloud wizard whose body is a fluffy white cloud, wearing a tall wonky purple star-covered hat, holding a sparkly wand, with a cheeky wink and grin."
+  },
+  {
+   "name": "guardian_marshmallow",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A giant squishy pink-and-white marshmallow monster with a goofy gap-toothed smile, tiny stubby arms, rosy cheeks and rainbow sprinkles on his head."
+  },
+  {
+   "name": "guardian_shadow",
+   "quality": "high",
+   "prompt": "A big funny video-game guardian character, comical and lovable, never scary. One figure only, facing left towards the viewer's left. A small lonely shadow creature: a soft inky dark-violet blob with a wispy tail, two big sad glowing pale-blue eyes and a tiny wobbly mouth, hugging itself shyly. Cute and sympathetic."
+  },
+  {
+   "name": "guardian_tree_happy",
+   "refs": [
+    "tools/raw/guardian_tree.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now beaming with a huge happy smile, branch arms open wide, covered in pink blossom. One figure only."
+  },
+  {
+   "name": "guardian_octopus_happy",
+   "refs": [
+    "tools/raw/guardian_octopus.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now delighted and no longer confused: bright sparkling normal eyes, big smile, tentacles untangled and waving happily, hat the right way up. One figure only."
+  },
+  {
+   "name": "guardian_dragon_happy",
+   "refs": [
+    "tools/raw/guardian_dragon.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now laughing happily with the flame out and a little puff of steam, giving a thumbs up. One figure only."
+  },
+  {
+   "name": "guardian_wizard_happy",
+   "refs": [
+    "tools/raw/guardian_wizard.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now laughing joyfully, hat askew, tossing rainbow sparkles from the wand. One figure only."
+  },
+  {
+   "name": "guardian_marshmallow_happy",
+   "refs": [
+    "tools/raw/guardian_marshmallow.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now giggling with delight, arms up, cheeks extra rosy. One figure only."
+  },
+  {
+   "name": "guardian_shadow_happy",
+   "refs": [
+    "tools/raw/guardian_shadow.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same character and art style as the reference, same size and facing the same way, now glowing with happiness: a big warm smile, sparkling eyes, tiny stars shimmering inside its body, arms open for a hug. One figure only."
+  },
+  {
+   "name": "island_woods",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is covered in an enchanted forest with giant red spotted mushrooms and a big friendly tree."
+  },
+  {
+   "name": "island_bay",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a coral atoll ring with a turquoise lagoon in the middle, a tiny shipwreck and bubbles."
+  },
+  {
+   "name": "island_dragon",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a cute volcano with a glowing lava top and a few dragon eggs at its foot."
+  },
+  {
+   "name": "island_cloud",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a fluffy cloud carrying a small fairy-tale castle with a rainbow arching over it."
+  },
+  {
+   "name": "island_candy",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is made of sweets: lollipop trees, a biscuit castle and a chocolate river."
+  },
+  {
+   "name": "island_star",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a deep-purple crystal island with glowing stars, a ringed planet floating above and a round portal."
+  },
+  {
+   "name": "crystal_whole",
+   "quality": "high",
+   "prompt": "The Great Rainbow Crystal: a large magnificent faceted crystal that shimmers with every colour of the rainbow, glowing softly, floating upright."
+  },
+  {
+   "name": "crystal_shard",
+   "quality": "high",
+   "prompt": "A single jagged crystal fragment, pure white and softly glowing with faint pearly facets, shaped like a broken shard pointing upward."
+  },
+  {
+   "name": "pearl",
+   "quality": "high",
+   "prompt": "A single big glossy magical pearl with a soft pink-white sheen and one bright highlight."
+  },
+  {
+   "name": "egg",
+   "quality": "high",
+   "prompt": "A single large dragon egg standing upright, cream coloured with soft orange spots and a gentle warm glow."
+  },
+  {
+   "name": "babydragon",
+   "quality": "high",
+   "prompt": "A single adorable chubby baby dragon, bright orange-red with a cream tummy, tiny wings, big happy eyes, sitting up and chirping with joy."
+  },
+  {
+   "name": "chest",
+   "quality": "high",
+   "prompt": "A single wooden treasure chest, closed, with golden bands, a big friendly padlock and a faint glow from the gaps."
+  },
+  {
+   "name": "fg_woods",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows lush ferns, clover, small glowing mushrooms and wild flowers.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "fg_bay",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows sea grass, round corals, shells and a few starfish on rippled sand.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "fg_dragon",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows dark volcanic rocks with glowing orange cracks and small purple crystals.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "fg_cloud",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows soft puffy cloud tops with a few tiny daisies and sparkles.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "fg_candy",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows gumdrops, swirly lollipops, candy canes and blobs of icing.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "fg_star",
+   "quality": "high",
+   "prompt": "A foreground layer for a side-scrolling game, drawn as an isolated strip: content ONLY along the bottom quarter of the picture, spanning the full width edge to edge; the upper three quarters are completely empty. Slightly darker and softer than a normal sprite because it sits closest to the camera. The strip shows glowing violet crystals, tiny stars and luminous alien flowers.",
+   "size": "1536x1024"
+  },
+  {
+   "name": "ring",
+   "quality": "high",
+   "prompt": "A single magical swim-through hoop seen from the front: a thick round ring made of smooth pale stone wrapped in a little coral and pearls, with a clearly empty hole in the middle that is fully transparent."
+  },
+  {
+   "name": "cliff",
+   "quality": "high",
+   "prompt": "A single chunky cliff-edge platform for a side-view game: a block of warm grey-brown rock with a flat grassy top, a few flowers, and a rough rocky underside, squared-off on the left side and jagged on the right side."
+  },
+  {
+   "name": "jar",
+   "quality": "high",
+   "prompt": "A single round glass sweet-shop jar with a red lid, full of colourful sweets, with a tiny padlock on the lid."
+  },
+  {
+   "name": "friend_fish",
+   "quality": "high",
+   "prompt": "A single cute round tropical reef fish, bright yellow with turquoise fins and a little blue stripe, with big happy eyes and a wide smile, seen from the side facing left."
+  },
+  {
+   "name": "friend_gummy",
+   "quality": "high",
+   "prompt": "A single adorable shiny red gummy-bear creature with big happy eyes, arms up, cheering joyfully."
+  },
+  {
+   "name": "bg_ending",
+   "refs": [
+    "tools/raw/otter_ref.png",
+    "tools/raw/mosey_ref.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "size": "1536x1024",
+   "background": "opaque",
+   "style": "scene_with_characters",
+   "prompt": "A joyful ending illustration: on a beautiful tropical island beach at sunset, Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace, resting in the shallow water) celebrate beneath the huge restored Great Rainbow Crystal, which beams rainbow light across the sky. Around them, their new friends cheer: a smiling blossom-covered tree, a happy purple octopus in a sailor hat, a chubby orange dragon in blue trousers, a little cloud wizard in a purple star hat, a pink marshmallow monster and a small sparkling violet shadow creature. Confetti and fireflies in the air. Same characters and art style as the references. No text."
+  }
+ ]
+}

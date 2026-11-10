@@ -1,0 +1,1617 @@
+[
+ {
+  "word": "sun",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The ___ is hot and bright."
+ },
+ {
+  "word": "tree",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A bird sat in the ___."
+ },
+ {
+  "word": "fish",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A ___ swims in the sea."
+ },
+ {
+  "word": "frog",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The green ___ can hop."
+ },
+ {
+  "word": "star",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "I saw a ___ in the night sky."
+ },
+ {
+  "word": "boat",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "We sail in a ___."
+ },
+ {
+  "word": "moon",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The ___ glows at night."
+ },
+ {
+  "word": "sand",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "We dig in the ___."
+ },
+ {
+  "word": "shell",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "I found a ___ on the beach."
+ },
+ {
+  "word": "leaf",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A ___ fell from the tree."
+ },
+ {
+  "word": "rain",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The ___ makes puddles."
+ },
+ {
+  "word": "wave",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A big ___ splashed us."
+ },
+ {
+  "word": "bird",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The ___ can sing."
+ },
+ {
+  "word": "jump",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "Otter can ___ very high."
+ },
+ {
+  "word": "swim",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "Mosey loves to ___."
+ },
+ {
+  "word": "play",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "Let us ___ a game."
+ },
+ {
+  "word": "ship",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The ___ has a tall mast."
+ },
+ {
+  "word": "crab",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A ___ walks sideways."
+ },
+ {
+  "word": "nest",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The eggs are in the ___."
+ },
+ {
+  "word": "pond",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "Ducks swim on the ___."
+ },
+ {
+  "word": "cloud",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "A fluffy ___ floats by."
+ },
+ {
+  "word": "green",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "The grass is ___."
+ },
+ {
+  "word": "happy",
+  "topic": "starterWords",
+  "level": 1,
+  "sentence": "Otter feels ___ today."
+ },
+ {
+  "word": "water",
+  "topic": "starterWords",
+  "level": 2,
+  "sentence": "Fish live in ___."
+ },
+ {
+  "word": "because",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I wear a coat ___ it is cold."
+ },
+ {
+  "word": "people",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "Lots of ___ came to the party."
+ },
+ {
+  "word": "friend",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "Mosey is my best ___."
+ },
+ {
+  "word": "again",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "Please sing it ___."
+ },
+ {
+  "word": "could",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I ___ swim when I was five."
+ },
+ {
+  "word": "would",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "___ you like some cake?"
+ },
+ {
+  "word": "should",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We ___ brush our teeth."
+ },
+ {
+  "word": "every",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I read ___ day."
+ },
+ {
+  "word": "great",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We had a ___ time."
+ },
+ {
+  "word": "beautiful",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "The rainbow looks ___."
+ },
+ {
+  "word": "early",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I woke up ___ this morning."
+ },
+ {
+  "word": "earth",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We all live on planet ___."
+ },
+ {
+  "word": "fruit",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "An apple is a ___."
+ },
+ {
+  "word": "heard",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I ___ a loud bang."
+ },
+ {
+  "word": "learn",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We ___ new things at school."
+ },
+ {
+  "word": "often",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I ___ play outside."
+ },
+ {
+  "word": "group",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We work in a ___."
+ },
+ {
+  "word": "guide",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "The ___ showed us the way."
+ },
+ {
+  "word": "heart",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "My ___ beats fast when I run."
+ },
+ {
+  "word": "woman",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "The ___ waved at us."
+ },
+ {
+  "word": "build",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "Let us ___ a sandcastle."
+ },
+ {
+  "word": "busy",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "The bees are ___ today."
+ },
+ {
+  "word": "eight",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "A spider has ___ legs."
+ },
+ {
+  "word": "answer",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "I know the ___!"
+ },
+ {
+  "word": "appear",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Stars ___ at night."
+ },
+ {
+  "word": "arrive",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "We will ___ at noon."
+ },
+ {
+  "word": "believe",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ___ in magic."
+ },
+ {
+  "word": "breath",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Take a deep ___."
+ },
+ {
+  "word": "breathe",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Fish ___ under water."
+ },
+ {
+  "word": "century",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "A ___ is one hundred years."
+ },
+ {
+  "word": "circle",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "The moon is a ___ tonight."
+ },
+ {
+  "word": "decide",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I cannot ___ which one to pick."
+ },
+ {
+  "word": "describe",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Can you ___ the dragon?"
+ },
+ {
+  "word": "enough",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I have had ___ cake, thank you."
+ },
+ {
+  "word": "famous",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "The singer is very ___."
+ },
+ {
+  "word": "favourite",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Blue is my ___ colour."
+ },
+ {
+  "word": "island",
+  "topic": "exceptionWords",
+  "level": 2,
+  "sentence": "We sailed to the ___."
+ },
+ {
+  "word": "minute",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Wait one ___, please."
+ },
+ {
+  "word": "notice",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Did you ___ the tiny crab?"
+ },
+ {
+  "word": "perhaps",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "___ it will snow tomorrow."
+ },
+ {
+  "word": "popular",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Football is a ___ game."
+ },
+ {
+  "word": "quarter",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ate a ___ of the pizza."
+ },
+ {
+  "word": "question",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "May I ask a ___?"
+ },
+ {
+  "word": "recent",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "This is a ___ photo."
+ },
+ {
+  "word": "regular",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "We have ___ swimming lessons."
+ },
+ {
+  "word": "remember",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ___ my first day at school."
+ },
+ {
+  "word": "sentence",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Write a ___ about otters."
+ },
+ {
+  "word": "special",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Today is a ___ day."
+ },
+ {
+  "word": "straight",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Draw a ___ line."
+ },
+ {
+  "word": "strange",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I heard a ___ noise."
+ },
+ {
+  "word": "strength",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "It takes ___ to lift a rock."
+ },
+ {
+  "word": "surprise",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "The party was a ___."
+ },
+ {
+  "word": "thought",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ___ I saw a dragon."
+ },
+ {
+  "word": "through",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "We walked ___ the woods."
+ },
+ {
+  "word": "various",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The shop sells ___ sweets."
+ },
+ {
+  "word": "weight",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The ___ of the rock is huge."
+ },
+ {
+  "word": "bicycle",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ride my ___ to school."
+ },
+ {
+  "word": "business",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "She runs a small ___."
+ },
+ {
+  "word": "calendar",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Mark the date on the ___."
+ },
+ {
+  "word": "caught",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ___ the ball."
+ },
+ {
+  "word": "certain",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "I am ___ that I locked the door."
+ },
+ {
+  "word": "complete",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Please ___ the puzzle."
+ },
+ {
+  "word": "consider",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Please ___ my idea."
+ },
+ {
+  "word": "continue",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Let us ___ the story."
+ },
+ {
+  "word": "different",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Each shell is ___."
+ },
+ {
+  "word": "difficult",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "That puzzle was ___."
+ },
+ {
+  "word": "disappear",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The magician made the coin ___."
+ },
+ {
+  "word": "exercise",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Swimming is good ___."
+ },
+ {
+  "word": "experience",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "The trip was a great ___."
+ },
+ {
+  "word": "experiment",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "We did a science ___."
+ },
+ {
+  "word": "grammar",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "We learn ___ in English lessons."
+ },
+ {
+  "word": "history",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "We learn about the past in ___."
+ },
+ {
+  "word": "imagine",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Can you ___ a pink dragon?"
+ },
+ {
+  "word": "important",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "It is ___ to be kind."
+ },
+ {
+  "word": "interest",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "I have an ___ in space."
+ },
+ {
+  "word": "knowledge",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "Books fill us with ___."
+ },
+ {
+  "word": "library",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I borrow books from the ___."
+ },
+ {
+  "word": "material",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Wool is a soft ___."
+ },
+ {
+  "word": "medicine",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The doctor gave me some ___."
+ },
+ {
+  "word": "naughty",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The ___ puppy chewed my shoe."
+ },
+ {
+  "word": "occasion",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "A birthday is a special ___."
+ },
+ {
+  "word": "opposite",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Hot is the ___ of cold."
+ },
+ {
+  "word": "ordinary",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "It was just an ___ day."
+ },
+ {
+  "word": "particular",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "I want this ___ book."
+ },
+ {
+  "word": "peculiar",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "That fish looks very ___."
+ },
+ {
+  "word": "position",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Get into ___ for the race."
+ },
+ {
+  "word": "possible",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Is it ___ to fly to the moon?"
+ },
+ {
+  "word": "potatoes",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "We had mashed ___ for tea."
+ },
+ {
+  "word": "pressure",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Push with gentle ___."
+ },
+ {
+  "word": "probably",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "It will ___ rain later."
+ },
+ {
+  "word": "promise",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "I ___ to be careful."
+ },
+ {
+  "word": "purpose",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "I did not do it on ___."
+ },
+ {
+  "word": "separate",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "Put the shells in ___ piles."
+ },
+ {
+  "word": "suppose",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "I ___ we should go home."
+ },
+ {
+  "word": "therefore",
+  "topic": "exceptionWords",
+  "level": 5,
+  "sentence": "It is raining, ___ we need coats."
+ },
+ {
+  "word": "although",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "___ it rained, we had fun."
+ },
+ {
+  "word": "actual",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "This is the ___ size of the egg."
+ },
+ {
+  "word": "address",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Write your ___ on the letter."
+ },
+ {
+  "word": "accident",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "I dropped it by ___."
+ },
+ {
+  "word": "height",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "What is the ___ of the tower?"
+ },
+ {
+  "word": "length",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Measure the ___ of the rope."
+ },
+ {
+  "word": "increase",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The waves ___ in the storm."
+ },
+ {
+  "word": "mention",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "Did I ___ my new pet?"
+ },
+ {
+  "word": "natural",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "A cave is a ___ shelter."
+ },
+ {
+  "word": "forward",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "Take one step ___."
+ },
+ {
+  "word": "february",
+  "topic": "exceptionWords",
+  "level": 4,
+  "sentence": "The month after January is ___."
+ },
+ {
+  "word": "guard",
+  "topic": "exceptionWords",
+  "level": 3,
+  "sentence": "The dragon will ___ the gold."
+ },
+ {
+  "word": "unhappy",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "The lost puppy looked ___."
+ },
+ {
+  "word": "unlock",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "Use the key to ___ the chest."
+ },
+ {
+  "word": "unkind",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "It is ___ to tease."
+ },
+ {
+  "word": "undo",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "Can you ___ this knot?"
+ },
+ {
+  "word": "unfair",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "Cheating is ___."
+ },
+ {
+  "word": "untidy",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "My bedroom is ___."
+ },
+ {
+  "word": "unusual",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "A blue otter would be ___."
+ },
+ {
+  "word": "dislike",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "I ___ soggy toast."
+ },
+ {
+  "word": "disagree",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "We ___ about the best game."
+ },
+ {
+  "word": "disobey",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "Do not ___ the rules."
+ },
+ {
+  "word": "dishonest",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "Telling lies is ___."
+ },
+ {
+  "word": "misbehave",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "Puppies sometimes ___."
+ },
+ {
+  "word": "misspell",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "Take care not to ___ the word."
+ },
+ {
+  "word": "mislead",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "A wrong map can ___ you."
+ },
+ {
+  "word": "misplace",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "I often ___ my hat."
+ },
+ {
+  "word": "redo",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "I will ___ my drawing."
+ },
+ {
+  "word": "replay",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "Let us ___ the game."
+ },
+ {
+  "word": "rewrite",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "Please ___ your sentence."
+ },
+ {
+  "word": "return",
+  "topic": "prefixes",
+  "level": 2,
+  "sentence": "We will ___ before dark."
+ },
+ {
+  "word": "refresh",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "A cold drink will ___ you."
+ },
+ {
+  "word": "reappear",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "The sun will ___ soon."
+ },
+ {
+  "word": "rebuild",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "We must ___ the bridge."
+ },
+ {
+  "word": "submarine",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "A ___ travels under the sea."
+ },
+ {
+  "word": "subway",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "We crossed under the road in a ___."
+ },
+ {
+  "word": "subheading",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "Write a ___ for each part."
+ },
+ {
+  "word": "supermarket",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "We buy food at the ___."
+ },
+ {
+  "word": "superstar",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "The singer is a ___."
+ },
+ {
+  "word": "superhero",
+  "topic": "prefixes",
+  "level": 3,
+  "sentence": "The ___ wore a red cape."
+ },
+ {
+  "word": "anticlockwise",
+  "topic": "prefixes",
+  "level": 5,
+  "sentence": "Turn the dial ___."
+ },
+ {
+  "word": "antiseptic",
+  "topic": "prefixes",
+  "level": 5,
+  "sentence": "Put ___ cream on the cut."
+ },
+ {
+  "word": "autograph",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "The star signed an ___."
+ },
+ {
+  "word": "automatic",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "The doors are ___."
+ },
+ {
+  "word": "interact",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "Dolphins ___ with each other."
+ },
+ {
+  "word": "international",
+  "topic": "prefixes",
+  "level": 5,
+  "sentence": "The airport has ___ flights."
+ },
+ {
+  "word": "impossible",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "Nothing is ___ for best friends."
+ },
+ {
+  "word": "invisible",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "The wizard became ___."
+ },
+ {
+  "word": "incorrect",
+  "topic": "prefixes",
+  "level": 4,
+  "sentence": "That answer was ___."
+ },
+ {
+  "word": "irregular",
+  "topic": "prefixes",
+  "level": 5,
+  "sentence": "The rock had an ___ shape."
+ },
+ {
+  "word": "immature",
+  "topic": "prefixes",
+  "level": 5,
+  "sentence": "A tadpole is an ___ frog."
+ },
+ {
+  "word": "quickly",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "Otter ran ___ to the river."
+ },
+ {
+  "word": "slowly",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "The snail moved ___."
+ },
+ {
+  "word": "sadly",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "___, the ice cream melted."
+ },
+ {
+  "word": "gently",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "Stroke the kitten ___."
+ },
+ {
+  "word": "happily",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "The children played ___."
+ },
+ {
+  "word": "finally",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "___, we reached the top."
+ },
+ {
+  "word": "usually",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "I ___ walk to school."
+ },
+ {
+  "word": "completely",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The bridge was ___ broken."
+ },
+ {
+  "word": "carefully",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "Carry the eggs ___."
+ },
+ {
+  "word": "bravely",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "Otter ___ crossed the bridge."
+ },
+ {
+  "word": "angrily",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The goose honked ___."
+ },
+ {
+  "word": "basically",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "A whale is ___ a huge swimmer."
+ },
+ {
+  "word": "information",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The sign gives useful ___."
+ },
+ {
+  "word": "sensation",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Tingling is a funny ___."
+ },
+ {
+  "word": "preparation",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "A feast needs lots of ___."
+ },
+ {
+  "word": "celebration",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "We had a big ___."
+ },
+ {
+  "word": "adoration",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "The puppy gazed up with ___."
+ },
+ {
+  "word": "dangerous",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "Lava is ___."
+ },
+ {
+  "word": "poisonous",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Some berries are ___."
+ },
+ {
+  "word": "mountainous",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "The island is rocky and ___."
+ },
+ {
+  "word": "enormous",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "The octopus was ___."
+ },
+ {
+  "word": "jealous",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Do not be ___ of your friend."
+ },
+ {
+  "word": "curious",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Otter is a ___ animal."
+ },
+ {
+  "word": "serious",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The owl looked very ___."
+ },
+ {
+  "word": "courageous",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "The ___ knight saved the day."
+ },
+ {
+  "word": "obvious",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The answer was ___."
+ },
+ {
+  "word": "hopping",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "The rabbit is ___ away."
+ },
+ {
+  "word": "running",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "Otter is ___ fast."
+ },
+ {
+  "word": "beginning",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Start at the ___ of the story."
+ },
+ {
+  "word": "forgotten",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "I have ___ my lunch."
+ },
+ {
+  "word": "gardener",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "The ___ planted roses."
+ },
+ {
+  "word": "treasure",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "The chest is full of ___."
+ },
+ {
+  "word": "measure",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "Use a ruler to ___ it."
+ },
+ {
+  "word": "pleasure",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "It is a ___ to meet you."
+ },
+ {
+  "word": "creature",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "A strange ___ lives in the cave."
+ },
+ {
+  "word": "picture",
+  "topic": "suffixes",
+  "level": 2,
+  "sentence": "I drew a ___ of Mosey."
+ },
+ {
+  "word": "adventure",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "We are going on an ___."
+ },
+ {
+  "word": "nature",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "We love walking in ___."
+ },
+ {
+  "word": "furniture",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Chairs and tables are ___."
+ },
+ {
+  "word": "invention",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The wheel was a clever ___."
+ },
+ {
+  "word": "action",
+  "topic": "suffixes",
+  "level": 3,
+  "sentence": "The film was full of ___."
+ },
+ {
+  "word": "magician",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The ___ pulled out a rabbit."
+ },
+ {
+  "word": "musician",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The ___ played a happy tune."
+ },
+ {
+  "word": "expression",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "She had a happy ___ on her face."
+ },
+ {
+  "word": "discussion",
+  "topic": "suffixes",
+  "level": 5,
+  "sentence": "We had a ___ about pets."
+ },
+ {
+  "word": "television",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "We watched a film on ___."
+ },
+ {
+  "word": "division",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Sharing equally is called ___."
+ },
+ {
+  "word": "confusion",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "The octopus stared in ___."
+ },
+ {
+  "word": "decision",
+  "topic": "suffixes",
+  "level": 4,
+  "sentence": "Picking a pet is a big ___."
+ },
+ {
+  "word": "hear",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "I can ___ the waves.",
+  "partner": "here"
+ },
+ {
+  "word": "here",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "Come over ___, Mosey!",
+  "partner": "hear"
+ },
+ {
+  "word": "sea",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "Mosey swims in the ___.",
+  "partner": "see"
+ },
+ {
+  "word": "see",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "I can ___ a rainbow.",
+  "partner": "sea"
+ },
+ {
+  "word": "one",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "I have ___ nose.",
+  "partner": "won"
+ },
+ {
+  "word": "won",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "Our team ___ the race.",
+  "partner": "one"
+ },
+ {
+  "word": "son",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "The king has a ___ and a daughter.",
+  "partner": "sun"
+ },
+ {
+  "word": "knight",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The brave ___ rode a horse.",
+  "partner": "night"
+ },
+ {
+  "word": "night",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Owls hunt at ___.",
+  "partner": "knight"
+ },
+ {
+  "word": "bee",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "A ___ makes honey.",
+  "partner": "be"
+ },
+ {
+  "word": "blew",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The wind ___ my hat off.",
+  "partner": "blue"
+ },
+ {
+  "word": "blue",
+  "topic": "homophones",
+  "level": 2,
+  "sentence": "The sky is ___.",
+  "partner": "blew"
+ },
+ {
+  "word": "bear",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The ___ loves honey.",
+  "partner": "bare"
+ },
+ {
+  "word": "bare",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "I walked on the sand with ___ feet.",
+  "partner": "bear"
+ },
+ {
+  "word": "grown",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The plant has ___ tall.",
+  "partner": "groan"
+ },
+ {
+  "word": "groan",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Bad jokes make me ___.",
+  "partner": "grown"
+ },
+ {
+  "word": "mane",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The lion has a golden ___.",
+  "partner": "main"
+ },
+ {
+  "word": "main",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The ___ door is at the front.",
+  "partner": "mane"
+ },
+ {
+  "word": "meat",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Lions eat ___.",
+  "partner": "meet"
+ },
+ {
+  "word": "meet",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Let us ___ at the park.",
+  "partner": "meat"
+ },
+ {
+  "word": "mist",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The hills were hidden by ___.",
+  "partner": "missed"
+ },
+ {
+  "word": "missed",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "I ___ the bus this morning.",
+  "partner": "mist"
+ },
+ {
+  "word": "piece",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "May I have a ___ of cake?",
+  "partner": "peace"
+ },
+ {
+  "word": "peace",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The dove is a sign of ___.",
+  "partner": "piece"
+ },
+ {
+  "word": "plane",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The ___ flew above the clouds.",
+  "partner": "plain"
+ },
+ {
+  "word": "plain",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "I like ___ crisps best.",
+  "partner": "plane"
+ },
+ {
+  "word": "scene",
+  "topic": "homophones",
+  "level": 4,
+  "sentence": "The last ___ of the play was funny.",
+  "partner": "seen"
+ },
+ {
+  "word": "seen",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Have you ___ my scarf?",
+  "partner": "scene"
+ },
+ {
+  "word": "weather",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The ___ is sunny today.",
+  "partner": "whether"
+ },
+ {
+  "word": "whether",
+  "topic": "homophones",
+  "level": 4,
+  "sentence": "I wonder ___ it will snow.",
+  "partner": "weather"
+ },
+ {
+  "word": "berry",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The bird ate a red ___.",
+  "partner": "bury"
+ },
+ {
+  "word": "bury",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Dogs ___ their bones.",
+  "partner": "berry"
+ },
+ {
+  "word": "brake",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Squeeze the ___ to stop the bike.",
+  "partner": "break"
+ },
+ {
+  "word": "break",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Be careful not to ___ the egg.",
+  "partner": "brake"
+ },
+ {
+  "word": "fare",
+  "topic": "homophones",
+  "level": 4,
+  "sentence": "We paid the bus ___.",
+  "partner": "fair"
+ },
+ {
+  "word": "fair",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "We rode the big wheel at the ___.",
+  "partner": "fare"
+ },
+ {
+  "word": "heal",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The cut will soon ___.",
+  "partner": "heel"
+ },
+ {
+  "word": "heel",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "I have a blister on my ___.",
+  "partner": "heal"
+ },
+ {
+  "word": "knot",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Tie a ___ in the rope.",
+  "partner": "not"
+ },
+ {
+  "word": "male",
+  "topic": "homophones",
+  "level": 4,
+  "sentence": "A ___ lion has a mane.",
+  "partner": "mail"
+ },
+ {
+  "word": "mail",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The postman brings the ___.",
+  "partner": "male"
+ },
+ {
+  "word": "their",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "The otters love ___ river.",
+  "partner": "there"
+ },
+ {
+  "word": "there",
+  "topic": "homophones",
+  "level": 3,
+  "sentence": "Look over ___!",
+  "partner": "their"
+ }
+]

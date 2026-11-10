@@ -1,0 +1,937 @@
+{
+ "islands": [
+  {
+   "id": "woods",
+   "name": "Whispering Woods",
+   "tagline": "Where the trees tell tales",
+   "focus": "Spelling and word building",
+   "colour": "#3FBF6B",
+   "guardian": {
+    "name": "Old Grumblebark",
+    "kind": "tree",
+    "phases": [
+     "g:Harrumph! My leaves have gone grey and so has my mood!",
+     "g:Stop it. I am NOT smiling. That is just how my bark sits.",
+     "g:Oh no. I can feel a giggle coming. Hold it in, Grumblebark!"
+    ],
+    "befriended": [
+     "g:Ha ha ha! I have not laughed in a hundred years!",
+     "g:Take the crystal fragment. And come back for a story, little ones.",
+     "o:A talking tree who tells stories? Best. Day. Ever."
+    ]
+   },
+   "levels": [
+    {
+     "id": "woods-1",
+     "title": "Bubble Glade",
+     "mode": "wordBlaster",
+     "skills": [
+      "starterWords"
+     ],
+     "count": 6,
+     "intro": [
+      "o:Look, Mosey! Word bubbles are stuck in the trees.",
+      "m:Fill in the missing letters and they will pop!",
+      "o:Popping things is my favourite subject."
+     ],
+     "outro": [
+      "m:Look! The flowers are waking up.",
+      "o:Our answers bring the colour back!"
+     ],
+     "reward": "pet-firefly",
+     "blurb": "Pop the word bubbles"
+    },
+    {
+     "id": "woods-2",
+     "title": "Mushroom Canyon",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "starterWords",
+      "exceptionWords"
+     ],
+     "count": 6,
+     "intro": [
+      "o:Uh oh. The bridge has vanished!",
+      "m:Each right answer builds a rainbow plank.",
+      "o:Then I shall walk on rainbows. Naturally."
+     ],
+     "outro": [
+      "o:I crossed a rainbow! My feet feel fizzy."
+     ],
+     "reward": "deco-mushroom",
+     "blurb": "Build a rainbow bridge"
+    },
+    {
+     "id": "woods-3",
+     "title": "River Dash",
+     "mode": "typingTurbo",
+     "skills": [
+      "typing"
+     ],
+     "count": 5,
+     "intro": [
+      "m:Hop on, Otter. The river is the fastest way.",
+      "o:Type the words to make us zoom!",
+      "m:Hold on to my frills. Gently!"
+     ],
+     "outro": [
+      "o:Again! Again!",
+      "m:Maybe after a snack."
+     ],
+     "reward": "pet-squirrel",
+     "blurb": "Type to zoom down the river"
+    },
+    {
+     "id": "woods-4",
+     "title": "Firefly Hollow",
+     "mode": "wordBlaster",
+     "skills": [
+      "exceptionWords",
+      "prefixes"
+     ],
+     "count": 8,
+     "intro": [
+      "m:The fireflies have lost their glow.",
+      "o:Tricky words ahead. I love tricky words!",
+      "m:You love ALL words."
+     ],
+     "outro": [
+      "o:Every firefly is glowing again!"
+     ],
+     "reward": "hat-leaf",
+     "blurb": "Light up the fireflies"
+    },
+    {
+     "id": "woods-5",
+     "title": "Old Grumblebark",
+     "mode": "guardian",
+     "skills": [
+      "exceptionWords",
+      "starterWords",
+      "prefixes"
+     ],
+     "count": 9,
+     "intro": [
+      "g:WHO is making all that cheerful noise in MY woods?",
+      "o:Hello, Mr Tree! We are looking for a crystal fragment.",
+      "g:Bah! Spell my word muddles first. If you can!"
+     ],
+     "outro": [
+      "m:One fragment found. Five to go!",
+      "o:The whole wood is green again!"
+     ],
+     "reward": null,
+     "blurb": "Cheer up the grumpy tree"
+    }
+   ]
+  },
+  {
+   "id": "bay",
+   "name": "Bubble Bay",
+   "tagline": "Treasure under the waves",
+   "focus": "Addition and subtraction",
+   "colour": "#29B6E8",
+   "guardian": {
+    "name": "Inky",
+    "kind": "octopus",
+    "phases": [
+     "g:Eight arms… or is it nine? I have lost count of EVERYTHING!",
+     "g:Wait, that helps! But now my sums are all in a knot.",
+     "g:Nearly untangled! Do I add this arm or take it away?"
+    ],
+    "befriended": [
+     "g:Eight! I have EIGHT arms! Thank you, clever friends!",
+     "g:Here, I was sitting on this shiny thing.",
+     "m:That is the crystal fragment! Good sitting, Inky."
+    ]
+   },
+   "levels": [
+    {
+     "id": "bay-1",
+     "title": "Coral Tunnels",
+     "mode": "mathsSplash",
+     "skills": [
+      "addition"
+     ],
+     "count": 6,
+     "intro": [
+      "m:Welcome to my favourite place. Maths under the sea!",
+      "o:Which tunnel do we take?",
+      "m:The one with the right answer. Follow me!"
+     ],
+     "outro": [
+      "o:You swim so fast when you are right!",
+      "m:Maths makes me zoomy."
+     ],
+     "reward": "pet-turtle",
+     "blurb": "Swim through the right tunnel"
+    },
+    {
+     "id": "bay-2",
+     "title": "Pearl Bridge",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "subtraction",
+      "addition"
+     ],
+     "count": 6,
+     "intro": [
+      "o:A canyon. Under the sea. How?",
+      "m:Do not ask how. Ask how many!",
+      "o:Fine. Rainbow bridge time."
+     ],
+     "outro": [
+      "m:A rainbow under water. Now I have seen everything."
+     ],
+     "reward": "deco-fountain",
+     "blurb": "Bridge the sea canyon"
+    },
+    {
+     "id": "bay-3",
+     "title": "Sunken Treasure",
+     "mode": "eggRescue",
+     "skills": [
+      "addition",
+      "subtraction"
+     ],
+     "count": 6,
+     "intro": [
+      "o:Treasure chests! But they are locked.",
+      "m:Type the answer to pop each lock.",
+      "o:I hope one is full of fish biscuits."
+     ],
+     "outro": [
+      "o:No fish biscuits. But look at all these new friends!"
+     ],
+     "reward": "pet-crab",
+     "blurb": "Unlock the treasure chests"
+    },
+    {
+     "id": "bay-4",
+     "title": "Shipwreck Sprint",
+     "mode": "mathsSplash",
+     "skills": [
+      "subtraction",
+      "addition",
+      "placeValue"
+     ],
+     "count": 8,
+     "intro": [
+      "m:The old shipwreck! Stay close, Otter.",
+      "o:I am not scared. You are scared.",
+      "m:I am a mosasaur. I am never scared."
+     ],
+     "outro": [
+      "o:We made it! Was that a ghost?",
+      "m:That was a jellyfish in a hat."
+     ],
+     "reward": "hat-pirate",
+     "blurb": "Race past the shipwreck"
+    },
+    {
+     "id": "bay-5",
+     "title": "Inky the Octopus",
+     "mode": "guardian",
+     "skills": [
+      "addition",
+      "subtraction"
+     ],
+     "count": 9,
+     "intro": [
+      "g:Oh dear, oh dear. Is that two visitors or twelve?",
+      "m:Just two, Inky. Are you feeling muddled?",
+      "g:Terribly! Help me sort my sums out!"
+     ],
+     "outro": [
+      "o:Two fragments! We make a brilliant team.",
+      "m:The reef is glowing again!"
+     ],
+     "reward": null,
+     "blurb": "Untangle the octopus"
+    }
+   ]
+  },
+  {
+   "id": "dragon",
+   "name": "Dragonfire Mountain",
+   "tagline": "Hot rocks and hatching eggs",
+   "focus": "Times tables",
+   "colour": "#F2683C",
+   "guardian": {
+    "name": "Sir Scorch",
+    "kind": "dragon",
+    "phases": [
+     "g:Behold my mighty fl… is something burning?",
+     "g:It is my TROUSERS! Again! Quick, distract me with times tables!",
+     "g:Still a bit toasty back there. One more round!"
+    ],
+    "befriended": [
+     "m:Hold still, Sir Scorch. One splash coming up!",
+     "g:Ahhh. Thank you. These were my best trousers.",
+     "g:Take the fragment. It was making my pocket itchy."
+    ]
+   },
+   "levels": [
+    {
+     "id": "dragon-1",
+     "title": "Dragon Egg Rescue",
+     "mode": "eggRescue",
+     "skills": [
+      "multiplication"
+     ],
+     "count": 6,
+     "intro": [
+      "o:Dragon eggs! They are getting cold.",
+      "m:Type the answer to hatch each one.",
+      "o:Come out, little dragons!"
+     ],
+     "outro": [
+      "o:They think I am their mum.",
+      "m:You do have the right hair."
+     ],
+     "reward": "pet-ember",
+     "blurb": "Hatch the baby dragons"
+    },
+    {
+     "id": "dragon-2",
+     "title": "Hot Spring Rapids",
+     "mode": "mathsSplash",
+     "skills": [
+      "multiplication"
+     ],
+     "count": 6,
+     "intro": [
+      "m:A warm river. Lovely for my flippers.",
+      "o:Times tables tunnels ahead!",
+      "m:Count in jumps if you get stuck."
+     ],
+     "outro": [
+      "m:That was like a bubbly bath. With maths."
+     ],
+     "reward": "deco-lantern",
+     "blurb": "Swim the warm rapids"
+    },
+    {
+     "id": "dragon-3",
+     "title": "Lava Bridge",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "multiplication",
+      "sequences"
+     ],
+     "count": 7,
+     "intro": [
+      "o:That lava looks very… lava-y.",
+      "m:Then let us not fall in. Bridge time!",
+      "o:Rainbow planks, do your thing."
+     ],
+     "outro": [
+      "o:My tail did not get toasted. Success!"
+     ],
+     "reward": "pet-cinder",
+     "blurb": "Cross the lava safely"
+    },
+    {
+     "id": "dragon-4",
+     "title": "Crystal Cave Nest",
+     "mode": "eggRescue",
+     "skills": [
+      "multiplication",
+      "sequences"
+     ],
+     "count": 8,
+     "intro": [
+      "m:More eggs, deep in the crystal cave.",
+      "o:These ones are trickier.",
+      "m:Good. Tricky makes us clever."
+     ],
+     "outro": [
+      "o:So many dragons. I need more arms for cuddles."
+     ],
+     "reward": "hat-crown",
+     "blurb": "Rescue the cave dragons"
+    },
+    {
+     "id": "dragon-5",
+     "title": "Sir Scorch",
+     "mode": "guardian",
+     "skills": [
+      "multiplication"
+     ],
+     "count": 9,
+     "intro": [
+      "g:Halt! I am Sir Scorch, the fearsome… ouch. Warm.",
+      "o:Excuse me. Your trousers are on fire.",
+      "g:Nonsense! Dragons do not… oh. OH! Not again!"
+     ],
+     "outro": [
+      "m:Three fragments. Halfway there!",
+      "o:And nobody got toasted."
+     ],
+     "reward": null,
+     "blurb": "Cool down the silly dragon"
+    }
+   ]
+  },
+  {
+   "id": "cloud",
+   "name": "Cloud Castle",
+   "tagline": "Type your way through the sky",
+   "focus": "Typing and sentences",
+   "colour": "#8FA8FF",
+   "guardian": {
+    "name": "Nimbus",
+    "kind": "wizard",
+    "phases": [
+     "g:Tee hee! I jumbled all the words in the sky!",
+     "g:Hey! Stop fixing things! Take THAT word muddle!",
+     "g:My best spell! Nobody can… oh. You can."
+    ],
+    "befriended": [
+     "g:All right, all right. You win. That was fun!",
+     "g:Nobody ever plays with me up here.",
+     "o:Then come and play with us! After you hand over the fragment."
+    ]
+   },
+   "levels": [
+    {
+     "id": "cloud-1",
+     "title": "Sky Sprint",
+     "mode": "typingTurbo",
+     "skills": [
+      "typing"
+     ],
+     "count": 5,
+     "intro": [
+      "o:We are flying! On a cloud! Mosey, you are flying!",
+      "m:I am a sky mosasaur now. Type to keep us going!"
+     ],
+     "outro": [
+      "m:Flying is just swimming with extra air."
+     ],
+     "reward": "pet-owl",
+     "blurb": "Type to soar"
+    },
+    {
+     "id": "cloud-2",
+     "title": "Cloud Bubbles",
+     "mode": "wordBlaster",
+     "skills": [
+      "suffixes"
+     ],
+     "count": 7,
+     "intro": [
+      "o:Word bubbles, all the way up here!",
+      "m:These words have special endings.",
+      "o:Endings are my second favourite. After beginnings."
+     ],
+     "outro": [
+      "o:Pop, pop, pop. The sky is turning blue again!"
+     ],
+     "reward": "deco-kite",
+     "blurb": "Pop the sky bubbles"
+    },
+    {
+     "id": "cloud-3",
+     "title": "Cloud Steps",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "homophones",
+      "suffixes"
+     ],
+     "count": 7,
+     "intro": [
+      "m:Some words sound the same but mean different things.",
+      "o:Like 'sea' and 'see'!",
+      "m:Pick the right one to build each cloud step."
+     ],
+     "outro": [
+      "o:I can SEE the SEA from here. Ha!"
+     ],
+     "reward": "pet-butterfly",
+     "blurb": "Build steps to the castle"
+    },
+    {
+     "id": "cloud-4",
+     "title": "Portal Race",
+     "mode": "typingTurbo",
+     "skills": [
+      "typing"
+     ],
+     "count": 6,
+     "intro": [
+      "m:The castle portal is opening!",
+      "o:Fast fingers, careful fingers!",
+      "m:Careful first. Fast comes later."
+     ],
+     "outro": [
+      "o:We made it through! My whiskers are tingling."
+     ],
+     "reward": "hat-wizard",
+     "blurb": "Race to the portal"
+    },
+    {
+     "id": "cloud-5",
+     "title": "Nimbus the Cloud Wizard",
+     "mode": "guardian",
+     "skills": [
+      "suffixes",
+      "prefixes",
+      "homophones"
+     ],
+     "count": 9,
+     "intro": [
+      "g:Ooh, visitors! Want to see a trick?",
+      "o:Is it a nice trick?",
+      "g:Nope! It is a WORD MUDDLE! Tee hee!"
+     ],
+     "outro": [
+      "m:Four fragments. The sky is clear!",
+      "o:And we made a new friend."
+     ],
+     "reward": null,
+     "blurb": "Out-spell the cheeky wizard"
+    }
+   ]
+  },
+  {
+   "id": "candy",
+   "name": "Candy Kingdom",
+   "tagline": "Share and share alike",
+   "focus": "Division and fractions",
+   "colour": "#FF7EB6",
+   "guardian": {
+    "name": "Puff",
+    "kind": "marshmallow",
+    "phases": [
+     "g:MINE! All the sweets are MINE! …How many is that?",
+     "g:Sharing? What is sharing? Show Puff!",
+     "g:Half for you, half for me… Puff is getting it!"
+    ],
+    "befriended": [
+     "g:Sharing makes the sweets taste BETTER!",
+     "g:Puff shares the shiny thing too.",
+     "m:The fragment! Thank you, Puff. Fair shares all round."
+    ]
+   },
+   "levels": [
+    {
+     "id": "candy-1",
+     "title": "Sweet Shop Jars",
+     "mode": "eggRescue",
+     "skills": [
+      "division"
+     ],
+     "count": 6,
+     "intro": [
+      "o:Everything here is made of SWEETS.",
+      "m:Do not lick the scenery, Otter.",
+      "o:Too late. Let us open these jars by sharing equally!"
+     ],
+     "outro": [
+      "o:Fair shares for everyone. Mostly me."
+     ],
+     "reward": "pet-bunny",
+     "blurb": "Share out the sweets"
+    },
+    {
+     "id": "candy-2",
+     "title": "Chocolate River",
+     "mode": "mathsSplash",
+     "skills": [
+      "fractions"
+     ],
+     "count": 6,
+     "intro": [
+      "m:A chocolate river. I may never leave.",
+      "o:Fraction tunnels ahead!",
+      "m:Half of a thing is that thing shared by two."
+     ],
+     "outro": [
+      "m:I am now one quarter chocolate."
+     ],
+     "reward": "deco-carousel",
+     "blurb": "Swim the chocolate river"
+    },
+    {
+     "id": "candy-3",
+     "title": "Biscuit Bridge",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "wordProblems",
+      "division"
+     ],
+     "count": 6,
+     "intro": [
+      "o:The biscuit bridge got nibbled.",
+      "m:Somebody had a midnight snack.",
+      "o:It was not me. This time."
+     ],
+     "outro": [
+      "o:A rainbow biscuit bridge. Can I keep it?"
+     ],
+     "reward": "pet-bee",
+     "blurb": "Mend the nibbled bridge"
+    },
+    {
+     "id": "candy-4",
+     "title": "Fudge Falls",
+     "mode": "mathsSplash",
+     "skills": [
+      "division",
+      "fractions"
+     ],
+     "count": 8,
+     "intro": [
+      "m:Hold your nose. We are going under the fudge falls.",
+      "o:Best. Waterfall. Ever."
+     ],
+     "outro": [
+      "o:I have fudge in my ears.",
+      "m:Save some for later."
+     ],
+     "reward": "hat-bow",
+     "blurb": "Dive through Fudge Falls"
+    },
+    {
+     "id": "candy-5",
+     "title": "Puff the Marshmallow",
+     "mode": "guardian",
+     "skills": [
+      "division",
+      "fractions",
+      "wordProblems"
+     ],
+     "count": 9,
+     "intro": [
+      "g:PUFF is the biggest! Puff keeps ALL the sweets!",
+      "m:That does not sound very fair, Puff.",
+      "g:Fair? Puff does not know how to share!"
+     ],
+     "outro": [
+      "o:Five fragments! Only one left.",
+      "m:And it is on Starlight Island."
+     ],
+     "reward": null,
+     "blurb": "Teach Puff to share"
+    }
+   ]
+  },
+  {
+   "id": "star",
+   "name": "Starlight Island",
+   "tagline": "The last fragment",
+   "focus": "Everything you have learned",
+   "colour": "#9B6BFF",
+   "guardian": {
+    "name": "Umbra",
+    "kind": "shadow",
+    "phases": [
+     "g:Go away. Shadows do not have friends.",
+     "g:Why are you being kind to me? It makes me feel… warm.",
+     "g:If the crystal comes back… will I disappear?"
+    ],
+    "befriended": [
+     "m:You will not disappear, Umbra. Shadows need the light.",
+     "o:And friends need friends. Come with us!",
+     "g:I… I would like that. Here. I kept it safe for you."
+    ]
+   },
+   "levels": [
+    {
+     "id": "star-1",
+     "title": "Star Bubbles",
+     "mode": "wordBlaster",
+     "skills": [
+      "exceptionWords",
+      "prefixes",
+      "suffixes"
+     ],
+     "count": 8,
+     "intro": [
+      "o:The stars have gone dim.",
+      "m:Every word we spell lights one up.",
+      "o:Then let us light the whole sky!"
+     ],
+     "outro": [
+      "m:Look at them twinkle."
+     ],
+     "reward": "pet-comet",
+     "blurb": "Light up the stars"
+    },
+    {
+     "id": "star-2",
+     "title": "Comet Chase",
+     "mode": "mathsSplash",
+     "skills": [
+      "multiplication",
+      "division",
+      "addition",
+      "subtraction"
+     ],
+     "count": 8,
+     "intro": [
+      "m:We can swim through stardust up here!",
+      "o:Is it sticky?",
+      "m:Only a little. Tunnels ahead!"
+     ],
+     "outro": [
+      "o:I have stardust in my scarf. Fancy."
+     ],
+     "reward": "deco-rainbow",
+     "blurb": "Swim through the stardust"
+    },
+    {
+     "id": "star-3",
+     "title": "Rocket Words",
+     "mode": "typingTurbo",
+     "skills": [
+      "typing"
+     ],
+     "count": 6,
+     "intro": [
+      "o:To the last portal!",
+      "m:Type carefully and we will fly straight."
+     ],
+     "outro": [
+      "m:That was our best flying yet."
+     ],
+     "reward": "pet-moonmoth",
+     "blurb": "Type across the galaxy"
+    },
+    {
+     "id": "star-4",
+     "title": "Constellation Bridge",
+     "mode": "bridgeBuilder",
+     "skills": [
+      "placeValue",
+      "fractions",
+      "homophones"
+     ],
+     "count": 8,
+     "intro": [
+      "o:One last bridge, made of stars.",
+      "m:Words and numbers together this time.",
+      "o:Our two favourite things!"
+     ],
+     "outro": [
+      "o:We built a bridge out of STARS, Mosey."
+     ],
+     "reward": "hat-shades",
+     "blurb": "Join up the stars"
+    },
+    {
+     "id": "star-5",
+     "title": "Umbra the Shadow",
+     "mode": "guardian",
+     "skills": [
+      "exceptionWords",
+      "multiplication",
+      "addition",
+      "homophones",
+      "division"
+     ],
+     "count": 9,
+     "intro": [
+      "g:You came all this way for a crystal?",
+      "o:And to find out who broke it.",
+      "g:I did not mean to. I only wanted to hold something bright."
+     ],
+     "outro": [
+      "n:The six fragments joined together, and colour rushed across every island.",
+      "o:We did it, Mosey!",
+      "m:We did it together. That is the real magic."
+     ],
+     "reward": null,
+     "blurb": "Befriend the lonely shadow"
+    }
+   ]
+  }
+ ],
+ "rewards": [
+  {
+   "id": "pet-firefly",
+   "kind": "pet",
+   "name": "Flicker the firefly",
+   "emoji": "✨"
+  },
+  {
+   "id": "pet-squirrel",
+   "kind": "pet",
+   "name": "Nutmeg the squirrel",
+   "emoji": "🐿️"
+  },
+  {
+   "id": "hat-leaf",
+   "kind": "accessory",
+   "name": "Leafy explorer hat",
+   "emoji": "🍃"
+  },
+  {
+   "id": "deco-mushroom",
+   "kind": "decoration",
+   "name": "Glow mushroom",
+   "emoji": "🍄"
+  },
+  {
+   "id": "pet-turtle",
+   "kind": "pet",
+   "name": "Shelly the turtle",
+   "emoji": "🐢"
+  },
+  {
+   "id": "pet-crab",
+   "kind": "pet",
+   "name": "Pinchy the crab",
+   "emoji": "🦀"
+  },
+  {
+   "id": "hat-pirate",
+   "kind": "accessory",
+   "name": "Captain's hat",
+   "emoji": "🏴‍☠️"
+  },
+  {
+   "id": "deco-fountain",
+   "kind": "decoration",
+   "name": "Pearl fountain",
+   "emoji": "⛲"
+  },
+  {
+   "id": "pet-ember",
+   "kind": "pet",
+   "name": "Ember the baby dragon",
+   "emoji": "🐲"
+  },
+  {
+   "id": "pet-cinder",
+   "kind": "pet",
+   "name": "Cinder the lizard",
+   "emoji": "🦎"
+  },
+  {
+   "id": "hat-crown",
+   "kind": "accessory",
+   "name": "Golden crown",
+   "emoji": "👑"
+  },
+  {
+   "id": "deco-lantern",
+   "kind": "decoration",
+   "name": "Lava lantern",
+   "emoji": "🏮"
+  },
+  {
+   "id": "pet-owl",
+   "kind": "pet",
+   "name": "Hoot the cloud owl",
+   "emoji": "🦉"
+  },
+  {
+   "id": "pet-butterfly",
+   "kind": "pet",
+   "name": "Breeze the butterfly",
+   "emoji": "🦋"
+  },
+  {
+   "id": "hat-wizard",
+   "kind": "accessory",
+   "name": "Wizard's top hat",
+   "emoji": "🎩"
+  },
+  {
+   "id": "deco-kite",
+   "kind": "decoration",
+   "name": "Rainbow kite",
+   "emoji": "🪁"
+  },
+  {
+   "id": "pet-bunny",
+   "kind": "pet",
+   "name": "Toffee the bunny",
+   "emoji": "🐰"
+  },
+  {
+   "id": "pet-bee",
+   "kind": "pet",
+   "name": "Sherbet the bee",
+   "emoji": "🐝"
+  },
+  {
+   "id": "hat-bow",
+   "kind": "accessory",
+   "name": "Candy bow",
+   "emoji": "🎀"
+  },
+  {
+   "id": "deco-carousel",
+   "kind": "decoration",
+   "name": "Candy carousel",
+   "emoji": "🎠"
+  },
+  {
+   "id": "pet-comet",
+   "kind": "pet",
+   "name": "Comet the star pup",
+   "emoji": "🐶"
+  },
+  {
+   "id": "pet-moonmoth",
+   "kind": "pet",
+   "name": "Luna the moon moth",
+   "emoji": "🌙"
+  },
+  {
+   "id": "hat-shades",
+   "kind": "accessory",
+   "name": "Star shades",
+   "emoji": "🕶️"
+  },
+  {
+   "id": "deco-rainbow",
+   "kind": "decoration",
+   "name": "Rainbow arch",
+   "emoji": "🌈"
+  },
+  {
+   "id": "deco-palm",
+   "kind": "decoration",
+   "name": "Palm tree",
+   "emoji": "🌴"
+  },
+  {
+   "id": "deco-flowers",
+   "kind": "decoration",
+   "name": "Flower patch",
+   "emoji": "🌸"
+  },
+  {
+   "id": "deco-castle",
+   "kind": "decoration",
+   "name": "Sandcastle",
+   "emoji": "🏰"
+  },
+  {
+   "id": "deco-tent",
+   "kind": "decoration",
+   "name": "Party tent",
+   "emoji": "🎪"
+  }
+ ],
+ "intro": [
+  "n:One sunny morning on Rainbow Island…",
+  "o:Mosey! I spelled 'breakfast' in the sand. Now I am hungry.",
+  "m:You are always hungry. That is three breakfasts today.",
+  "o:Three is a very good number.",
+  "n:Suddenly, the Great Rainbow Crystal began to shake…",
+  "n:CRACK! It shattered into six fragments and flew across the sea!",
+  "m:Otter… the colours are fading!",
+  "o:The flowers have gone grey. We have to fix this!",
+  "m:Look, a word bubble by that flower. Try the missing letter!"
+ ],
+ "introAfter": [
+  "o:It bloomed! The colour came back!",
+  "m:So our answers bring the world back to life.",
+  "o:Six islands. Six fragments. One snack break. Let us go!"
+ ]
+}

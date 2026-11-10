@@ -1,0 +1,39 @@
+# level|text (lowercase letters and spaces only)
+1|otter can swim
+1|mosey is blue
+1|i see a star
+1|the sun is hot
+1|we can jump
+1|a fish can swim
+1|i like the sea
+1|fun in the sun
+2|otter loves to play
+2|mosey swims very fast
+2|the frog sat on a log
+2|we found a red shell
+2|the moon is bright
+2|a crab ran away
+2|the dragon is my friend
+2|clouds float in the sky
+3|otter and mosey are best friends
+3|the dragon has a silly hat
+3|we sailed to a magic island
+3|the wizard lost his wand again
+3|rainbows make the world bright
+3|the octopus has eight wiggly arms
+3|fireflies glow in the dark woods
+3|a treasure chest sat on the sand
+4|the brave otter crossed the rainbow bridge
+4|mosey counted every pearl in the bay
+4|the grumpy tree told a funny joke
+4|we believe in the power of friendship
+4|the cloud wizard sneezed and it rained sweets
+4|a baby dragon popped out of the egg
+4|the crystal began to sparkle and glow
+4|kind words can colour the whole world
+5|although it was difficult the friends never gave up
+5|the marshmallow monster bounced through the candy forest
+5|a peculiar creature appeared from the starlight portal
+5|together they restored the beautiful rainbow crystal
+5|the lonely shadow finally found some friends
+5|every question we answer brings the colour back

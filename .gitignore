@@ -1,0 +1,12 @@
+.DS_Store
+build/
+DerivedData/
+.build/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+tools/.art-ledger.json
+tools/reference/
+tools/raw/
+.env
+__pycache__/

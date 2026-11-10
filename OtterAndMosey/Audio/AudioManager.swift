@@ -1,0 +1,158 @@
+import AVFoundation
+import CoreHaptics
+import LostIslandsCore
+import UIKit
+
+/// Every sound effect in the game. Raw values are file names in Resources/Audio.
+enum SFX: String, CaseIterable {
+    case tap, nav, correct, combo, wrong, pop, crystal, star, jump, swim, crack, chirp
+    case portal, guardian, friendship, levelComplete, unlock, victory, key, whoosh, plank
+}
+
+/// Plays music and effects. Uses the ambient audio session, so the ring/silent switch
+/// mutes the game and other apps' audio keeps playing.
+final class AudioManager {
+    static let shared = AudioManager()
+
+    private var pools: [SFX: [AVAudioPlayer]] = [:]
+    private var music: AVAudioPlayer?
+    private var currentTrack: String?
+    private var settings = AppSettings()
+
+    private init() {
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { note in
+            let ended = (note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt) == AVAudioSession.InterruptionType.ended.rawValue
+            Task { @MainActor in AudioManager.shared.interruption(ended: ended) }
+        }
+    }
+
+    private func interruption(ended: Bool) {
+        if ended {
+            try? AVAudioSession.sharedInstance().setActive(true)
+            if !settings.muted { music?.play() }
+        } else {
+            music?.pause()
+        }
+    }
+
+    func apply(_ settings: AppSettings) {
+        self.settings = settings
+        music?.volume = musicVolume
+        if settings.muted { music?.pause() } else if music?.isPlaying == false { music?.play() }
+    }
+
+    private var musicVolume: Float { settings.muted ? 0 : Float(settings.musicVolume) * 0.55 }
+    private var effectsVolume: Float { settings.muted ? 0 : Float(settings.effectsVolume) }
+
+    private static func url(_ name: String) -> URL? {
+        for ext in ["m4a", "wav", "mp3", "caf"] {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) { return url }
+        }
+        return nil
+    }
+
+    func play(_ effect: SFX, volume: Float = 1) {
+        guard effectsVolume > 0 else { return }
+        var pool = pools[effect] ?? []
+        var player = pool.first { !$0.isPlaying }
+        if player == nil, pool.count < 4, let url = Self.url(effect.rawValue), let made = try? AVAudioPlayer(contentsOf: url) {
+            made.prepareToPlay()
+            pool.append(made)
+            pools[effect] = pool
+            player = made
+        }
+        guard let player else { return }
+        player.volume = effectsVolume * volume
+        player.currentTime = 0
+        player.play()
+    }
+
+    /// Cross-fades to a looping music track. Passing the current track does nothing.
+    func playMusic(_ track: String) {
+        guard track != currentTrack else { return }
+        currentTrack = track
+        let old = music
+        old?.setVolume(0, fadeDuration: 0.6)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { old?.stop() }
+        guard let url = Self.url(track), let player = try? AVAudioPlayer(contentsOf: url) else {
+            music = nil
+            return
+        }
+        player.numberOfLoops = -1
+        player.volume = 0
+        player.prepareToPlay()
+        if !settings.muted { player.play() }
+        player.setVolume(musicVolume, fadeDuration: 0.8)
+        music = player
+    }
+
+    func pauseForBackground() { music?.pause() }
+
+    func resumeFromBackground() {
+        if !settings.muted { music?.play() }
+    }
+}
+
+/// Reads words and questions aloud with the system voice. Works offline.
+final class Narrator {
+    static let shared = Narrator()
+    private let synthesizer = AVSpeechSynthesizer()
+    private let voice = AVSpeechSynthesisVoice(language: "en-GB")
+    var volume: Float = 0.9
+
+    func speak(_ text: String) {
+        guard volume > 0, !text.isEmpty else { return }
+        synthesizer.stopSpeaking(at: .immediate)
+        let utterance = AVSpeechUtterance(string: text.replacingOccurrences(of: "___", with: "blank"))
+        utterance.voice = voice
+        utterance.rate = 0.42
+        utterance.pitchMultiplier = 1.1
+        utterance.volume = volume
+        synthesizer.speak(utterance)
+    }
+
+    func stop() { synthesizer.stopSpeaking(at: .immediate) }
+}
+
+/// Light, optional touch feedback. Nothing in the game depends on it.
+final class Haptics {
+    static let shared = Haptics()
+    var enabled = true
+    private var engine: CHHapticEngine?
+    private let light = UIImpactFeedbackGenerator(style: .light)
+    private let soft = UIImpactFeedbackGenerator(style: .soft)
+    private let notify = UINotificationFeedbackGenerator()
+
+    private init() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        engine = try? CHHapticEngine()
+        engine?.isAutoShutdownEnabled = true
+    }
+
+    func tap() { if enabled { light.impactOccurred() } }
+    func nudge() { if enabled { soft.impactOccurred(intensity: 0.7) } }
+    func success() { if enabled { notify.notificationOccurred(.success) } }
+
+    /// A rising rumble for Friendship Power and big finales.
+    func crescendo() {
+        guard enabled, let engine else { return }
+        var events: [CHHapticEvent] = []
+        for step in 0..<8 {
+            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25 + Float(step) * 0.09)
+            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3 + Float(step) * 0.07)
+            events.append(CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: Double(step) * 0.09))
+        }
+        events.append(CHHapticEvent(eventType: .hapticContinuous, parameters: [
+            CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+            CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4),
+        ], relativeTime: 0.75, duration: 0.35))
+        do {
+            try engine.start()
+            try engine.makePlayer(with: CHHapticPattern(events: events, parameters: [])).start(atTime: CHHapticTimeImmediate)
+        } catch {
+            // Haptics are a nicety; ignore failures.
+        }
+    }
+}

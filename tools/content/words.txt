@@ -1,0 +1,264 @@
+# word|topic|level|sentence with ___|homophone partner (optional)
+# topics: st=starter, ex=exception, pre=prefix, suf=suffix, hom=homophone
+sun|st|1|The ___ is hot and bright.
+tree|st|1|A bird sat in the ___.
+fish|st|1|A ___ swims in the sea.
+frog|st|1|The green ___ can hop.
+star|st|1|I saw a ___ in the night sky.
+boat|st|1|We sail in a ___.
+moon|st|1|The ___ glows at night.
+sand|st|1|We dig in the ___.
+shell|st|1|I found a ___ on the beach.
+leaf|st|1|A ___ fell from the tree.
+rain|st|1|The ___ makes puddles.
+wave|st|1|A big ___ splashed us.
+bird|st|1|The ___ can sing.
+jump|st|1|Otter can ___ very high.
+swim|st|1|Mosey loves to ___.
+play|st|1|Let us ___ a game.
+ship|st|1|The ___ has a tall mast.
+crab|st|1|A ___ walks sideways.
+nest|st|1|The eggs are in the ___.
+pond|st|1|Ducks swim on the ___.
+cloud|st|1|A fluffy ___ floats by.
+green|st|1|The grass is ___.
+happy|st|1|Otter feels ___ today.
+water|st|2|Fish live in ___.
+because|ex|2|I wear a coat ___ it is cold.
+people|ex|2|Lots of ___ came to the party.
+friend|ex|2|Mosey is my best ___.
+again|ex|2|Please sing it ___.
+could|ex|2|I ___ swim when I was five.
+would|ex|2|___ you like some cake?
+should|ex|2|We ___ brush our teeth.
+every|ex|2|I read ___ day.
+great|ex|2|We had a ___ time.
+beautiful|ex|3|The rainbow looks ___.
+early|ex|2|I woke up ___ this morning.
+earth|ex|2|We all live on planet ___.
+fruit|ex|2|An apple is a ___.
+heard|ex|2|I ___ a loud bang.
+learn|ex|2|We ___ new things at school.
+often|ex|2|I ___ play outside.
+group|ex|2|We work in a ___.
+guide|ex|3|The ___ showed us the way.
+heart|ex|2|My ___ beats fast when I run.
+woman|ex|2|The ___ waved at us.
+build|ex|2|Let us ___ a sandcastle.
+busy|ex|2|The bees are ___ today.
+eight|ex|2|A spider has ___ legs.
+answer|ex|2|I know the ___!
+appear|ex|3|Stars ___ at night.
+arrive|ex|3|We will ___ at noon.
+believe|ex|3|I ___ in magic.
+breath|ex|3|Take a deep ___.
+breathe|ex|3|Fish ___ under water.
+century|ex|3|A ___ is one hundred years.
+circle|ex|2|The moon is a ___ tonight.
+decide|ex|3|I cannot ___ which one to pick.
+describe|ex|3|Can you ___ the dragon?
+enough|ex|3|I have had ___ cake, thank you.
+famous|ex|3|The singer is very ___.
+favourite|ex|3|Blue is my ___ colour.
+island|ex|2|We sailed to the ___.
+minute|ex|3|Wait one ___, please.
+notice|ex|3|Did you ___ the tiny crab?
+perhaps|ex|3|___ it will snow tomorrow.
+popular|ex|3|Football is a ___ game.
+quarter|ex|3|I ate a ___ of the pizza.
+question|ex|3|May I ask a ___?
+recent|ex|3|This is a ___ photo.
+regular|ex|3|We have ___ swimming lessons.
+remember|ex|3|I ___ my first day at school.
+sentence|ex|3|Write a ___ about otters.
+special|ex|3|Today is a ___ day.
+straight|ex|4|Draw a ___ line.
+strange|ex|3|I heard a ___ noise.
+strength|ex|4|It takes ___ to lift a rock.
+surprise|ex|3|The party was a ___.
+thought|ex|3|I ___ I saw a dragon.
+through|ex|3|We walked ___ the woods.
+various|ex|4|The shop sells ___ sweets.
+weight|ex|4|The ___ of the rock is huge.
+bicycle|ex|3|I ride my ___ to school.
+business|ex|4|She runs a small ___.
+calendar|ex|4|Mark the date on the ___.
+caught|ex|3|I ___ the ball.
+certain|ex|4|I am ___ that I locked the door.
+complete|ex|3|Please ___ the puzzle.
+consider|ex|4|Please ___ my idea.
+continue|ex|4|Let us ___ the story.
+different|ex|3|Each shell is ___.
+difficult|ex|4|That puzzle was ___.
+disappear|ex|4|The magician made the coin ___.
+exercise|ex|4|Swimming is good ___.
+experience|ex|5|The trip was a great ___.
+experiment|ex|5|We did a science ___.
+grammar|ex|4|We learn ___ in English lessons.
+history|ex|3|We learn about the past in ___.
+imagine|ex|3|Can you ___ a pink dragon?
+important|ex|4|It is ___ to be kind.
+interest|ex|4|I have an ___ in space.
+knowledge|ex|5|Books fill us with ___.
+library|ex|3|I borrow books from the ___.
+material|ex|4|Wool is a soft ___.
+medicine|ex|4|The doctor gave me some ___.
+naughty|ex|4|The ___ puppy chewed my shoe.
+occasion|ex|5|A birthday is a special ___.
+opposite|ex|4|Hot is the ___ of cold.
+ordinary|ex|4|It was just an ___ day.
+particular|ex|5|I want this ___ book.
+peculiar|ex|5|That fish looks very ___.
+position|ex|4|Get into ___ for the race.
+possible|ex|4|Is it ___ to fly to the moon?
+potatoes|ex|4|We had mashed ___ for tea.
+pressure|ex|4|Push with gentle ___.
+probably|ex|4|It will ___ rain later.
+promise|ex|3|I ___ to be careful.
+purpose|ex|4|I did not do it on ___.
+separate|ex|5|Put the shells in ___ piles.
+suppose|ex|4|I ___ we should go home.
+therefore|ex|5|It is raining, ___ we need coats.
+although|ex|4|___ it rained, we had fun.
+actual|ex|4|This is the ___ size of the egg.
+address|ex|3|Write your ___ on the letter.
+accident|ex|4|I dropped it by ___.
+height|ex|4|What is the ___ of the tower?
+length|ex|4|Measure the ___ of the rope.
+increase|ex|4|The waves ___ in the storm.
+mention|ex|4|Did I ___ my new pet?
+natural|ex|4|A cave is a ___ shelter.
+forward|ex|3|Take one step ___.
+february|ex|4|The month after January is ___.
+guard|ex|3|The dragon will ___ the gold.
+unhappy|pre|2|The lost puppy looked ___.
+unlock|pre|2|Use the key to ___ the chest.
+unkind|pre|2|It is ___ to tease.
+undo|pre|2|Can you ___ this knot?
+unfair|pre|2|Cheating is ___.
+untidy|pre|2|My bedroom is ___.
+unusual|pre|3|A blue otter would be ___.
+dislike|pre|3|I ___ soggy toast.
+disagree|pre|3|We ___ about the best game.
+disobey|pre|3|Do not ___ the rules.
+dishonest|pre|4|Telling lies is ___.
+misbehave|pre|3|Puppies sometimes ___.
+misspell|pre|4|Take care not to ___ the word.
+mislead|pre|4|A wrong map can ___ you.
+misplace|pre|4|I often ___ my hat.
+redo|pre|2|I will ___ my drawing.
+replay|pre|2|Let us ___ the game.
+rewrite|pre|3|Please ___ your sentence.
+return|pre|2|We will ___ before dark.
+refresh|pre|3|A cold drink will ___ you.
+reappear|pre|3|The sun will ___ soon.
+rebuild|pre|3|We must ___ the bridge.
+submarine|pre|3|A ___ travels under the sea.
+subway|pre|3|We crossed under the road in a ___.
+subheading|pre|4|Write a ___ for each part.
+supermarket|pre|3|We buy food at the ___.
+superstar|pre|3|The singer is a ___.
+superhero|pre|3|The ___ wore a red cape.
+anticlockwise|pre|5|Turn the dial ___.
+antiseptic|pre|5|Put ___ cream on the cut.
+autograph|pre|4|The star signed an ___.
+automatic|pre|4|The doors are ___.
+interact|pre|4|Dolphins ___ with each other.
+international|pre|5|The airport has ___ flights.
+impossible|pre|4|Nothing is ___ for best friends.
+invisible|pre|4|The wizard became ___.
+incorrect|pre|4|That answer was ___.
+irregular|pre|5|The rock had an ___ shape.
+immature|pre|5|A tadpole is an ___ frog.
+quickly|suf|2|Otter ran ___ to the river.
+slowly|suf|2|The snail moved ___.
+sadly|suf|2|___, the ice cream melted.
+gently|suf|3|Stroke the kitten ___.
+happily|suf|3|The children played ___.
+finally|suf|3|___, we reached the top.
+usually|suf|3|I ___ walk to school.
+completely|suf|4|The bridge was ___ broken.
+carefully|suf|3|Carry the eggs ___.
+bravely|suf|3|Otter ___ crossed the bridge.
+angrily|suf|4|The goose honked ___.
+basically|suf|5|A whale is ___ a huge swimmer.
+information|suf|4|The sign gives useful ___.
+sensation|suf|4|Tingling is a funny ___.
+preparation|suf|5|A feast needs lots of ___.
+celebration|suf|4|We had a big ___.
+adoration|suf|5|The puppy gazed up with ___.
+dangerous|suf|3|Lava is ___.
+poisonous|suf|4|Some berries are ___.
+mountainous|suf|5|The island is rocky and ___.
+enormous|suf|3|The octopus was ___.
+jealous|suf|4|Do not be ___ of your friend.
+curious|suf|4|Otter is a ___ animal.
+serious|suf|4|The owl looked very ___.
+courageous|suf|5|The ___ knight saved the day.
+obvious|suf|4|The answer was ___.
+hopping|suf|2|The rabbit is ___ away.
+running|suf|2|Otter is ___ fast.
+beginning|suf|4|Start at the ___ of the story.
+forgotten|suf|4|I have ___ my lunch.
+gardener|suf|3|The ___ planted roses.
+treasure|suf|3|The chest is full of ___.
+measure|suf|3|Use a ruler to ___ it.
+pleasure|suf|4|It is a ___ to meet you.
+creature|suf|3|A strange ___ lives in the cave.
+picture|suf|2|I drew a ___ of Mosey.
+adventure|suf|3|We are going on an ___.
+nature|suf|3|We love walking in ___.
+furniture|suf|4|Chairs and tables are ___.
+invention|suf|4|The wheel was a clever ___.
+action|suf|3|The film was full of ___.
+magician|suf|4|The ___ pulled out a rabbit.
+musician|suf|4|The ___ played a happy tune.
+expression|suf|4|She had a happy ___ on her face.
+discussion|suf|5|We had a ___ about pets.
+television|suf|4|We watched a film on ___.
+division|suf|4|Sharing equally is called ___.
+confusion|suf|4|The octopus stared in ___.
+decision|suf|4|Picking a pet is a big ___.
+hear|hom|2|I can ___ the waves.|here
+here|hom|2|Come over ___, Mosey!|hear
+sea|hom|2|Mosey swims in the ___.|see
+see|hom|2|I can ___ a rainbow.|sea
+one|hom|2|I have ___ nose.|won
+won|hom|2|Our team ___ the race.|one
+son|hom|2|The king has a ___ and a daughter.|sun
+knight|hom|3|The brave ___ rode a horse.|night
+night|hom|3|Owls hunt at ___.|knight
+bee|hom|2|A ___ makes honey.|be
+blew|hom|3|The wind ___ my hat off.|blue
+blue|hom|2|The sky is ___.|blew
+bear|hom|3|The ___ loves honey.|bare
+bare|hom|3|I walked on the sand with ___ feet.|bear
+grown|hom|3|The plant has ___ tall.|groan
+groan|hom|3|Bad jokes make me ___.|grown
+mane|hom|3|The lion has a golden ___.|main
+main|hom|3|The ___ door is at the front.|mane
+meat|hom|3|Lions eat ___.|meet
+meet|hom|3|Let us ___ at the park.|meat
+mist|hom|3|The hills were hidden by ___.|missed
+missed|hom|3|I ___ the bus this morning.|mist
+piece|hom|3|May I have a ___ of cake?|peace
+peace|hom|3|The dove is a sign of ___.|piece
+plane|hom|3|The ___ flew above the clouds.|plain
+plain|hom|3|I like ___ crisps best.|plane
+scene|hom|4|The last ___ of the play was funny.|seen
+seen|hom|3|Have you ___ my scarf?|scene
+weather|hom|3|The ___ is sunny today.|whether
+whether|hom|4|I wonder ___ it will snow.|weather
+berry|hom|3|The bird ate a red ___.|bury
+bury|hom|3|Dogs ___ their bones.|berry
+brake|hom|3|Squeeze the ___ to stop the bike.|break
+break|hom|3|Be careful not to ___ the egg.|brake
+fare|hom|4|We paid the bus ___.|fair
+fair|hom|3|We rode the big wheel at the ___.|fare
+heal|hom|3|The cut will soon ___.|heel
+heel|hom|3|I have a blister on my ___.|heal
+knot|hom|3|Tie a ___ in the rope.|not
+male|hom|4|A ___ lion has a mane.|mail
+mail|hom|3|The postman brings the ___.|male
+their|hom|3|The otters love ___ river.|there
+there|hom|3|Look over ___!|their

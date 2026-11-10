@@ -1,0 +1,139 @@
+# Otter & Mosey: The Lost Islands
+
+A native iOS and iPadOS adventure game for UK Year 3 children (ages 8–9) that teaches spelling,
+typing and maths. Otter (a mischievous brown otter) and Mosey (a friendly blue mosasaur) travel
+across six islands recovering the fragments of the Great Rainbow Crystal. Every right answer
+brings colour back to the world.
+
+Landscape only. iOS / iPadOS 26 or later. Fully offline: no accounts, adverts, purchases or
+network calls.
+
+## What is in the game
+
+- **Six islands, 30 levels**: Whispering Woods, Bubble Bay, Dragonfire Mountain, Cloud Castle,
+  Candy Kingdom and Starlight Island. Each has four levels and a guardian encounter.
+- **Six game modes**
+  - *Word Blaster*: type the missing letters to pop word bubbles (look-cover-write at higher levels).
+  - *Maths Splash*: Mosey swims through the tunnel with the right answer; drag to scoop pearls.
+  - *Rainbow Bridge*: drag the right answer into the gap to build a bridge plank by plank.
+  - *Number Rescue*: type the answer on a number pad to hatch eggs and open chests and jars.
+  - *Typing Turbo*: every correct key speeds the ride. Stars come from accuracy, never speed.
+  - *Guardian encounters*: right answers charge Friendship Power for a joint special move.
+- **Learning engine**: Year 3 maths generators (addition, subtraction, 2/3/4/5/8/10 times tables,
+  division, fractions, place value, sequences, word problems), a curated bank of 262 UK-spelling
+  words with context sentences, per-skill adaptive difficulty and spaced repetition of missed
+  words and number facts.
+- **Progression**: three-star ratings, crystals, pets, hats, stickers (achievements), a home
+  island to decorate, and multiple local player profiles.
+- **Parent area** behind a gate: playtime, accuracy per subject and skill, items being revisited,
+  difficulty, times tables, spelling topics, break reminders and accessibility.
+- **Accessibility**: calmer motion, high contrast, easy-read text, spoken questions, hints,
+  volume controls, no mandatory timers.
+
+## Build and run
+
+Requirements: macOS with Xcode 26 or later. No third-party dependencies.
+
+```bash
+open OtterAndMosey.xcodeproj
+```
+
+Choose the `OtterAndMosey` scheme and an iPhone or iPad simulator, then Run. From the command line:
+
+```bash
+xcodebuild -project OtterAndMosey.xcodeproj -scheme OtterAndMosey -destination 'platform=iOS Simulator,name=iPad (A16)' build
+```
+
+If several simulators share a name, pass `id=<UDID>` from `xcrun simctl list devices` instead.
+Bundle ID: `otter-and-mosey-and-the-lost-islands.dev.skynolimit`.
+
+## Tests
+
+```bash
+cd Packages/LostIslandsCore && swift test
+```
+
+45 tests cover question correctness, the word bank, adaptive difficulty, spaced repetition,
+sessions, progression and save files. They run on macOS in under a second.
+
+```bash
+xcodebuild -project OtterAndMosey.xcodeproj -scheme OtterAndMosey -destination 'platform=iOS Simulator,id=<UDID>' test
+```
+
+5 app tests check that all art and audio is bundled, that progress survives a relaunch and that
+every game mode builds a scene and asks a question.
+
+## Project layout
+
+| Path | What it holds |
+| --- | --- |
+| `Packages/LostIslandsCore` | Platform-neutral logic (Foundation only): questions, generators, learner model, sessions, progression, save data, and the JSON content. |
+| `OtterAndMosey/App` | App entry, navigation and the app model. |
+| `OtterAndMosey/Game` | SpriteKit: scenes, characters, effects, art loading. |
+| `OtterAndMosey/UI` | SwiftUI: menus, HUD, keyboards, dialogue, parent dashboard. |
+| `OtterAndMosey/Audio` | Audio, narration and haptics. |
+| `OtterAndMosey/Assets.xcassets`, `OtterAndMosey/Resources/Audio` | Bundled art and sound. |
+| `tools/` | Development-time content, art and audio pipelines. |
+
+### Porting to web and Android
+
+`LostIslandsCore` has no UIKit, SwiftUI or SpriteKit imports. The level catalogue, dialogue,
+word bank and typing sentences are plain JSON in
+`Packages/LostIslandsCore/Sources/LostIslandsCore/Resources`, so another client can read the same
+files. The rules that would need re-implementing (generators, adaptive level, spaced repetition,
+star thresholds, unlocks) are small, pure and covered by the tests, which double as a spec.
+Save files are versioned JSON.
+
+## Content pipeline
+
+Edit `tools/content/words.txt`, `sentences.txt` or `islands.py`, then:
+
+```bash
+python3 tools/build_content.py
+```
+
+This validates the content and regenerates the JSON, including `lookalikes.json`, the list of
+real words used to stop a wrong spelling choice from accidentally forming another word.
+
+## Art pipeline (development only)
+
+All art was generated with the OpenAI Images API (`gpt-image-2.5-flare` and
+`gpt-image-2.5-sunburst`) from the prompts in `tools/art_manifest.json`. The two heroes were
+drawn from photos of the family's plush toys; every later pose uses those references.
+
+```bash
+python3 tools/generate_art.py          # generate anything missing into tools/raw
+python3 tools/import_art.py            # optimise and package into Assets.xcassets
+```
+
+`generate_art.py` reads `OPENAI_API_KEY_CHATGPT_GRAPHICS` from the environment, passes it to curl
+on stdin, tracks spend in `tools/.art-ledger.json` and stops at `ART_BUDGET_USD` (default 13).
+`import_art.py` needs ImageMagick and pngquant (`brew install imagemagick pngquant`). The key is
+never used at runtime and nothing in the app talks to the network. `tools/raw` and
+`tools/reference` are git-ignored.
+
+## Audio
+
+`python3 tools/synth_audio.py` synthesises all 21 effects and 4 music loops from scratch (pure
+Python plus macOS `afconvert`). They are original but simple, and are intended as placeholders:
+replace any `.m4a` in `OtterAndMosey/Resources/Audio` with a file of the same name.
+
+## Debug launch arguments (Debug builds only)
+
+| Argument | Effect |
+| --- | --- |
+| `-debugLevel bay-1` | Open a level directly. |
+| `-debugRoute map` | Open a screen: `map`, `collection`, `home`, `parent`, `ending`, `intro`, `island:woods`. |
+| `-debugUnlock` | Treat every level as cleared for this launch. |
+| `-debugShort` | Limit levels to three questions. |
+
+## Known limitations
+
+- Sound effects and music are synthesised placeholders.
+- Characters are animated by swapping painted poses and moving them in code. There are no
+  frame-by-frame sprite sheets.
+- Typing speed is only recorded when a hardware keyboard is attached. The hardware keyboard path
+  has not been exercised in the simulator.
+- Easy-read text uses Verdana with wider spacing rather than a dedicated dyslexia typeface.
+- Pets, hats and home decorations use emoji artwork.
+- Held in portrait, iPadOS letterboxes the landscape game instead of rotating it.
