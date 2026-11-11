@@ -167,7 +167,15 @@ final class Narrator {
     /// either way drives `SpeechStage` so the speaker's mouth and badge move.
     func speakLine(_ line: DialogueLine, voiced: Bool) {
         stop()
-        guard line.speaker != .narrator else { return }
+        if line.speaker == .narrator {
+            // Story lines are heard but nobody on screen is talking, so the speech stage stays empty.
+            if voiced, volume > 0, let key = line.audioKey, let url = Self.clipURL(key), let clip = try? AVAudioPlayer(contentsOf: url) {
+                clip.volume = volume
+                clip.play()
+                player = clip
+            }
+            return
+        }
         chatterLength = Chatter.duration(forTextLength: line.text.count)
         envelope = []
         if voiced, volume > 0, let key = line.audioKey, let url = Self.clipURL(key), let clip = try? AVAudioPlayer(contentsOf: url) {

@@ -154,7 +154,7 @@ voice (or with a made-up rhythm when a line has no recording); see
 [docs/SPEAKING_ANIMATION_PLAN.md](docs/SPEAKING_ANIMATION_PLAN.md).
 
 Otter, Mosey and the six guardians have their own designed voices and all 174 of their lines
-are recorded; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
+are recorded, and the four "Story" lines are read by the question narrator; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
 to ElevenLabs and how to continue. Questions with no exact recording, such as word problems, get
 the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
 have the built-in iOS voice read those word for word.

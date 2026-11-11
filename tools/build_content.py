@@ -90,7 +90,7 @@ for island in source.ISLANDS:
     for l in island["levels"]:
         if l["reward"] and l["reward"] not in reward_ids: sys.exit(f"unknown reward {l['reward']}")
 if len(set(level_ids)) != len(level_ids): sys.exit("duplicate level ids")
-# Character dialogue that can be voiced (Otter, Mosey and the guardians): clip key -> who
+# Dialogue that is voiced (Otter, Mosey, the guardians and the story narrator): clip key -> who
 # says it, where, and the words.
 # The key is a hash of "speaker:text", computed the same way by DialogueLine.audioKey in Swift.
 def line_key(line):
@@ -109,7 +109,8 @@ def collect(scene, lines, guardian=None, mood=None):
         elif speaker in ("o", "m"):
             entry = {"speaker": "otter" if speaker == "o" else "mosey", "scene": scene, "text": text}
         else:
-            continue
+            # Story lines, read by the question narrator.
+            entry = {"speaker": "narrator", "scene": scene, "text": text}
         if mood:
             entry["mood"] = mood
         dialogue.setdefault(line_key(line), entry)

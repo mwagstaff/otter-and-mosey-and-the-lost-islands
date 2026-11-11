@@ -53,11 +53,10 @@ public struct DialogueLine: Codable, Equatable, Sendable {
         }
     }
 
-    /// The recorded clip for this line, when one exists. Otter, Mosey and the guardians are
-    /// voiced; the story narrator's lines are not.
+    /// The recorded clip for this line. Every speaker is voiced; story lines are read by the
+    /// question narrator.
     /// The key is a 32-bit FNV-1a hash of "speaker:text", matching tools/build_content.py.
     public var audioKey: String? {
-        guard speaker != .narrator else { return nil }
         var hash: UInt32 = 0x811C_9DC5
         for byte in "\(prefix):\(text)".utf8 {
             hash = (hash ^ UInt32(byte)) &* 0x0100_0193

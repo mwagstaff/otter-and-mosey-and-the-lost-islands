@@ -12,7 +12,7 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | Question narrator, "Alice" (486 clips) | Done and bundled. |
 | Otter and Mosey voices | Done and bundled: all 133 lines. The 9 opening-story lines were recorded first as a proof of concept. |
 | Guardian voices | Done and bundled: all 41 lines, six designed voices. |
-| "Story" lines | Not voiced. |
+| "Story" lines (4 clips) | Done and bundled, read by Alice with her question settings and no tag. Copies in `docs/voice-poc/story/`. |
 
 ## Setup
 
@@ -143,7 +143,7 @@ All of Otter's and Mosey's 133 lines are recorded with the settings above. The c
 after a change, or for new lines.
 
 The full script is `Packages/LostIslandsCore/Sources/LostIslandsCore/Resources/dialogue.json`
-(174 lines, about 6,600 characters before tags: 133 for Otter and Mosey, 41 for guardians), built from `tools/content/islands.py` by
+(178 lines, about 6,800 characters before tags: 133 for Otter and Mosey, 41 for guardians, 4 story lines), built from `tools/content/islands.py` by
 `python3 tools/build_content.py`. Each entry has a `speaker`, a `scene` (`intro` or a level id such
 as `woods-1`) and the `text`.
 
@@ -166,9 +166,9 @@ How the pieces fit:
   (`deliveryTag` in `narration.config.json`). Per-line tags would need a small change: add an
   optional tag to the lines in `islands.py`, carry it into `dialogue.json`, and use it in
   `narrate.mjs` in place of the character's default.
-- "Story" lines are not in `dialogue.json`. Voicing them means adding the narrator speaker in
-  `build_content.py` and `DialogueLine.audioKey`, and choosing a voice (Alice would be the
-  natural one).
+- "Story" lines are in `dialogue.json` with the speaker `narrator`. `narrate.mjs` records them
+  with the question narrator's voice and settings (section 2) and no delivery tag. In the app they
+  play like any other line but show no speech badge, since nobody on screen is talking.
 
 ## 1b. Guardian voices
 

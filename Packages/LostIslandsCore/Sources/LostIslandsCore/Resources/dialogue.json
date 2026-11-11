@@ -1,4 +1,9 @@
 {
+"line_366b0470": {
+"speaker": "narrator",
+"scene": "intro",
+"text": "One sunny morning on Rainbow Island…"
+},
 "line_4b3595f3": {
 "speaker": "otter",
 "scene": "intro",
@@ -13,6 +18,16 @@
 "speaker": "otter",
 "scene": "intro",
 "text": "Three is a very good number."
+},
+"line_ed90f5a1": {
+"speaker": "narrator",
+"scene": "intro",
+"text": "Suddenly, the Great Rainbow Crystal began to shake…"
+},
+"line_9663b5d1": {
+"speaker": "narrator",
+"scene": "intro",
+"text": "CRACK! It shattered into six fragments and flew across the sea!"
 },
 "line_4b10a9e0": {
 "speaker": "mosey",
@@ -843,6 +858,11 @@
 "speaker": "shadow",
 "scene": "star-5",
 "text": "I did not mean to. I only wanted to hold something bright."
+},
+"line_3f8c9225": {
+"speaker": "narrator",
+"scene": "star-5",
+"text": "The six fragments joined together, and colour rushed across every island."
 },
 "line_62738bf8": {
 "speaker": "otter",

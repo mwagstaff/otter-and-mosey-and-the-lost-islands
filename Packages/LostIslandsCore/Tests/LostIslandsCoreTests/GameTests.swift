@@ -46,7 +46,9 @@ import Testing
                 #expect(entry?.text == line.text, "no script entry for: \(line.text)")
                 #expect(entry?.speaker == guardian, "guardian lines are recorded under their own voice")
             case .narrator:
-                #expect(line.audioKey == nil)
+                let entry = script[line.audioKey ?? ""]
+                #expect(entry?.text == line.text, "no script entry for: \(line.text)")
+                #expect(entry?.speaker == "narrator")
             }
         }
         for island in catalog.islands {
@@ -55,7 +57,7 @@ import Testing
             }
             #expect(script.values.contains { $0.speaker == island.guardian.kind })
         }
-        #expect(script.values.filter { $0.scene == "intro" }.count == 9)
+        #expect(script.values.filter { $0.scene == "intro" }.count == 12, "nine for Otter and Mosey, three story lines")
     }
 
     @Test func modesOnlyGetSkillsTheyCanPresent() {
