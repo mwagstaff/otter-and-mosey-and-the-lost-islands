@@ -17,7 +17,8 @@ left out by decision. What differs from the plan below:
   `tools/import_art.py` pastes only the mouth area onto the idle picture and refuses to import if
   anything else differs.
 - **Guardians get the speech badge only**, not a body bounce, because their sprite is resized by
-  layout and breathing already.
+  layout and breathing already. Their lines are now recorded too, so the badge follows
+  their real voices.
 - **No tail on the dialogue panel.** The bouncing, talking portrait beside it does that job.
 - Characters only show the badge in scenes where they appear as themselves. In Typing Turbo the
   pair are one combined picture, so only the dialogue portrait animates there.

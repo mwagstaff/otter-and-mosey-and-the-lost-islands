@@ -96,7 +96,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var spokenInstructions = true
     /// Let the device's built-in voice read questions that have no narrator recording.
     public var deviceVoice = false
-    /// Play Otter's and Mosey's recorded voices during story dialogue.
+    /// Play the characters' recorded voices during story dialogue.
     public var characterVoices = true
 
     public init() {}

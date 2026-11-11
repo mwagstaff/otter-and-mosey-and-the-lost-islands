@@ -134,10 +134,20 @@
 "scene": "woods-4",
 "text": "Every firefly is glowing again!"
 },
+"line_7e6f5893": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "WHO is making all that cheerful noise in MY woods?"
+},
 "line_b283540b": {
 "speaker": "otter",
 "scene": "woods-5",
 "text": "Hello, Mr Tree! We are looking for a crystal fragment."
+},
+"line_75ccacd5": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Bah! Spell my word muddles first. If you can!"
 },
 "line_08333424": {
 "speaker": "mosey",
@@ -149,10 +159,38 @@
 "scene": "woods-5",
 "text": "The whole wood is green again!"
 },
+"line_4e635e09": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Harrumph! My leaves have gone grey and so has my mood!"
+},
+"line_1b341c14": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Stop it. I am NOT smiling. That is just how my bark sits."
+},
+"line_7454ac5a": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Oh no. I can feel a giggle coming. Hold it in, Grumblebark!"
+},
+"line_0945f2cf": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Ha ha ha! I have not laughed in a hundred years!",
+"mood": "befriended"
+},
+"line_e198253e": {
+"speaker": "tree",
+"scene": "woods-5",
+"text": "Take the crystal fragment. And come back for a story, little ones.",
+"mood": "befriended"
+},
 "line_43e72b5f": {
 "speaker": "otter",
 "scene": "woods-5",
-"text": "A talking tree who tells stories? Best. Day. Ever."
+"text": "A talking tree who tells stories? Best. Day. Ever.",
+"mood": "befriended"
 },
 "line_26adc4d9": {
 "speaker": "mosey",
@@ -244,10 +282,20 @@
 "scene": "bay-4",
 "text": "That was a jellyfish in a hat."
 },
+"line_deba6d19": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Oh dear, oh dear. Is that two visitors or twelve?"
+},
 "line_89f96708": {
 "speaker": "mosey",
 "scene": "bay-5",
 "text": "Just two, Inky. Are you feeling muddled?"
+},
+"line_9ec00d90": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Terribly! Help me sort my sums out!"
 },
 "line_bf17b1a9": {
 "speaker": "otter",
@@ -259,10 +307,38 @@
 "scene": "bay-5",
 "text": "The reef is glowing again!"
 },
+"line_43ceeb74": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Eight arms… or is it nine? I have lost count of EVERYTHING!"
+},
+"line_26367f35": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Wait, that helps! But now my sums are all in a knot."
+},
+"line_31c97e29": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Nearly untangled! Do I add this arm or take it away?"
+},
+"line_dab9703c": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Eight! I have EIGHT arms! Thank you, clever friends!",
+"mood": "befriended"
+},
+"line_5746de22": {
+"speaker": "octopus",
+"scene": "bay-5",
+"text": "Here, I was sitting on this shiny thing.",
+"mood": "befriended"
+},
 "line_ced185bb": {
 "speaker": "mosey",
 "scene": "bay-5",
-"text": "That is the crystal fragment! Good sitting, Inky."
+"text": "That is the crystal fragment! Good sitting, Inky.",
+"mood": "befriended"
 },
 "line_b48310e2": {
 "speaker": "otter",
@@ -349,10 +425,20 @@
 "scene": "dragon-4",
 "text": "So many dragons. I need more arms for cuddles."
 },
+"line_56e94e50": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Halt! I am Sir Scorch, the fearsome… ouch. Warm."
+},
 "line_f9337626": {
 "speaker": "otter",
 "scene": "dragon-5",
 "text": "Excuse me. Your trousers are on fire."
+},
+"line_6e03c375": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Nonsense! Dragons do not… oh. OH! Not again!"
 },
 "line_5a728bb0": {
 "speaker": "mosey",
@@ -364,10 +450,38 @@
 "scene": "dragon-5",
 "text": "And nobody got toasted."
 },
+"line_3cbdf25e": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Behold my mighty fl… is something burning?"
+},
+"line_d6704ca7": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "It is my TROUSERS! Again! Quick, distract me with times tables!"
+},
+"line_085bdeb9": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Still a bit toasty back there. One more round!"
+},
 "line_d4527a59": {
 "speaker": "mosey",
 "scene": "dragon-5",
-"text": "Hold still, Sir Scorch. One splash coming up!"
+"text": "Hold still, Sir Scorch. One splash coming up!",
+"mood": "befriended"
+},
+"line_8af84091": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Ahhh. Thank you. These were my best trousers.",
+"mood": "befriended"
+},
+"line_8cbb42dc": {
+"speaker": "dragon",
+"scene": "dragon-5",
+"text": "Take the fragment. It was making my pocket itchy.",
+"mood": "befriended"
 },
 "line_9a441d98": {
 "speaker": "otter",
@@ -444,10 +558,20 @@
 "scene": "cloud-4",
 "text": "We made it through! My whiskers are tingling."
 },
+"line_66e31df5": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "Ooh, visitors! Want to see a trick?"
+},
 "line_3f70f2bd": {
 "speaker": "otter",
 "scene": "cloud-5",
 "text": "Is it a nice trick?"
+},
+"line_bfdc8640": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "Nope! It is a WORD MUDDLE! Tee hee!"
 },
 "line_044898e9": {
 "speaker": "mosey",
@@ -459,10 +583,38 @@
 "scene": "cloud-5",
 "text": "And we made a new friend."
 },
+"line_d12197e6": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "Tee hee! I jumbled all the words in the sky!"
+},
+"line_75f1c73c": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "Hey! Stop fixing things! Take THAT word muddle!"
+},
+"line_c05f9ef6": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "My best spell! Nobody can… oh. You can."
+},
+"line_c60bb441": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "All right, all right. You win. That was fun!",
+"mood": "befriended"
+},
+"line_354499ed": {
+"speaker": "wizard",
+"scene": "cloud-5",
+"text": "Nobody ever plays with me up here.",
+"mood": "befriended"
+},
 "line_8a4dc418": {
 "speaker": "otter",
 "scene": "cloud-5",
-"text": "Then come and play with us! After you hand over the fragment."
+"text": "Then come and play with us! After you hand over the fragment.",
+"mood": "befriended"
 },
 "line_1242abc0": {
 "speaker": "otter",
@@ -544,10 +696,20 @@
 "scene": "candy-4",
 "text": "Save some for later."
 },
+"line_d4c2d15b": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "PUFF is the biggest! Puff keeps ALL the sweets!"
+},
 "line_521ba7f3": {
 "speaker": "mosey",
 "scene": "candy-5",
 "text": "That does not sound very fair, Puff."
+},
+"line_c2663dd6": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "Fair? Puff does not know how to share!"
 },
 "line_e798815f": {
 "speaker": "otter",
@@ -559,10 +721,38 @@
 "scene": "candy-5",
 "text": "And it is on Starlight Island."
 },
+"line_c67ffce0": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "MINE! All the sweets are MINE! …How many is that?"
+},
+"line_d167234b": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "Sharing? What is sharing? Show Puff!"
+},
+"line_6aa57a78": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "Half for you, half for me… Puff is getting it!"
+},
+"line_a41b8cd7": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "Sharing makes the sweets taste BETTER!",
+"mood": "befriended"
+},
+"line_b3f2297b": {
+"speaker": "marshmallow",
+"scene": "candy-5",
+"text": "Puff shares the shiny thing too.",
+"mood": "befriended"
+},
 "line_c20ae3f9": {
 "speaker": "mosey",
 "scene": "candy-5",
-"text": "The fragment! Thank you, Puff. Fair shares all round."
+"text": "The fragment! Thank you, Puff. Fair shares all round.",
+"mood": "befriended"
 },
 "line_ccbbee19": {
 "speaker": "otter",
@@ -639,10 +829,20 @@
 "scene": "star-4",
 "text": "We built a bridge out of STARS, Mosey."
 },
+"line_9a7aa39a": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "You came all this way for a crystal?"
+},
 "line_dcd5bdcd": {
 "speaker": "otter",
 "scene": "star-5",
 "text": "And to find out who broke it."
+},
+"line_3e24359b": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "I did not mean to. I only wanted to hold something bright."
 },
 "line_62738bf8": {
 "speaker": "otter",
@@ -654,14 +854,37 @@
 "scene": "star-5",
 "text": "We did it together. That is the real magic."
 },
+"line_3c8e8ac2": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "Go away. Shadows do not have friends."
+},
+"line_cadc9899": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "Why are you being kind to me? It makes me feel… warm."
+},
+"line_bf8b6ae9": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "If the crystal comes back… will I disappear?"
+},
 "line_ee5f9b80": {
 "speaker": "mosey",
 "scene": "star-5",
-"text": "You will not disappear, Umbra. Shadows need the light."
+"text": "You will not disappear, Umbra. Shadows need the light.",
+"mood": "befriended"
 },
 "line_701d85be": {
 "speaker": "otter",
 "scene": "star-5",
-"text": "And friends need friends. Come with us!"
+"text": "And friends need friends. Come with us!",
+"mood": "befriended"
+},
+"line_0383e1fc": {
+"speaker": "shadow",
+"scene": "star-5",
+"text": "I… I would like that. Here. I kept it safe for you.",
+"mood": "befriended"
 }
 }

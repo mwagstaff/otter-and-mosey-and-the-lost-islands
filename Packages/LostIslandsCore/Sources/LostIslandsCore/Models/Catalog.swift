@@ -53,10 +53,11 @@ public struct DialogueLine: Codable, Equatable, Sendable {
         }
     }
 
-    /// The recorded clip for this line, when one exists. Only Otter and Mosey are voiced.
+    /// The recorded clip for this line, when one exists. Otter, Mosey and the guardians are
+    /// voiced; the story narrator's lines are not.
     /// The key is a 32-bit FNV-1a hash of "speaker:text", matching tools/build_content.py.
     public var audioKey: String? {
-        guard speaker == .otter || speaker == .mosey else { return nil }
+        guard speaker != .narrator else { return nil }
         var hash: UInt32 = 0x811C_9DC5
         for byte in "\(prefix):\(text)".utf8 {
             hash = (hash ^ UInt32(byte)) &* 0x0100_0193
@@ -150,6 +151,8 @@ public struct Catalog: Codable, Sendable {
         public let speaker: String
         public let scene: String
         public let text: String
+        /// Set to "befriended" for a guardian's lines after it has been won over.
+        public let mood: String?
     }
 
     public static let voicedLines: [String: VoicedLine] = {

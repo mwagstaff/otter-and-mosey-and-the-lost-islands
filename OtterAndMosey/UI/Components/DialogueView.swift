@@ -103,7 +103,6 @@ struct DialogueView: View {
     private func show() {
         onLineShown(index)
         AudioManager.shared.play(.nav, volume: 0.6)
-        // Otter and Mosey speak their lines where a recording exists; everything else is left to the reader.
         // The mouth and speech badge move for every speaker, recorded or not.
         Narrator.shared.speakLine(line, voiced: model.settings.characterVoices)
     }

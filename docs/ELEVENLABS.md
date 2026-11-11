@@ -11,7 +11,8 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | Sound effects (21) | Done and bundled. |
 | Question narrator, "Alice" (486 clips) | Done and bundled. |
 | Otter and Mosey voices | Done and bundled: all 133 lines. The 9 opening-story lines were recorded first as a proof of concept. |
-| Guardian and "Story" lines | Not voiced. |
+| Guardian voices | Done and bundled: all 41 lines, six designed voices. |
+| "Story" lines | Not voiced. |
 
 ## Setup
 
@@ -138,11 +139,11 @@ gentle; line 5 is alarmed, not excited), and whether "Let us go!" should be writ
 
 ### Continuing
 
-All 133 lines are recorded with the settings above. The commands below are for re-recording
+All of Otter's and Mosey's 133 lines are recorded with the settings above. The commands below are for re-recording
 after a change, or for new lines.
 
 The full script is `Packages/LostIslandsCore/Sources/LostIslandsCore/Resources/dialogue.json`
-(133 lines, about 4,700 characters before tags), built from `tools/content/islands.py` by
+(174 lines, about 6,600 characters before tags: 133 for Otter and Mosey, 41 for guardians), built from `tools/content/islands.py` by
 `python3 tools/build_content.py`. Each entry has a `speaker`, a `scene` (`intro` or a level id such
 as `woods-1`) and the `text`.
 
@@ -165,8 +166,102 @@ How the pieces fit:
   (`deliveryTag` in `narration.config.json`). Per-line tags would need a small change: add an
   optional tag to the lines in `islands.py`, carry it into `dialogue.json`, and use it in
   `narrate.mjs` in place of the character's default.
-- Guardians and "Story" lines are not in `dialogue.json`. Voicing them means adding their speakers
-  in `build_content.py` and `DialogueLine.audioKey`, plus a voice for each in the config.
+- "Story" lines are not in `dialogue.json`. Voicing them means adding the narrator speaker in
+  `build_content.py` and `DialogueLine.audioKey`, and choosing a voice (Alice would be the
+  natural one).
+
+## 1b. Guardian voices
+
+Six more designed voices, one per guardian, made the same way as Otter's and Mosey's
+(`client.textToVoice.design`, then `client.textToVoice.create`). All 41 guardian lines are
+recorded. Each guardian is described as an adult performer playing a funny, harmless cartoon
+character.
+
+### Voice Design requests
+
+**Old Grumblebark** (`tree`)
+
+- `voiceDescription`: "An elderly British man performing a grumpy but lovable talking oak tree in a family animated film. Deep, slow, creaky and gravelly, full of comic harrumphing and bluster, with obvious warmth underneath. Funny, never frightening. Clean studio recording."
+- `text`: "Harrumph! Who is making all that cheerful noise in my woods? My leaves have gone grey, and so has my mood. Stop it. I am not smiling. That is just how my bark sits. Oh no. I can feel a giggle coming. Ha ha ha! I have not laughed in a hundred years!"
+
+**Inky** (`octopus`)
+
+- `voiceDescription`: "A middle-aged British woman performing a sweet, hopelessly muddled octopus in a family animated film. Fluttery, dithery and flustered, warm and a little posh, tripping over her own thoughts and counting on her arms. Comic and kind, never frightening. Clean studio recording."
+- `text`: "Oh dear, oh dear. Is that two visitors, or twelve? Eight arms, or is it nine? I have lost count of everything! Wait, that helps! But now my sums are all in a knot. Eight! I have eight arms! Thank you, clever friends! Here, I was sitting on this shiny thing."
+
+**Sir Scorch** (`dragon`)
+
+- `voiceDescription`: "A British man performing a silly, pompous little dragon knight in a family animated film. Grand, theatrical and self-important, with a plummy voice that keeps cracking into panicked yelps. A harmless buffoon, comic, never frightening. Clean studio recording."
+- `text`: "Halt! I am Sir Scorch, the fearsome... ouch. Warm. Behold my mighty fl... is something burning? It is my trousers! Again! Quick, distract me with times tables! Ahhh. Thank you. These were my best trousers. Take the fragment. It was making my pocket itchy."
+
+**Nimbus** (`wizard`)
+
+- `voiceDescription`: "A British voice actor performing a cheeky, mischievous little cloud wizard in a family animated film. Light, quick, impish and giggly, constantly delighted with his own tricks, sing-song and playful. Comic, never frightening. Clean studio recording."
+- `text`: "Ooh, visitors! Want to see a trick? Nope! It is a word muddle! Tee hee! I jumbled all the words in the sky! Hey! Stop fixing things! Take that word muddle! My best spell! Nobody can... oh. You can. All right, all right. You win. That was fun!"
+
+**Puff** (`marshmallow`)
+
+- `voiceDescription`: "A British man performing a huge, soft, friendly marshmallow monster in a family animated film. Big, round, slow and pillowy, simple and sweet-natured, speaking about himself by name in short sentences, booming but gentle. Comic, never frightening. Clean studio recording."
+- `text`: "Puff is the biggest! Puff keeps all the sweets! Mine! All the sweets are mine! How many is that? Sharing? What is sharing? Show Puff! Half for you, half for me. Puff is getting it! Sharing makes the sweets taste better! Puff shares the shiny thing too."
+
+**Umbra** (`shadow`)
+
+- `voiceDescription`: "A British voice actor performing a small, shy, lonely shadow creature in a family animated film. Very soft, breathy, hesitant and quiet, sad but gentle and sweet, slowly warming with hope. Sympathetic, never frightening. Clean studio recording."
+- `text`: "Go away. Shadows do not have friends. You came all this way for a crystal? I did not mean to. I only wanted to hold something bright. Why are you being kind to me? It makes me feel warm. I would like that. Here. I kept it safe for you."
+
+### Voices kept and how their lines are sent
+
+| Guardian | Key | Voice ID | Preview kept | Tag before it is won over | Tag once befriended | Stability |
+| --- | --- | --- | --- | --- | --- | --- |
+| Old Grumblebark | `tree` | `DJO7Y2M4iHF0NW2Ct2hR` | 3 of 3 | `[grumpy]` | `[laughing warmly]` | 0.45 |
+| Inky | `octopus` | `7Y4hG5Z0d1hT7SGlsdND` | 2 of 3 | `[flustered]` | `[delighted]` | 0.4 |
+| Sir Scorch | `dragon` | `BwY7haYnrb0GMFyLs0BE` | 3 of 3 | `[pompous]` | `[relieved]` | 0.4 |
+| Nimbus | `wizard` | `TDf5YPBJ2QCSoaRCudlR` | 3 of 3 | `[mischievous]` | `[cheerful]` | 0.35 |
+| Puff | `marshmallow` | `32MUcGWPdUZx2kPgRYP7` | 3 of 3 | `[booming]` | `[happy]` | 0.5 |
+| Umbra | `shadow` | `5UOpXM9aihJ3gGnRwbAw` | 3 of 3 | `[sad, quietly]` | `[hopeful, softly]` | 0.55 |
+
+All use `eleven_v4`, `mp3_44100_64`, `languageCode: "en"` and `similarityBoost` 0.8, as for Otter
+and Mosey. A guardian's "befriended" lines (those spoken after the third Friendship Power) are
+marked `"mood": "befriended"` in `dialogue.json` and get the second tag; every other line gets the
+first.
+
+The exact text sent for each line is listed by `npm run narrate -- --dialogue <level> --count`
+after deleting or forcing, or can be read from `dialogue.json` plus the tags above.
+
+### How the previews were chosen
+
+Again without listening, from the pitch measurement (median pitch / range, in Hz, previews 1 to 3):
+
+| Guardian | Preview 1 · 2 · 3 |
+| --- | --- |
+| Old Grumblebark | 302 / 124 · 267 / 143 · 222 / 165 |
+| Inky | 444 / 339 · 286 / 164 · 271 / 143 |
+| Sir Scorch | 302 / 113 · 302 / 159 · 314 / 202 |
+| Nimbus | 500 / 302 · 356 / 224 · 356 / 295 |
+| Puff | 333 / 118 · 364 / 186 · 198 / 72 |
+| Umbra | 348 / 235 · 390 / 276 · 281 / 107 |
+
+The measurement only looks between 120 and 600 Hz, so deep male voices read about an octave too
+high; only the comparison within a row means anything. The lowest or steadiest preview was kept
+for the tree, Puff and Umbra, a livelier one for Sir Scorch and Nimbus, and the middle one for
+Inky because the first was very high. These are the least certain choices in this document:
+listen to the previews in `docs/voice-poc/guardians/design_<key>_<n>.mp3` and to the two sample
+lines per guardian beside them (`line_<key>_...mp3`).
+
+Things worth listening for: Nimbus's "Nobody ever plays with me up here." is sent with
+`[cheerful]` but is a wistful line; and whether Sir Scorch's panic and Puff's size come through.
+
+To replace a guardian's voice, run the design step for that key, keep a preview, then re-record
+its level:
+
+```bash
+cd tools/sfx
+node --env-file=../../.env.local design-voices.mjs dragon
+node --env-file=../../.env.local design-voices.mjs --keep dragon 1
+npm run narrate -- --dialogue dragon-5 --force
+```
+
+Note that `--force` on a guardian's level also re-records Otter's and Mosey's lines in it.
 
 ## 2. Question narrator
 

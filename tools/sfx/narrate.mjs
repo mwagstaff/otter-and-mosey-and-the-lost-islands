@@ -6,8 +6,8 @@
 //   npm run narrate -- --force            # record everything again (uses about 13,000 credits)
 //   npm run narrate -- --samples          # short samples of each candidate voice, into ./samples
 //   npm run narrate -- --count            # show what would be recorded, spend nothing
-//   npm run narrate -- --dialogue intro   # Otter's and Mosey's lines for one scene (intro, woods-1, ...)
-//   npm run narrate -- --dialogue all     # every Otter and Mosey line
+//   npm run narrate -- --dialogue intro   # character lines for one scene (intro, woods-1, ...)
+//   npm run narrate -- --dialogue all     # every Otter, Mosey and guardian line
 //
 // The script (what is said) comes from narration.json, which tools/build_content.py writes.
 // The voice and model are set in narration.config.json. The API key is read from
@@ -89,7 +89,8 @@ if (flags.has("--samples")) {
     .map(([key, line]) => {
       const character = config.characters[line.speaker];
       return { key, voiceId: character.voiceId, voiceSettings: character.voiceSettings,
-               text: `${character.deliveryTag ?? ""}${line.text}`, file: join(speechDir, `say_${key}.mp3`) };
+               text: `${(line.mood === "befriended" && character.befriendedTag) || character.deliveryTag || ""}${line.text}`,
+               file: join(speechDir, `say_${key}.mp3`) };
     })
     .filter((job) => flags.has("--force") || !existsSync(job.file));
   const characters = jobs.reduce((sum, job) => sum + job.text.length, 0);

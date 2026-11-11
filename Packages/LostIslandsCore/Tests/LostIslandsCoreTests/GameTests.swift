@@ -29,20 +29,31 @@ import Testing
     @Test func dialogueClipKeysMatchTheBuiltScript() {
         let script = Catalog.voicedLines
         #expect(script.count > 100)
-        var lines = catalog.intro + catalog.introAfter
+        var lines: [(line: DialogueLine, guardian: String?)] = (catalog.intro + catalog.introAfter).map { ($0, nil) }
         for island in catalog.islands {
-            lines += island.guardian.phases + island.guardian.befriended
-            for level in island.levels { lines += level.intro + level.outro }
+            let kind = island.guardian.kind
+            lines += (island.guardian.phases + island.guardian.befriended).map { ($0, kind) }
+            for level in island.levels { lines += (level.intro + level.outro).map { ($0, kind) } }
         }
-        for line in lines {
+        for (line, guardian) in lines {
             switch line.speaker {
             case .otter, .mosey:
                 let entry = script[line.audioKey ?? ""]
                 #expect(entry?.text == line.text, "no script entry for: \(line.text)")
                 #expect(entry?.speaker == line.speaker.rawValue)
-            case .guardian, .narrator:
+            case .guardian:
+                let entry = script[line.audioKey ?? ""]
+                #expect(entry?.text == line.text, "no script entry for: \(line.text)")
+                #expect(entry?.speaker == guardian, "guardian lines are recorded under their own voice")
+            case .narrator:
                 #expect(line.audioKey == nil)
             }
+        }
+        for island in catalog.islands {
+            for line in island.guardian.befriended where line.speaker == .guardian {
+                #expect(script[line.audioKey ?? ""]?.mood == "befriended")
+            }
+            #expect(script.values.contains { $0.speaker == island.guardian.kind })
         }
         #expect(script.values.filter { $0.scene == "intro" }.count == 9)
     }

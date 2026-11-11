@@ -36,6 +36,66 @@
         "stability": 0.6,
         "similarityBoost": 0.8
       }
+    },
+    "tree": {
+      "voiceId": "DJO7Y2M4iHF0NW2Ct2hR",
+      "voiceName": "Old Grumblebark (Lost Islands)",
+      "deliveryTag": "[grumpy] ",
+      "befriendedTag": "[laughing warmly] ",
+      "voiceSettings": {
+        "stability": 0.45,
+        "similarityBoost": 0.8
+      }
+    },
+    "octopus": {
+      "voiceId": "7Y4hG5Z0d1hT7SGlsdND",
+      "voiceName": "Inky (Lost Islands)",
+      "deliveryTag": "[flustered] ",
+      "befriendedTag": "[delighted] ",
+      "voiceSettings": {
+        "stability": 0.4,
+        "similarityBoost": 0.8
+      }
+    },
+    "dragon": {
+      "voiceId": "BwY7haYnrb0GMFyLs0BE",
+      "voiceName": "Sir Scorch (Lost Islands)",
+      "deliveryTag": "[pompous] ",
+      "befriendedTag": "[relieved] ",
+      "voiceSettings": {
+        "stability": 0.4,
+        "similarityBoost": 0.8
+      }
+    },
+    "wizard": {
+      "voiceId": "TDf5YPBJ2QCSoaRCudlR",
+      "voiceName": "Nimbus (Lost Islands)",
+      "deliveryTag": "[mischievous] ",
+      "befriendedTag": "[cheerful] ",
+      "voiceSettings": {
+        "stability": 0.35,
+        "similarityBoost": 0.8
+      }
+    },
+    "marshmallow": {
+      "voiceId": "32MUcGWPdUZx2kPgRYP7",
+      "voiceName": "Puff (Lost Islands)",
+      "deliveryTag": "[booming] ",
+      "befriendedTag": "[happy] ",
+      "voiceSettings": {
+        "stability": 0.5,
+        "similarityBoost": 0.8
+      }
+    },
+    "shadow": {
+      "voiceId": "5UOpXM9aihJ3gGnRwbAw",
+      "voiceName": "Umbra (Lost Islands)",
+      "deliveryTag": "[sad, quietly] ",
+      "befriendedTag": "[hopeful, softly] ",
+      "voiceSettings": {
+        "stability": 0.55,
+        "similarityBoost": 0.8
+      }
     }
   }
 }

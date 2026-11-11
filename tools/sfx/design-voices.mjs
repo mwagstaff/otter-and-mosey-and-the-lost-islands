@@ -31,6 +31,37 @@ const characters = {
     description: "An adult British voice actress in her twenties performing a gentle cartoon sea creature for a family animated film. Soft, light and youthful, calm, steady, kind and reassuring, unhurried, with quiet wonder and a little playful humour. Clean studio recording.",
     text: "Welcome to my favourite place. Maths, under the sea. Stay close, Otter, and follow me. Each right answer builds a rainbow plank, so there is no need to rush. Look, the flowers are waking up. We did it together, and that is the real magic.",
   },
+  // The six guardians: funny, never frightening. Keys match the guardian "kind" in islands.py.
+  tree: {
+    name: "Old Grumblebark (Lost Islands)",
+    description: "An elderly British man performing a grumpy but lovable talking oak tree in a family animated film. Deep, slow, creaky and gravelly, full of comic harrumphing and bluster, with obvious warmth underneath. Funny, never frightening. Clean studio recording.",
+    text: "Harrumph! Who is making all that cheerful noise in my woods? My leaves have gone grey, and so has my mood. Stop it. I am not smiling. That is just how my bark sits. Oh no. I can feel a giggle coming. Ha ha ha! I have not laughed in a hundred years!",
+  },
+  octopus: {
+    name: "Inky (Lost Islands)",
+    description: "A middle-aged British woman performing a sweet, hopelessly muddled octopus in a family animated film. Fluttery, dithery and flustered, warm and a little posh, tripping over her own thoughts and counting on her arms. Comic and kind, never frightening. Clean studio recording.",
+    text: "Oh dear, oh dear. Is that two visitors, or twelve? Eight arms, or is it nine? I have lost count of everything! Wait, that helps! But now my sums are all in a knot. Eight! I have eight arms! Thank you, clever friends! Here, I was sitting on this shiny thing.",
+  },
+  dragon: {
+    name: "Sir Scorch (Lost Islands)",
+    description: "A British man performing a silly, pompous little dragon knight in a family animated film. Grand, theatrical and self-important, with a plummy voice that keeps cracking into panicked yelps. A harmless buffoon, comic, never frightening. Clean studio recording.",
+    text: "Halt! I am Sir Scorch, the fearsome... ouch. Warm. Behold my mighty fl... is something burning? It is my trousers! Again! Quick, distract me with times tables! Ahhh. Thank you. These were my best trousers. Take the fragment. It was making my pocket itchy.",
+  },
+  wizard: {
+    name: "Nimbus (Lost Islands)",
+    description: "A British voice actor performing a cheeky, mischievous little cloud wizard in a family animated film. Light, quick, impish and giggly, constantly delighted with his own tricks, sing-song and playful. Comic, never frightening. Clean studio recording.",
+    text: "Ooh, visitors! Want to see a trick? Nope! It is a word muddle! Tee hee! I jumbled all the words in the sky! Hey! Stop fixing things! Take that word muddle! My best spell! Nobody can... oh. You can. All right, all right. You win. That was fun!",
+  },
+  marshmallow: {
+    name: "Puff (Lost Islands)",
+    description: "A British man performing a huge, soft, friendly marshmallow monster in a family animated film. Big, round, slow and pillowy, simple and sweet-natured, speaking about himself by name in short sentences, booming but gentle. Comic, never frightening. Clean studio recording.",
+    text: "Puff is the biggest! Puff keeps all the sweets! Mine! All the sweets are mine! How many is that? Sharing? What is sharing? Show Puff! Half for you, half for me. Puff is getting it! Sharing makes the sweets taste better! Puff shares the shiny thing too.",
+  },
+  shadow: {
+    name: "Umbra (Lost Islands)",
+    description: "A British voice actor performing a small, shy, lonely shadow creature in a family animated film. Very soft, breathy, hesitant and quiet, sad but gentle and sweet, slowly warming with hope. Sympathetic, never frightening. Clean studio recording.",
+    text: "Go away. Shadows do not have friends. You came all this way for a crystal? I did not mean to. I only wanted to hold something bright. Why are you being kind to me? It makes me feel warm. I would like that. Here. I kept it safe for you.",
+  },
 };
 
 // Median pitch and how much it moves, from a simple autocorrelation. A rough, objective

@@ -90,7 +90,8 @@ for island in source.ISLANDS:
     for l in island["levels"]:
         if l["reward"] and l["reward"] not in reward_ids: sys.exit(f"unknown reward {l['reward']}")
 if len(set(level_ids)) != len(level_ids): sys.exit("duplicate level ids")
-# Character dialogue that can be voiced: clip key -> who says it, where, and the words.
+# Character dialogue that can be voiced (Otter, Mosey and the guardians): clip key -> who
+# says it, where, and the words.
 # The key is a hash of "speaker:text", computed the same way by DialogueLine.audioKey in Swift.
 def line_key(line):
     value = 0x811C9DC5
@@ -99,16 +100,28 @@ def line_key(line):
     return f"line_{value:08x}"
 
 dialogue = {}
-def collect(scene, lines):
+def collect(scene, lines, guardian=None, mood=None):
     for line in lines:
         speaker, text = line.split(":", 1)
-        if speaker in ("o", "m"):
-            dialogue.setdefault(line_key(line), {"speaker": "otter" if speaker == "o" else "mosey", "scene": scene, "text": text})
+        if speaker == "g" and guardian:
+            # Guardians are recorded under their kind (tree, octopus, ...), one voice each.
+            entry = {"speaker": guardian, "scene": scene, "text": text}
+        elif speaker in ("o", "m"):
+            entry = {"speaker": "otter" if speaker == "o" else "mosey", "scene": scene, "text": text}
+        else:
+            continue
+        if mood:
+            entry["mood"] = mood
+        dialogue.setdefault(line_key(line), entry)
 collect("intro", source.INTRO + source.INTRO_AFTER)
 for island in source.ISLANDS:
+    kind = island["guardian"]["kind"]
     for l in island["levels"]:
-        collect(l["id"], l["intro"] + l["outro"])
-    collect(island["levels"][-1]["id"], island["guardian"]["phases"] + island["guardian"]["befriended"])
+        collect(l["id"], l["intro"] + l["outro"], guardian=kind)
+    boss = island["levels"][-1]["id"]
+    collect(boss, island["guardian"]["phases"], guardian=kind)
+    # Once won over, the guardian sounds different: these lines get the "befriended" delivery.
+    collect(boss, island["guardian"]["befriended"], guardian=kind, mood="befriended")
 (out / "dialogue.json").write_text(json.dumps(dialogue, indent=0, ensure_ascii=False) + "\n")
 catalogue = {
     "islands": source.ISLANDS,

@@ -38,9 +38,9 @@ import Testing
         #expect(!Narrator.shared.canSay(key: nil, fallback: "anything"), "no recording and no device voice means silence")
     }
 
-    @Test func everyOtterAndMoseyLineHasARecording() {
+    @Test func everyCharacterLineHasARecording() {
         let missing = Catalog.voicedLines.filter { Narrator.clipURL($0.key) == nil }.map(\.value.text).sorted()
-        #expect(Catalog.voicedLines.count == 133)
+        #expect(Catalog.voicedLines.count == 174, "133 for Otter and Mosey, 41 for the guardians")
         #expect(missing.isEmpty, "\(missing.count) character lines missing a recording, e.g. \(missing.prefix(3))")
     }
 
@@ -62,7 +62,7 @@ import Testing
         }
         #expect(peak > 0.3 && opened, "level peaked at \(peak)")
 
-        // A guardian line has no recording: the made-up rhythm still marks the speaker, then ends.
+        // A line with no recording: the made-up rhythm still marks the speaker, then ends.
         let silent = DialogueLine(speaker: .guardian, text: "Harrumph!")
         Narrator.shared.speakLine(silent, voiced: true)
         #expect(stage.speaker == .guardian)
