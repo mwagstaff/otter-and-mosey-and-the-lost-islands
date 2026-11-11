@@ -149,6 +149,10 @@ The voice and model are set in `tools/sfx/narration.config.json`. What is record
 - one short instruction per maths topic, used when a question's exact numbers have no recording
   (for example "Add the two numbers together.")
 
+While a character speaks, a speech badge appears over them and their mouth moves with the
+voice (or with a made-up rhythm when a line has no recording); see
+[docs/SPEAKING_ANIMATION_PLAN.md](docs/SPEAKING_ANIMATION_PLAN.md).
+
 Otter and Mosey have their own designed voices, so far recorded only for the opening story as a
 proof of concept; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
 to ElevenLabs and how to continue. Questions with no exact recording, such as word problems, get

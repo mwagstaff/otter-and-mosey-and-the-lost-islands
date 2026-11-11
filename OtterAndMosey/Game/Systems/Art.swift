@@ -208,6 +208,28 @@ enum Art {
         }
     }
 
+    /// A small speech bubble with a tail, shown over whoever is talking.
+    static var speechBubble: SKTexture {
+        drawn("speechBubble", size: CGSize(width: 132, height: 110)) { context, rect in
+            let body = CGRect(x: 5, y: 5, width: rect.width - 10, height: 78)
+            let path = UIBezierPath(roundedRect: body, cornerRadius: 34)
+            let tail = UIBezierPath()
+            tail.move(to: CGPoint(x: 40, y: 78))
+            tail.addLine(to: CGPoint(x: 34, y: 104))
+            tail.addLine(to: CGPoint(x: 66, y: 80))
+            tail.close()
+            path.append(tail)
+            context.setLineJoin(.round)
+            context.addPath(path.cgPath)
+            context.setStrokeColor(UIColor(hex: "#0E3B43").cgColor)
+            context.setLineWidth(9)
+            context.strokePath()
+            context.addPath(path.cgPath)
+            context.setFillColor(UIColor(hex: "#FFFDF3").cgColor)
+            context.fillPath()
+        }
+    }
+
     /// A full rainbow arc, for bridge and island finales.
     static func rainbowArc(width: CGFloat) -> SKTexture {
         let size = CGSize(width: width, height: width / 2)

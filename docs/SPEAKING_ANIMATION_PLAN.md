@@ -2,7 +2,29 @@
 
 A plan for making it obvious which character is talking during story dialogue: a mouth that opens
 and closes with the voice, a small animated speech bubble over the speaker, and a little body
-movement. Nothing here is built yet.
+movement.
+
+## Status: built
+
+Layers 1 and 2 are implemented for Otter, Mosey and the guardians. Layer 3 (word highlight) was
+left out by decision. What differs from the plan below:
+
+- **Loudness comes from the clip file, not live metering.** Live `AVAudioPlayer` metering read as
+  silence in the simulator, so `Narrator` now reads each clip once, works out its loudness 30 times
+  a second, and follows that by elapsed time. This is the "worked out in advance" alternative
+  listed further down, done at load time instead of at build time.
+- **The generated talking frames were good enough**, so the drawn-mouth fallback was not needed.
+  `tools/import_art.py` pastes only the mouth area onto the idle picture and refuses to import if
+  anything else differs.
+- **Guardians get the speech badge only**, not a body bounce, because their sprite is resized by
+  layout and breathing already.
+- **No tail on the dialogue panel.** The bouncing, talking portrait beside it does that job.
+- Characters only show the badge in scenes where they appear as themselves. In Typing Turbo the
+  pair are one combined picture, so only the dialogue portrait animates there.
+
+Where it lives: `MouthGate` and `Chatter` in `LostIslandsCore/Education/Speech.swift`;
+`SpeechStage` and `Narrator.speakLine` in `Audio/AudioManager.swift`; `SpeechBadge` and the mouth
+swap in `Game/Characters/CharacterNode.swift`; the portrait in `UI/Components/DialogueView.swift`.
 
 The aim is a visual helper, not lip-sync. A mouth that flaps roughly in time with the loudness of
 the voice reads as "talking" to a child; matching mouth shapes to individual sounds is out of scope.

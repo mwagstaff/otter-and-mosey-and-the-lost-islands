@@ -298,3 +298,54 @@ import Testing
         #expect(TypingMeter().wordsPerMinute == nil)
     }
 }
+
+@Suite struct SpeechTests {
+    @Test func mouthOpensOnLoudAndClosesOnQuiet() {
+        var gate = MouthGate()
+        let quiet = gate.update(level: 0.1, at: 0)
+        let loud = gate.update(level: 0.8, at: 0.1)
+        let between = gate.update(level: 0.25, at: 0.3)
+        let silent = gate.update(level: 0.05, at: 0.5)
+        #expect(!quiet && loud)
+        #expect(between, "between the thresholds it stays as it was")
+        #expect(!silent)
+    }
+
+    @Test func mouthDoesNotFlickerOnNoisyInput() {
+        var gate = MouthGate()
+        var changes = 0
+        var last = false
+        // Loudness that jumps above and below the thresholds on every 1/30 s reading.
+        for step in 0..<60 {
+            let open = gate.update(level: step.isMultiple(of: 2) ? 0.9 : 0.0, at: Double(step) / 30)
+            if open != last { changes += 1 }
+            last = open
+        }
+        #expect(Double(changes) <= 2.0 / 0.07 + 1, "state changes are limited by the hold time")
+        #expect(changes < 30, "far fewer changes than readings")
+    }
+
+    @Test func chatterLastsForTheLineAndThenStops() {
+        #expect(Chatter.duration(forTextLength: 3) == 1.0)
+        #expect(abs(Chatter.duration(forTextLength: 30) - 1.8) < 0.0001)
+        #expect(Chatter.duration(forTextLength: 500) == 4.0)
+        let duration = Chatter.duration(forTextLength: 40)
+        var gate = MouthGate()
+        var opens = 0
+        var last = false
+        var peak = 0.0
+        for step in 0..<Int(duration * 30) {
+            let time = Double(step) / 30
+            let level = Chatter.level(at: time, duration: duration)
+            #expect((0...1).contains(level))
+            peak = max(peak, level)
+            let open = gate.update(level: level, at: time)
+            if open, !last { opens += 1 }
+            last = open
+        }
+        #expect(peak > 0.6)
+        #expect(opens >= 6, "the mouth opens several times over a line (\(opens))")
+        #expect(Chatter.level(at: duration, duration: duration) == 0)
+        #expect(Chatter.level(at: duration + 1, duration: duration) == 0)
+    }
+}

@@ -16,6 +16,7 @@ final class GuardianScene: GameScene {
     private var powerButton: SKSpriteNode?
     private var crystal: SKSpriteNode?
     private var acceptingAnswers = false
+    private let guardianBadge = SpeechBadge(role: .guardian, width: 80)
 
     private var perPhase: Double { max(1, Double(session.total) / 3) }
 
@@ -26,6 +27,7 @@ final class GuardianScene: GameScene {
         guardian.anchorPoint = CGPoint(x: 0.5, y: 0)
         guardian.zPosition = 9
         addChild(guardian)
+        addChild(guardianBadge)
         bridge.friendship = 0
         if !Effects.reducedMotion {
             guardian.run(.repeatForever(SKAction.sequence([.scaleY(to: 1.03, duration: 1.4), .scaleY(to: 1, duration: 1.4)]).eased()))
@@ -40,6 +42,8 @@ final class GuardianScene: GameScene {
         let texture = guardian.texture?.size() ?? CGSize(width: 1, height: 1)
         guardian.size = CGSize(width: guardianHeight * texture.width / texture.height, height: guardianHeight)
         guardian.position = CGPoint(x: play.maxX - max(guardian.size.width * 0.52, play.width * 0.14), y: groundY)
+        guardianBadge.resize(min(max(play.height * 0.22, 56), 120))
+        guardianBadge.position = CGPoint(x: guardian.position.x - guardian.size.width * 0.42, y: guardian.position.y + guardian.size.height * 0.78)
         otter.resize(min(play.height * 0.36, 250))
         mosey.resize(min(play.height * 0.46, 330))
         otter.position = CGPoint(x: play.minX + play.width * 0.1, y: groundY)

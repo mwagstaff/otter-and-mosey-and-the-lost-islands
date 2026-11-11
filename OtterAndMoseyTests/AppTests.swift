@@ -12,7 +12,7 @@ import Testing
         for kind in ["otter", "mosey"] {
             for pose in ["idle", "blink", "cheer", "think", "oops"] { names.append("\(kind)_\(pose)") }
         }
-        names += ["otter_run", "mosey_swim"]
+        names += ["otter_run", "mosey_swim", "otter_talk", "mosey_talk"]
         for island in Catalog.shared.islands {
             let theme = IslandTheme.island(island.id)
             names += [theme.background, theme.foreground, theme.guardian, theme.guardianHappy, theme.islandArt, theme.container, theme.friend]
@@ -35,6 +35,43 @@ import Testing
         #expect(Narrator.shared.canSay(key: "word_because", fallback: ""))
         Narrator.shared.deviceVoice = false
         #expect(!Narrator.shared.canSay(key: nil, fallback: "anything"), "no recording and no device voice means silence")
+    }
+
+    @Test func speakingALineDrivesTheSpeechStage() async throws {
+        let stage = SpeechStage.shared
+        let voicedLine = Catalog.shared.intro.first { $0.speaker == .otter }!
+        #expect(Narrator.clipURL(voicedLine.audioKey ?? "") != nil, "the opening Otter line has a recording")
+
+        // A recorded line: the speaker is set and the mouth moves with the clip.
+        Narrator.shared.volume = 0.9
+        Narrator.shared.speakLine(voicedLine, voiced: true)
+        #expect(stage.speaker == .otter)
+        var peak = 0.0
+        var opened = false
+        for _ in 0..<40 {
+            try await Task.sleep(for: .milliseconds(50))
+            peak = max(peak, stage.level)
+            opened = opened || stage.mouthOpen
+        }
+        #expect(peak > 0.3 && opened, "level peaked at \(peak)")
+
+        // A guardian line has no recording: the made-up rhythm still marks the speaker, then ends.
+        let silent = DialogueLine(speaker: .guardian, text: "Harrumph!")
+        Narrator.shared.speakLine(silent, voiced: true)
+        #expect(stage.speaker == .guardian)
+        opened = false
+        for _ in 0..<12 {
+            try await Task.sleep(for: .milliseconds(50))
+            opened = opened || stage.mouthOpen
+        }
+        #expect(opened)
+        try await Task.sleep(for: .milliseconds(700))
+        #expect(stage.speaker == nil && !stage.mouthOpen, "the cue clears when the line is over")
+
+        // Story lines have no speaker to mark.
+        Narrator.shared.speakLine(DialogueLine(speaker: .narrator, text: "Once upon a time"), voiced: true)
+        #expect(stage.speaker == nil)
+        Narrator.shared.stop()
     }
 
     @Test func progressSurvivesARelaunch() {

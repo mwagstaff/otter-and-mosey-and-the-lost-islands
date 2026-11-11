@@ -17,6 +17,43 @@ LIMITS = {"otter": 760, "mosey": 900, "duo": 1000, "guardian": 900, "island": 56
           "jar": 420, "friend": 380}
 
 
+# Talking frames. Each is the idle picture with only the mouth taken from a generated edit
+# (tools/raw/<name>_talk_gen.png), so the rest of the character cannot shift between frames.
+# Values are the mouth area in the 1024-pixel raw image: centre x, centre y, radius x, radius y.
+MOUTHS = {"otter": (640, 300, 110, 75), "mosey": (890, 465, 115, 70)}
+
+
+def build_talk_frames():
+    for name, (cx, cy, rx, ry) in MOUTHS.items():
+        idle, edit, talk = RAW / f"{name}_idle.png", RAW / f"{name}_talk_gen.png", RAW / f"{name}_talk.png"
+        if not edit.exists():
+            continue
+        mask = RAW / ".mouth_mask.png"
+        subprocess.run(["magick", "-size", "1024x1024", "xc:black", "-fill", "white", "-draw",
+                        f"ellipse {cx},{cy} {rx},{ry} 0,360", "-blur", "0x7", str(mask)], check=True)
+        # Cut the mouth out of the edit (its own transparency times the soft mask), then lay that
+        # patch over the untouched idle picture.
+        patch = RAW / ".mouth_patch.png"
+        subprocess.run(["magick", str(edit), "(", "+clone", "-alpha", "extract", str(mask), "-compose", "Multiply", "-composite", ")",
+                        "-alpha", "off", "-compose", "CopyOpacity", "-composite", str(patch)], check=True)
+        subprocess.run(["magick", str(idle), str(patch), "-compose", "Over", "-composite", str(talk)], check=True)
+        mask.unlink()
+        patch.unlink()
+        # Prove it: with the mouth area painted over in both, the two frames must be identical.
+        cover = ["-fill", "black", "-draw", f"rectangle {cx - rx - 30},{cy - ry - 30} {cx + rx + 30},{cy + ry + 30}"]
+        covered = [RAW / ".covered_idle.png", RAW / ".covered_talk.png"]
+        subprocess.run(["magick", str(idle), *cover, str(covered[0])], check=True)
+        subprocess.run(["magick", str(talk), *cover, str(covered[1])], check=True)
+        result = subprocess.run(["magick", "compare", "-metric", "AE", str(covered[0]), str(covered[1]), "null:"],
+                                capture_output=True, text=True)
+        for file in covered:
+            file.unlink()
+        differing = (result.stderr.strip().split() or ["nan"])[0]
+        if float(differing) != 0:
+            raise SystemExit(f"{name}_talk differs from {name}_idle outside the mouth area ({differing} pixels)")
+        print(f"{name}_talk: only the mouth differs from {name}_idle")
+
+
 def write_set(name, source, extension):
     folder = CATALOG / f"{name}.imageset"
     folder.mkdir(parents=True, exist_ok=True)
@@ -37,10 +74,11 @@ def main():
         "info": {"author": "xcode", "version": 1}}, indent=2))
     tmp = ROOT / "tools/raw/.tmp"
     tmp.mkdir(exist_ok=True)
+    build_talk_frames()
     count = 0
     for path in sorted(RAW.glob("*.png")):
         name = path.stem
-        if name.endswith("_ref"):
+        if name.endswith("_ref") or name.endswith("_gen"):
             continue
         if name == "app_icon":
             folder = CATALOG / "AppIcon.appiconset"
@@ -60,7 +98,10 @@ def main():
             # Generated sprites carry a faint, invisible haze in their "transparent" areas, so a plain
             # trim does not crop them. Find the painted bounds from the alpha channel, clear the haze,
             # then crop to those bounds.
-            bounds = subprocess.run(["magick", str(path), "-alpha", "extract", "-threshold", "10%", "-format", "%@", "info:"],
+            # A talking frame is cropped exactly like its idle frame so the two line up.
+            outline = RAW / name.replace("_talk", "_idle") if name.endswith("_talk") else path
+            outline = outline if outline.suffix else outline.with_suffix(".png")
+            bounds = subprocess.run(["magick", str(outline), "-alpha", "extract", "-threshold", "10%", "-format", "%@", "info:"],
                                     check=True, capture_output=True, text=True).stdout.strip()
             subprocess.run(["magick", str(path), "-channel", "A", "-level", "6%,100%", "+channel", "-crop", bounds, "+repage",
                             "-resize", f"{limit}x{limit}>", str(out)], check=True)

@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreHaptics
 import LostIslandsCore
+import Observation
 import UIKit
 
 /// Every sound effect in the game. Raw values are file names in Resources/Audio.
@@ -95,6 +96,17 @@ final class AudioManager {
     }
 }
 
+/// Who is speaking right now and how loudly. Scenes and the dialogue panel read this to
+/// move mouths and show the speech badge; `Narrator` keeps it up to date.
+@Observable
+final class SpeechStage {
+    static let shared = SpeechStage()
+    var speaker: Speaker?
+    /// Smoothed loudness from 0 to 1.
+    var level = 0.0
+    var mouthOpen = false
+}
+
 /// Reads questions aloud. Uses the pre-recorded narrator clips bundled with the game
 /// (Resources/Speech), so it works offline and sounds the same on every device. Questions
 /// without a recording stay silent unless the grown-up has allowed the device's own voice.
@@ -140,6 +152,91 @@ final class Narrator {
         player?.stop()
         player = nil
         if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
+        endLine()
+    }
+
+    // MARK: - Character dialogue
+
+    private var gate = MouthGate()
+    private var ticker: Timer?
+    private var lineStart = Date()
+    /// How long the current line lasts: the recording's length, or the made-up rhythm's.
+    private var chatterLength = 0.0
+
+    /// Starts a line of dialogue: plays its recording if there is one and voices are on, and
+    /// either way drives `SpeechStage` so the speaker's mouth and badge move.
+    func speakLine(_ line: DialogueLine, voiced: Bool) {
+        stop()
+        guard line.speaker != .narrator else { return }
+        chatterLength = Chatter.duration(forTextLength: line.text.count)
+        envelope = []
+        if voiced, volume > 0, let key = line.audioKey, let url = Self.clipURL(key), let clip = try? AVAudioPlayer(contentsOf: url) {
+            clip.volume = volume
+            clip.play()
+            player = clip
+            envelope = Self.envelope(of: url)
+            if !envelope.isEmpty { chatterLength = Double(envelope.count) / Self.envelopeRate }
+        }
+        gate = MouthGate()
+        lineStart = Date()
+        SpeechStage.shared.speaker = line.speaker
+        ticker = Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { _ in
+            MainActor.assumeIsolated { Narrator.shared.tick() }
+        }
+    }
+
+    private func tick() {
+        let time = Date().timeIntervalSince(lineStart)
+        let loudness: Double
+        if envelope.isEmpty {
+            loudness = Chatter.level(at: time, duration: chatterLength)
+        } else {
+            // Follow the recording's own loudness, read from the file rather than from live
+            // metering, so it behaves the same on every device and in the simulator.
+            let index = Int(time * Self.envelopeRate)
+            loudness = envelope.indices.contains(index) ? envelope[index] : 0
+        }
+        let stage = SpeechStage.shared
+        stage.level = max(loudness, stage.level * 0.7)
+        stage.mouthOpen = gate.update(level: loudness, at: time)
+        if time >= chatterLength { endLine() }
+    }
+
+    private var envelope: [Double] = []
+    private static let envelopeRate = 30.0
+    private static var envelopes: [URL: [Double]] = [:]
+
+    /// The loudness of a clip, 30 values a second from 0 to 1, relative to its loudest moment.
+    static func envelope(of url: URL) -> [Double] {
+        if let cached = envelopes[url] { return cached }
+        var result: [Double] = []
+        if let file = try? AVAudioFile(forReading: url),
+           let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length)),
+           (try? file.read(into: buffer)) != nil, let samples = buffer.floatChannelData?[0] {
+            let window = max(Int(file.processingFormat.sampleRate / envelopeRate), 1)
+            let count = Int(buffer.frameLength)
+            var start = 0
+            while start < count {
+                let end = min(start + window, count)
+                var sum: Float = 0
+                for index in start..<end { sum += samples[index] * samples[index] }
+                result.append(Double((sum / Float(end - start)).squareRoot()))
+                start = end
+            }
+            let peak = result.max() ?? 0
+            result = peak > 0 ? result.map { min($0 / peak * 1.3, 1) } : []
+        }
+        envelopes[url] = result
+        return result
+    }
+
+    private func endLine() {
+        ticker?.invalidate()
+        ticker = nil
+        let stage = SpeechStage.shared
+        if stage.speaker != nil { stage.speaker = nil }
+        stage.level = 0
+        stage.mouthOpen = false
     }
 }
 

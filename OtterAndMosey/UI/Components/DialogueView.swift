@@ -23,6 +23,7 @@ struct DialogueView: View {
             HStack(alignment: .bottom, spacing: compact ? 10 : 18) {
                 portrait
                     .frame(width: compact ? 96 : 150 * scale, height: compact ? 96 : 150 * scale)
+                    .scaleEffect(1 + (speaking && !model.settings.reducedMotion ? 0.07 * stage.level : 0), anchor: .bottom)
                     .scaleEffect(appear ? 1 : 0.6)
                     .animation(.spring(duration: 0.3, bounce: 0.5), value: appear)
                 VStack(alignment: .leading, spacing: 6) {
@@ -64,6 +65,14 @@ struct DialogueView: View {
         }
     }
 
+    private var stage: SpeechStage { SpeechStage.shared }
+    private var speaking: Bool { stage.speaker == line.speaker }
+
+    /// The portrait's mouth opens with the voice when a talking frame exists for the character.
+    private func face(_ name: String) -> String {
+        speaking && stage.mouthOpen && Art.hasAsset("\(name)_talk") ? "\(name)_talk" : "\(name)_idle"
+    }
+
     private var speakerName: String {
         switch line.speaker {
         case .otter: "Otter"
@@ -84,8 +93,8 @@ struct DialogueView: View {
 
     @ViewBuilder private var portrait: some View {
         switch line.speaker {
-        case .otter: Image("otter_idle").resizable().scaledToFit()
-        case .mosey: Image("mosey_idle").resizable().scaledToFit()
+        case .otter: Image(face("otter")).resizable().scaledToFit()
+        case .mosey: Image(face("mosey")).resizable().scaledToFit()
         case .guardian: Image(guardianArt ?? "guardian_tree").resizable().scaledToFit()
         case .narrator: Text("📖").font(.system(size: compact ? 60 : 96))
         }
@@ -95,8 +104,8 @@ struct DialogueView: View {
         onLineShown(index)
         AudioManager.shared.play(.nav, volume: 0.6)
         // Otter and Mosey speak their lines where a recording exists; everything else is left to the reader.
-        Narrator.shared.stop()
-        if model.settings.characterVoices { Narrator.shared.say(key: line.audioKey, fallback: "") }
+        // The mouth and speech badge move for every speaker, recorded or not.
+        Narrator.shared.speakLine(line, voiced: model.settings.characterVoices)
     }
 
     private func advance() {

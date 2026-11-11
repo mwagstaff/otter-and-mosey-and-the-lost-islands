@@ -425,6 +425,24 @@
    "background": "opaque",
    "style": "scene_with_characters",
    "prompt": "A joyful ending illustration: on a beautiful tropical island beach at sunset, Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace, resting in the shallow water) celebrate beneath the huge restored Great Rainbow Crystal, which beams rainbow light across the sky. Around them, their new friends cheer: a smiling blossom-covered tree, a happy purple octopus in a sailor hat, a chubby orange dragon in blue trousers, a little cloud wizard in a purple star hat, a pink marshmallow monster and a small sparkling violet shadow creature. Confetti and fireflies in the air. Same characters and art style as the references. No text."
+  },
+  {
+   "name": "otter_talk_gen",
+   "refs": [
+    "tools/raw/otter_idle.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same image, unchanged in every detail, same pose, same size and same position, except that his mouth is open in a happy, mid-sentence talking shape, showing a little pink tongue. Do not move or redraw anything else."
+  },
+  {
+   "name": "mosey_talk_gen",
+   "refs": [
+    "tools/raw/mosey_idle.png"
+   ],
+   "model": "gpt-image-2.5-sunburst",
+   "quality": "high",
+   "prompt": "Exactly the same image, unchanged in every detail, same pose, same size and same position, except that her mouth is slightly open in a gentle, mid-sentence talking shape, rounded, with a little pink tongue and no sharp teeth. Do not move or redraw anything else."
   }
  ]
 }
