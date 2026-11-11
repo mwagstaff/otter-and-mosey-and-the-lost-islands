@@ -1,0 +1,38 @@
+{
+  "modelId": "music_v2_5",
+  "bitrate": 96000,
+  "loudness": 0.14,
+  "crossfadeSeconds": 3,
+  "dropTailSeconds": 2.5,
+  "style": "Instrumental background music for a gentle children's learning game, ages 7 to 8. Warm, friendly and unhurried, with a clear hummable melody. Steady tempo and even loudness from the first second to the last: no intro build-up, no breakdown, no big finish, no fade-out, so it can repeat as a loop. No vocals, no spoken words, no sound effects.",
+  "tracks": {
+    "music_title": {
+      "seconds": 60,
+      "prompt": "Bright, welcoming adventure theme for a storybook world of rainbow islands. Ukulele, glockenspiel, pizzicato strings, soft hand percussion and a playful recorder melody. Sunny, hopeful, about 104 bpm, C major."
+    },
+    "music_woods": {
+      "seconds": 60,
+      "prompt": "Cosy enchanted forest tune. Fingerpicked acoustic guitar, wooden marimba, soft clarinet melody, light shaker. Curious and calm, like tiptoeing among friendly talking trees, about 92 bpm, G major."
+    },
+    "music_bay": {
+      "seconds": 60,
+      "prompt": "Dreamy underwater lagoon tune. Harp arpeggios, vibraphone, warm soft synth pad, gentle bubbling plucked bass, a floating flute melody. Weightless and soothing, about 84 bpm, F major."
+    },
+    "music_dragon": {
+      "seconds": 60,
+      "prompt": "Plucky, friendly volcano adventure tune. Bouncy bassoon and tuba, pizzicato strings, hand drums and a brave little trumpet melody. Determined but never scary, about 108 bpm, A minor with a cheerful lift."
+    },
+    "music_cloud": {
+      "seconds": 60,
+      "prompt": "Light, airy castle-in-the-sky tune. Celesta, music box, soft flutes and high gentle strings with a skipping waltz feel. Floating and a little mischievous, about 96 bpm in three-four time, D major."
+    },
+    "music_candy": {
+      "seconds": 60,
+      "prompt": "Sweet, bouncy sweet-shop tune. Toy piano, xylophone, kazoo-like soft synth lead, plucked upright bass and finger snaps. Giggly and light on its feet, about 112 bpm, B flat major."
+    },
+    "music_star": {
+      "seconds": 60,
+      "prompt": "Quiet, wondering night-sky tune. Soft felt piano, glassy bells, warm cello and a slow twinkling arpeggio. Tender and hopeful, a little lonely at first and comforting by the end of each phrase, about 76 bpm, E flat major."
+    }
+  }
+}

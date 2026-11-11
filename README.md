@@ -159,10 +159,11 @@ to ElevenLabs and how to continue. Questions with no exact recording, such as wo
 the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
 have the built-in iOS voice read those word for word.
 
-**Music** is four loops synthesised by `python3 tools/synth_audio.py` (pure Python plus
-`afconvert`). They are simple placeholders: replace any `music_*.m4a` with a file of the same
-name. `python3 tools/synth_audio.py --effects` also writes basic synthesised effects, which
-overwrites the ElevenLabs ones.
+**Music** is seven loops, one for the menus and one per island, composed with ElevenLabs Music
+by `npm run music` in `tools/sfx` (prompts in `tools/sfx/music.json`) and turned into seamless
+loops by the same script. To swap one, replace its `music_*.m4a` with a file of the same name.
+`python3 tools/synth_audio.py --music --effects` writes simple synthesised stand-ins instead,
+which overwrites the ElevenLabs files.
 
 ## Debug launch arguments (Debug builds only)
 

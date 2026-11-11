@@ -48,13 +48,13 @@ struct IslandTheme {
                         container: "egg", friend: "babydragon", music: "music_dragon", underwater: false)
         case "cloud":
             IslandTheme(id: id, tint: UIColor(hex: "#8FA8FF"), ambient: .sparkles, blooms: ["🌈", "☁️", "🕊️", "🌼", "🎈"],
-                        container: "chest", friend: "friend_fish", music: "music_woods", underwater: false)
+                        container: "chest", friend: "friend_fish", music: "music_cloud", underwater: false)
         case "candy":
             IslandTheme(id: id, tint: UIColor(hex: "#FF7EB6"), ambient: .sprinkles, blooms: ["🍭", "🍬", "🧁", "🍓", "🍩"],
-                        container: "jar", friend: "friend_gummy", music: "music_bay", underwater: false)
+                        container: "jar", friend: "friend_gummy", music: "music_candy", underwater: false)
         default:
             IslandTheme(id: "star", tint: UIColor(hex: "#9B6BFF"), ambient: .stars, blooms: ["⭐️", "🌟", "🪐", "💫", "☄️"],
-                        container: "chest", friend: "friend_fish", music: "music_dragon", underwater: false)
+                        container: "chest", friend: "friend_fish", music: "music_star", underwater: false)
         }
     }
 }

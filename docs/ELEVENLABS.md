@@ -12,6 +12,7 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | Question narrator, "Alice" (486 clips) | Done and bundled. |
 | Otter and Mosey voices | Done and bundled: all 133 lines. The 9 opening-story lines were recorded first as a proof of concept. |
 | Guardian voices | Done and bundled: all 41 lines, six designed voices. |
+| Music (7 loops) | Done and bundled: one for the menus, one per island. See section 4. |
 | "Story" lines (4 clips) | Done and bundled, read by Alice with her question settings and no tag. Copies in `docs/voice-poc/story/`. |
 
 ## Setup
@@ -385,3 +386,73 @@ script then trims silence, sets the level and encodes each as AAC with macOS `af
 cd tools/sfx
 npm run generate -- --force pop   # regenerate one effect after editing its prompt
 ```
+
+## 4. Music
+
+Seven instrumental loops, composed with ElevenLabs Music and bundled as
+`OtterAndMosey/Resources/Audio/music_*.m4a`. The menus use `music_title`; each island's track is
+named in `IslandTheme.island(_:)` in `OtterAndMosey/Game/Systems/Theme.swift`.
+
+```bash
+cd tools/sfx
+npm run music                 # compose anything missing from ./raw, then build the loops
+npm run music -- music_bay    # only this track
+npm run music -- --force      # compose again (uses credits)
+npm run music -- --install    # rebuild the loops from ./raw, composing nothing
+```
+
+### What is sent
+
+`client.music.compose` once per track, with:
+
+| Parameter | Value |
+| --- | --- |
+| `modelId` | `music_v2_5` |
+| `musicLengthMs` | 60000 |
+| `forceInstrumental` | `true` |
+| `prompt` | the track's prompt followed by the shared style text, both in `tools/sfx/music.json` |
+
+Shared style text, added to every prompt:
+
+> Instrumental background music for a gentle children's learning game, ages 7 to 8. Warm, friendly
+> and unhurried, with a clear hummable melody. Steady tempo and even loudness from the first second
+> to the last: no intro build-up, no breakdown, no big finish, no fade-out, so it can repeat as a
+> loop. No vocals, no spoken words, no sound effects.
+
+| Track | Used for | Prompt |
+| --- | --- | --- |
+| `music_title` | Menus, map, story | Bright, welcoming adventure theme for a storybook world of rainbow islands. Ukulele, glockenspiel, pizzicato strings, soft hand percussion and a playful recorder melody. Sunny, hopeful, about 104 bpm, C major. |
+| `music_woods` | Whispering Woods | Cosy enchanted forest tune. Fingerpicked acoustic guitar, wooden marimba, soft clarinet melody, light shaker. Curious and calm, like tiptoeing among friendly talking trees, about 92 bpm, G major. |
+| `music_bay` | Bubble Bay | Dreamy underwater lagoon tune. Harp arpeggios, vibraphone, warm soft synth pad, gentle bubbling plucked bass, a floating flute melody. Weightless and soothing, about 84 bpm, F major. |
+| `music_dragon` | Dragonfire Mountain | Plucky, friendly volcano adventure tune. Bouncy bassoon and tuba, pizzicato strings, hand drums and a brave little trumpet melody. Determined but never scary, about 108 bpm, A minor with a cheerful lift. |
+| `music_cloud` | Cloud Castle | Light, airy castle-in-the-sky tune. Celesta, music box, soft flutes and high gentle strings with a skipping waltz feel. Floating and a little mischievous, about 96 bpm in three-four time, D major. |
+| `music_candy` | Candy Kingdom | Sweet, bouncy sweet-shop tune. Toy piano, xylophone, kazoo-like soft synth lead, plucked upright bass and finger snaps. Giggly and light on its feet, about 112 bpm, B flat major. |
+| `music_star` | Starlight Island | Quiet, wondering night-sky tune. Soft felt piano, glassy bells, warm cello and a slow twinkling arpeggio. Tender and hopeful, a little lonely at first and comforting by the end of each phrase, about 76 bpm, E flat major. |
+
+Each track was composed once and kept; nothing was auditioned. Composing is not repeatable: the
+same prompt gives a different piece each time.
+
+### How a piece becomes a loop
+
+The composed MP3s (stereo, 48 kHz) are kept in the git-ignored `tools/sfx/raw/`. `music.mjs` then:
+
+1. trims silence from both ends and drops the last 2.5 seconds, where pieces tend to die away;
+2. blends the final 3 seconds into the first 3 seconds, so the end of the file runs into its start;
+3. sets every track to the same average loudness (0.14 of full scale);
+4. encodes stereo AAC at 96 kbit/s with `afconvert`. Each loop is about 54 seconds and 0.7 MB.
+
+The numbers are in `music.json` (`dropTailSeconds`, `crossfadeSeconds`, `loudness`, `bitrate`).
+
+### Cost
+
+The seven tracks used 5,250 credits in total (750 for each 60-second piece), read from the
+account's balance before and after. The balance updates a few minutes late, so do not rely on it
+straight after a run. Rebuilding loops with `--install` costs nothing.
+
+### Known limits
+
+- The blend hides the join in level but not in harmony: if a piece ends on a different chord from
+  the one it starts on, the join can still be heard as a soft change.
+- The Starlight Island track winds down towards its end, so its last few seconds are quieter.
+- The app plays loops with `AVAudioPlayer`, and AAC files carry a few milliseconds of padding, so a
+  very short gap at the loop point is possible.

@@ -25,7 +25,7 @@ import Testing
         for effect in SFX.allCases {
             #expect(Bundle.main.url(forResource: effect.rawValue, withExtension: "m4a") != nil, "missing sound: \(effect.rawValue)")
         }
-        for track in ["music_title", "music_woods", "music_bay", "music_dragon"] {
+        for track in ["music_title", "music_woods", "music_bay", "music_dragon", "music_cloud", "music_candy", "music_star"] {
             #expect(Bundle.main.url(forResource: track, withExtension: "m4a") != nil, "missing music: \(track)")
         }
     }
