@@ -1,0 +1,667 @@
+{
+"line_4b3595f3": {
+"speaker": "otter",
+"scene": "intro",
+"text": "Mosey! I spelled 'breakfast' in the sand. Now I am hungry."
+},
+"line_346f97c9": {
+"speaker": "mosey",
+"scene": "intro",
+"text": "You are always hungry. That is three breakfasts today."
+},
+"line_6370a177": {
+"speaker": "otter",
+"scene": "intro",
+"text": "Three is a very good number."
+},
+"line_4b10a9e0": {
+"speaker": "mosey",
+"scene": "intro",
+"text": "Otter… the colours are fading!"
+},
+"line_0db2687c": {
+"speaker": "otter",
+"scene": "intro",
+"text": "The flowers have gone grey. We have to fix this!"
+},
+"line_441c4686": {
+"speaker": "mosey",
+"scene": "intro",
+"text": "Look, a word bubble by that flower. Try the missing letter!"
+},
+"line_044ac971": {
+"speaker": "otter",
+"scene": "intro",
+"text": "It bloomed! The colour came back!"
+},
+"line_47a1f912": {
+"speaker": "mosey",
+"scene": "intro",
+"text": "So our answers bring the world back to life."
+},
+"line_f8eb8524": {
+"speaker": "otter",
+"scene": "intro",
+"text": "Six islands. Six fragments. One snack break. Let us go!"
+},
+"line_c6ed7ad3": {
+"speaker": "otter",
+"scene": "woods-1",
+"text": "Look, Mosey! Word bubbles are stuck in the trees."
+},
+"line_73310ce7": {
+"speaker": "mosey",
+"scene": "woods-1",
+"text": "Fill in the missing letters and they will pop!"
+},
+"line_6aafc015": {
+"speaker": "otter",
+"scene": "woods-1",
+"text": "Popping things is my favourite subject."
+},
+"line_d9e00389": {
+"speaker": "mosey",
+"scene": "woods-1",
+"text": "Look! The flowers are waking up."
+},
+"line_59da1674": {
+"speaker": "otter",
+"scene": "woods-1",
+"text": "Our answers bring the colour back!"
+},
+"line_7e17605f": {
+"speaker": "otter",
+"scene": "woods-2",
+"text": "Uh oh. The bridge has vanished!"
+},
+"line_25affb33": {
+"speaker": "mosey",
+"scene": "woods-2",
+"text": "Each right answer builds a rainbow plank."
+},
+"line_f41e72a5": {
+"speaker": "otter",
+"scene": "woods-2",
+"text": "Then I shall walk on rainbows. Naturally."
+},
+"line_5cbdebbe": {
+"speaker": "otter",
+"scene": "woods-2",
+"text": "I crossed a rainbow! My feet feel fizzy."
+},
+"line_f9730f53": {
+"speaker": "mosey",
+"scene": "woods-3",
+"text": "Hop on, Otter. The river is the fastest way."
+},
+"line_301ac67b": {
+"speaker": "otter",
+"scene": "woods-3",
+"text": "Type the words to make us zoom!"
+},
+"line_cf5646df": {
+"speaker": "mosey",
+"scene": "woods-3",
+"text": "Hold on to my frills. Gently!"
+},
+"line_97ca8a9e": {
+"speaker": "otter",
+"scene": "woods-3",
+"text": "Again! Again!"
+},
+"line_ede09cd9": {
+"speaker": "mosey",
+"scene": "woods-3",
+"text": "Maybe after a snack."
+},
+"line_72660315": {
+"speaker": "mosey",
+"scene": "woods-4",
+"text": "The fireflies have lost their glow."
+},
+"line_f8343f4b": {
+"speaker": "otter",
+"scene": "woods-4",
+"text": "Tricky words ahead. I love tricky words!"
+},
+"line_6582ffc1": {
+"speaker": "mosey",
+"scene": "woods-4",
+"text": "You love ALL words."
+},
+"line_1d382fa0": {
+"speaker": "otter",
+"scene": "woods-4",
+"text": "Every firefly is glowing again!"
+},
+"line_b283540b": {
+"speaker": "otter",
+"scene": "woods-5",
+"text": "Hello, Mr Tree! We are looking for a crystal fragment."
+},
+"line_08333424": {
+"speaker": "mosey",
+"scene": "woods-5",
+"text": "One fragment found. Five to go!"
+},
+"line_b7ab72b3": {
+"speaker": "otter",
+"scene": "woods-5",
+"text": "The whole wood is green again!"
+},
+"line_43e72b5f": {
+"speaker": "otter",
+"scene": "woods-5",
+"text": "A talking tree who tells stories? Best. Day. Ever."
+},
+"line_26adc4d9": {
+"speaker": "mosey",
+"scene": "bay-1",
+"text": "Welcome to my favourite place. Maths under the sea!"
+},
+"line_b918c532": {
+"speaker": "otter",
+"scene": "bay-1",
+"text": "Which tunnel do we take?"
+},
+"line_e0df1fca": {
+"speaker": "mosey",
+"scene": "bay-1",
+"text": "The one with the right answer. Follow me!"
+},
+"line_760300f7": {
+"speaker": "otter",
+"scene": "bay-1",
+"text": "You swim so fast when you are right!"
+},
+"line_b9b2ba5c": {
+"speaker": "mosey",
+"scene": "bay-1",
+"text": "Maths makes me zoomy."
+},
+"line_5a1caf6e": {
+"speaker": "otter",
+"scene": "bay-2",
+"text": "A canyon. Under the sea. How?"
+},
+"line_6e70fb68": {
+"speaker": "mosey",
+"scene": "bay-2",
+"text": "Do not ask how. Ask how many!"
+},
+"line_4c4d2a14": {
+"speaker": "otter",
+"scene": "bay-2",
+"text": "Fine. Rainbow bridge time."
+},
+"line_0f4cf957": {
+"speaker": "mosey",
+"scene": "bay-2",
+"text": "A rainbow under water. Now I have seen everything."
+},
+"line_168475a1": {
+"speaker": "otter",
+"scene": "bay-3",
+"text": "Treasure chests! But they are locked."
+},
+"line_94055a91": {
+"speaker": "mosey",
+"scene": "bay-3",
+"text": "Type the answer to pop each lock."
+},
+"line_068b30f1": {
+"speaker": "otter",
+"scene": "bay-3",
+"text": "I hope one is full of fish biscuits."
+},
+"line_624ea6c4": {
+"speaker": "otter",
+"scene": "bay-3",
+"text": "No fish biscuits. But look at all these new friends!"
+},
+"line_c567cfb8": {
+"speaker": "mosey",
+"scene": "bay-4",
+"text": "The old shipwreck! Stay close, Otter."
+},
+"line_f0ee2edf": {
+"speaker": "otter",
+"scene": "bay-4",
+"text": "I am not scared. You are scared."
+},
+"line_266d517c": {
+"speaker": "mosey",
+"scene": "bay-4",
+"text": "I am a mosasaur. I am never scared."
+},
+"line_6dd93b2a": {
+"speaker": "otter",
+"scene": "bay-4",
+"text": "We made it! Was that a ghost?"
+},
+"line_088cbad2": {
+"speaker": "mosey",
+"scene": "bay-4",
+"text": "That was a jellyfish in a hat."
+},
+"line_89f96708": {
+"speaker": "mosey",
+"scene": "bay-5",
+"text": "Just two, Inky. Are you feeling muddled?"
+},
+"line_bf17b1a9": {
+"speaker": "otter",
+"scene": "bay-5",
+"text": "Two fragments! We make a brilliant team."
+},
+"line_6e5822bf": {
+"speaker": "mosey",
+"scene": "bay-5",
+"text": "The reef is glowing again!"
+},
+"line_ced185bb": {
+"speaker": "mosey",
+"scene": "bay-5",
+"text": "That is the crystal fragment! Good sitting, Inky."
+},
+"line_b48310e2": {
+"speaker": "otter",
+"scene": "dragon-1",
+"text": "Dragon eggs! They are getting cold."
+},
+"line_e7d41269": {
+"speaker": "mosey",
+"scene": "dragon-1",
+"text": "Type the answer to hatch each one."
+},
+"line_7f5b4fd3": {
+"speaker": "otter",
+"scene": "dragon-1",
+"text": "Come out, little dragons!"
+},
+"line_c461c9aa": {
+"speaker": "otter",
+"scene": "dragon-1",
+"text": "They think I am their mum."
+},
+"line_e0a3e45b": {
+"speaker": "mosey",
+"scene": "dragon-1",
+"text": "You do have the right hair."
+},
+"line_91812a17": {
+"speaker": "mosey",
+"scene": "dragon-2",
+"text": "A warm river. Lovely for my flippers."
+},
+"line_b607afe0": {
+"speaker": "otter",
+"scene": "dragon-2",
+"text": "Times tables tunnels ahead!"
+},
+"line_19646eb3": {
+"speaker": "mosey",
+"scene": "dragon-2",
+"text": "Count in jumps if you get stuck."
+},
+"line_5fa7297a": {
+"speaker": "mosey",
+"scene": "dragon-2",
+"text": "That was like a bubbly bath. With maths."
+},
+"line_b747f97f": {
+"speaker": "otter",
+"scene": "dragon-3",
+"text": "That lava looks very… lava-y."
+},
+"line_76276166": {
+"speaker": "mosey",
+"scene": "dragon-3",
+"text": "Then let us not fall in. Bridge time!"
+},
+"line_f5771cd9": {
+"speaker": "otter",
+"scene": "dragon-3",
+"text": "Rainbow planks, do your thing."
+},
+"line_dd10f21a": {
+"speaker": "otter",
+"scene": "dragon-3",
+"text": "My tail did not get toasted. Success!"
+},
+"line_587481e0": {
+"speaker": "mosey",
+"scene": "dragon-4",
+"text": "More eggs, deep in the crystal cave."
+},
+"line_4016643f": {
+"speaker": "otter",
+"scene": "dragon-4",
+"text": "These ones are trickier."
+},
+"line_71a79a7f": {
+"speaker": "mosey",
+"scene": "dragon-4",
+"text": "Good. Tricky makes us clever."
+},
+"line_e9170059": {
+"speaker": "otter",
+"scene": "dragon-4",
+"text": "So many dragons. I need more arms for cuddles."
+},
+"line_f9337626": {
+"speaker": "otter",
+"scene": "dragon-5",
+"text": "Excuse me. Your trousers are on fire."
+},
+"line_5a728bb0": {
+"speaker": "mosey",
+"scene": "dragon-5",
+"text": "Three fragments. Halfway there!"
+},
+"line_8d5b17e6": {
+"speaker": "otter",
+"scene": "dragon-5",
+"text": "And nobody got toasted."
+},
+"line_d4527a59": {
+"speaker": "mosey",
+"scene": "dragon-5",
+"text": "Hold still, Sir Scorch. One splash coming up!"
+},
+"line_9a441d98": {
+"speaker": "otter",
+"scene": "cloud-1",
+"text": "We are flying! On a cloud! Mosey, you are flying!"
+},
+"line_c99bbc77": {
+"speaker": "mosey",
+"scene": "cloud-1",
+"text": "I am a sky mosasaur now. Type to keep us going!"
+},
+"line_30677b50": {
+"speaker": "mosey",
+"scene": "cloud-1",
+"text": "Flying is just swimming with extra air."
+},
+"line_89e0306e": {
+"speaker": "otter",
+"scene": "cloud-2",
+"text": "Word bubbles, all the way up here!"
+},
+"line_ce5a201d": {
+"speaker": "mosey",
+"scene": "cloud-2",
+"text": "These words have special endings."
+},
+"line_039021a7": {
+"speaker": "otter",
+"scene": "cloud-2",
+"text": "Endings are my second favourite. After beginnings."
+},
+"line_925603d3": {
+"speaker": "otter",
+"scene": "cloud-2",
+"text": "Pop, pop, pop. The sky is turning blue again!"
+},
+"line_6fc9119d": {
+"speaker": "mosey",
+"scene": "cloud-3",
+"text": "Some words sound the same but mean different things."
+},
+"line_888f98dd": {
+"speaker": "otter",
+"scene": "cloud-3",
+"text": "Like 'sea' and 'see'!"
+},
+"line_0eb3c94d": {
+"speaker": "mosey",
+"scene": "cloud-3",
+"text": "Pick the right one to build each cloud step."
+},
+"line_49a8dbac": {
+"speaker": "otter",
+"scene": "cloud-3",
+"text": "I can SEE the SEA from here. Ha!"
+},
+"line_ad98c5a4": {
+"speaker": "mosey",
+"scene": "cloud-4",
+"text": "The castle portal is opening!"
+},
+"line_cc0cdbb9": {
+"speaker": "otter",
+"scene": "cloud-4",
+"text": "Fast fingers, careful fingers!"
+},
+"line_0c439033": {
+"speaker": "mosey",
+"scene": "cloud-4",
+"text": "Careful first. Fast comes later."
+},
+"line_f16e2d90": {
+"speaker": "otter",
+"scene": "cloud-4",
+"text": "We made it through! My whiskers are tingling."
+},
+"line_3f70f2bd": {
+"speaker": "otter",
+"scene": "cloud-5",
+"text": "Is it a nice trick?"
+},
+"line_044898e9": {
+"speaker": "mosey",
+"scene": "cloud-5",
+"text": "Four fragments. The sky is clear!"
+},
+"line_ff41b997": {
+"speaker": "otter",
+"scene": "cloud-5",
+"text": "And we made a new friend."
+},
+"line_8a4dc418": {
+"speaker": "otter",
+"scene": "cloud-5",
+"text": "Then come and play with us! After you hand over the fragment."
+},
+"line_1242abc0": {
+"speaker": "otter",
+"scene": "candy-1",
+"text": "Everything here is made of SWEETS."
+},
+"line_346bee55": {
+"speaker": "mosey",
+"scene": "candy-1",
+"text": "Do not lick the scenery, Otter."
+},
+"line_76a6c3a1": {
+"speaker": "otter",
+"scene": "candy-1",
+"text": "Too late. Let us open these jars by sharing equally!"
+},
+"line_91e2e61c": {
+"speaker": "otter",
+"scene": "candy-1",
+"text": "Fair shares for everyone. Mostly me."
+},
+"line_e30230bc": {
+"speaker": "mosey",
+"scene": "candy-2",
+"text": "A chocolate river. I may never leave."
+},
+"line_7678c347": {
+"speaker": "otter",
+"scene": "candy-2",
+"text": "Fraction tunnels ahead!"
+},
+"line_187f87a4": {
+"speaker": "mosey",
+"scene": "candy-2",
+"text": "Half of a thing is that thing shared by two."
+},
+"line_1ce188a7": {
+"speaker": "mosey",
+"scene": "candy-2",
+"text": "I am now one quarter chocolate."
+},
+"line_23ab72d9": {
+"speaker": "otter",
+"scene": "candy-3",
+"text": "The biscuit bridge got nibbled."
+},
+"line_cb46f32c": {
+"speaker": "mosey",
+"scene": "candy-3",
+"text": "Somebody had a midnight snack."
+},
+"line_703e15c6": {
+"speaker": "otter",
+"scene": "candy-3",
+"text": "It was not me. This time."
+},
+"line_237ec439": {
+"speaker": "otter",
+"scene": "candy-3",
+"text": "A rainbow biscuit bridge. Can I keep it?"
+},
+"line_8021fd8b": {
+"speaker": "mosey",
+"scene": "candy-4",
+"text": "Hold your nose. We are going under the fudge falls."
+},
+"line_1a9d50ce": {
+"speaker": "otter",
+"scene": "candy-4",
+"text": "Best. Waterfall. Ever."
+},
+"line_a2859bb2": {
+"speaker": "otter",
+"scene": "candy-4",
+"text": "I have fudge in my ears."
+},
+"line_4432c172": {
+"speaker": "mosey",
+"scene": "candy-4",
+"text": "Save some for later."
+},
+"line_521ba7f3": {
+"speaker": "mosey",
+"scene": "candy-5",
+"text": "That does not sound very fair, Puff."
+},
+"line_e798815f": {
+"speaker": "otter",
+"scene": "candy-5",
+"text": "Five fragments! Only one left."
+},
+"line_c5388f9c": {
+"speaker": "mosey",
+"scene": "candy-5",
+"text": "And it is on Starlight Island."
+},
+"line_c20ae3f9": {
+"speaker": "mosey",
+"scene": "candy-5",
+"text": "The fragment! Thank you, Puff. Fair shares all round."
+},
+"line_ccbbee19": {
+"speaker": "otter",
+"scene": "star-1",
+"text": "The stars have gone dim."
+},
+"line_28d2c56d": {
+"speaker": "mosey",
+"scene": "star-1",
+"text": "Every word we spell lights one up."
+},
+"line_378e2412": {
+"speaker": "otter",
+"scene": "star-1",
+"text": "Then let us light the whole sky!"
+},
+"line_96d9382a": {
+"speaker": "mosey",
+"scene": "star-1",
+"text": "Look at them twinkle."
+},
+"line_3a0b5569": {
+"speaker": "mosey",
+"scene": "star-2",
+"text": "We can swim through stardust up here!"
+},
+"line_61e31079": {
+"speaker": "otter",
+"scene": "star-2",
+"text": "Is it sticky?"
+},
+"line_32db62fe": {
+"speaker": "mosey",
+"scene": "star-2",
+"text": "Only a little. Tunnels ahead!"
+},
+"line_b4c88c0c": {
+"speaker": "otter",
+"scene": "star-2",
+"text": "I have stardust in my scarf. Fancy."
+},
+"line_5033f68f": {
+"speaker": "otter",
+"scene": "star-3",
+"text": "To the last portal!"
+},
+"line_9e4db1c1": {
+"speaker": "mosey",
+"scene": "star-3",
+"text": "Type carefully and we will fly straight."
+},
+"line_4d1c8f57": {
+"speaker": "mosey",
+"scene": "star-3",
+"text": "That was our best flying yet."
+},
+"line_41251a1a": {
+"speaker": "otter",
+"scene": "star-4",
+"text": "One last bridge, made of stars."
+},
+"line_7ffa4a3f": {
+"speaker": "mosey",
+"scene": "star-4",
+"text": "Words and numbers together this time."
+},
+"line_2a09b8ef": {
+"speaker": "otter",
+"scene": "star-4",
+"text": "Our two favourite things!"
+},
+"line_a90a27f7": {
+"speaker": "otter",
+"scene": "star-4",
+"text": "We built a bridge out of STARS, Mosey."
+},
+"line_dcd5bdcd": {
+"speaker": "otter",
+"scene": "star-5",
+"text": "And to find out who broke it."
+},
+"line_62738bf8": {
+"speaker": "otter",
+"scene": "star-5",
+"text": "We did it, Mosey!"
+},
+"line_10b91d0f": {
+"speaker": "mosey",
+"scene": "star-5",
+"text": "We did it together. That is the real magic."
+},
+"line_ee5f9b80": {
+"speaker": "mosey",
+"scene": "star-5",
+"text": "You will not disappear, Umbra. Shadows need the light."
+},
+"line_701d85be": {
+"speaker": "otter",
+"scene": "star-5",
+"text": "And friends need friends. Come with us!"
+}
+}

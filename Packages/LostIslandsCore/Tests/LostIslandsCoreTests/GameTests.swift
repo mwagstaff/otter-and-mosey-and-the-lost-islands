@@ -26,6 +26,27 @@ import Testing
         #expect(!catalog.intro.isEmpty && !catalog.introAfter.isEmpty)
     }
 
+    @Test func dialogueClipKeysMatchTheBuiltScript() {
+        let script = Catalog.voicedLines
+        #expect(script.count > 100)
+        var lines = catalog.intro + catalog.introAfter
+        for island in catalog.islands {
+            lines += island.guardian.phases + island.guardian.befriended
+            for level in island.levels { lines += level.intro + level.outro }
+        }
+        for line in lines {
+            switch line.speaker {
+            case .otter, .mosey:
+                let entry = script[line.audioKey ?? ""]
+                #expect(entry?.text == line.text, "no script entry for: \(line.text)")
+                #expect(entry?.speaker == line.speaker.rawValue)
+            case .guardian, .narrator:
+                #expect(line.audioKey == nil)
+            }
+        }
+        #expect(script.values.filter { $0.scene == "intro" }.count == 9)
+    }
+
     @Test func modesOnlyGetSkillsTheyCanPresent() {
         for level in catalog.allLevels {
             switch level.mode {

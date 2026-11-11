@@ -93,8 +93,10 @@ struct DialogueView: View {
 
     private func show() {
         onLineShown(index)
-        // Story lines are deliberately not read aloud: the characters' voices are left to the reader.
         AudioManager.shared.play(.nav, volume: 0.6)
+        // Otter and Mosey speak their lines where a recording exists; everything else is left to the reader.
+        Narrator.shared.stop()
+        if model.settings.characterVoices { Narrator.shared.say(key: line.audioKey, fallback: "") }
     }
 
     private func advance() {
@@ -109,6 +111,7 @@ struct DialogueView: View {
     }
 
     private func finish() {
+        Narrator.shared.stop()
         onFinish()
     }
 }

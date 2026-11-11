@@ -44,6 +44,26 @@ public struct DialogueLine: Codable, Equatable, Sendable {
         text = parts[1]
     }
 
+    private var prefix: String {
+        switch speaker {
+        case .otter: "o"
+        case .mosey: "m"
+        case .guardian: "g"
+        case .narrator: "n"
+        }
+    }
+
+    /// The recorded clip for this line, when one exists. Only Otter and Mosey are voiced.
+    /// The key is a 32-bit FNV-1a hash of "speaker:text", matching tools/build_content.py.
+    public var audioKey: String? {
+        guard speaker == .otter || speaker == .mosey else { return nil }
+        var hash: UInt32 = 0x811C_9DC5
+        for byte in "\(prefix):\(text)".utf8 {
+            hash = (hash ^ UInt32(byte)) &* 0x0100_0193
+        }
+        return "line_" + String(hash, radix: 16).leftPadded(to: 8)
+    }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         let prefix = switch speaker {
@@ -53,6 +73,12 @@ public struct DialogueLine: Codable, Equatable, Sendable {
         case .narrator: "n"
         }
         try container.encode("\(prefix):\(text)")
+    }
+}
+
+extension String {
+    func leftPadded(to length: Int) -> String {
+        String(repeating: "0", count: max(0, length - count)) + self
     }
 }
 
@@ -117,6 +143,21 @@ public struct Catalog: Codable, Sendable {
             assertionFailure("Bundled catalogue failed to load: \(error)")
             return Catalog(islands: [], rewards: [], intro: [], introAfter: [])
         }
+    }()
+
+    /// Every voiced dialogue line: clip key to speaker, scene and text.
+    public struct VoicedLine: Codable, Equatable, Sendable {
+        public let speaker: String
+        public let scene: String
+        public let text: String
+    }
+
+    public static let voicedLines: [String: VoicedLine] = {
+        guard let url = Bundle.module.url(forResource: "dialogue", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let lines = try? JSONDecoder().decode([String: VoicedLine].self, from: data)
+        else { return [:] }
+        return lines
     }()
 
     public var allLevels: [LevelDef] { islands.flatMap(\.levels) }

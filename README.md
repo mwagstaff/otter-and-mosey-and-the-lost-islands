@@ -149,7 +149,9 @@ The voice and model are set in `tools/sfx/narration.config.json`. What is record
 - one short instruction per maths topic, used when a question's exact numbers have no recording
   (for example "Add the two numbers together.")
 
-Story dialogue is not read aloud. Questions with no exact recording, such as word problems, get
+Otter and Mosey have their own designed voices, so far recorded only for the opening story as a
+proof of concept; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
+to ElevenLabs and how to continue. Questions with no exact recording, such as word problems, get
 the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
 have the built-in iOS voice read those word for word.
 

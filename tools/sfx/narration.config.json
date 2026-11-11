@@ -3,11 +3,39 @@
   "voiceName": "Alice",
   "modelId": "eleven_v4",
   "outputFormat": "mp3_44100_64",
-  "voiceSettings": { "stability": 0.55, "similarityBoost": 0.75 },
+  "voiceSettings": {
+    "stability": 0.55,
+    "similarityBoost": 0.75
+  },
   "candidates": {
     "alice": "Xb7hH8MSUJpSbSDYk0k2",
     "george": "JBFqnCBsd6RMkjVDRZzb",
     "lily": "pFZP5JQG7iQjIQuC4Bku"
   },
-  "sampleKeys": ["word_because", "word_beautiful", "mul_8x7", "skill_sequences"]
+  "sampleKeys": [
+    "word_because",
+    "word_beautiful",
+    "mul_8x7",
+    "skill_sequences"
+  ],
+  "characters": {
+    "otter": {
+      "voiceId": "sYN0fMdsZGmW5GjQDfRo",
+      "voiceName": "Otter (Lost Islands)",
+      "deliveryTag": "[excited] ",
+      "voiceSettings": {
+        "stability": 0.35,
+        "similarityBoost": 0.8
+      }
+    },
+    "mosey": {
+      "voiceId": "K0lydB7PoIvM0LcxjPER",
+      "voiceName": "Mosey (Lost Islands)",
+      "deliveryTag": "[gently] ",
+      "voiceSettings": {
+        "stability": 0.6,
+        "similarityBoost": 0.8
+      }
+    }
+  }
 }

@@ -126,6 +126,7 @@ final class Narrator {
             clip.play()
             player = clip
         } else if deviceVoice, !fallback.isEmpty {
+            // Only questions pass fallback text; character dialogue never uses the device voice.
             let utterance = AVSpeechUtterance(string: fallback.replacingOccurrences(of: "___", with: "blank"))
             utterance.voice = voice
             utterance.rate = 0.42

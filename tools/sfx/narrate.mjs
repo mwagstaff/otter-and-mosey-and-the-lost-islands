@@ -6,6 +6,8 @@
 //   npm run narrate -- --force            # record everything again (uses about 13,000 credits)
 //   npm run narrate -- --samples          # short samples of each candidate voice, into ./samples
 //   npm run narrate -- --count            # show what would be recorded, spend nothing
+//   npm run narrate -- --dialogue intro   # Otter's and Mosey's lines for one scene (intro, woods-1, ...)
+//   npm run narrate -- --dialogue all     # every Otter and Mosey line
 //
 // The script (what is said) comes from narration.json, which tools/build_content.py writes.
 // The voice and model are set in narration.config.json. The API key is read from
@@ -19,20 +21,22 @@ const here = dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(readFileSync(join(here, "narration.config.json"), "utf8"));
 const script = JSON.parse(readFileSync(
   join(here, "../../Packages/LostIslandsCore/Sources/LostIslandsCore/Resources/narration.json"), "utf8"));
+const resources = join(here, "../../Packages/LostIslandsCore/Sources/LostIslandsCore/Resources");
+const dialogue = JSON.parse(readFileSync(join(resources, "dialogue.json"), "utf8"));
 const speechDir = join(here, "../../OtterAndMosey/Resources/Speech");
 const args = process.argv.slice(2);
 const flags = new Set(args.filter((arg) => arg.startsWith("--")));
-const wanted = args.filter((arg) => !arg.startsWith("--"));
+const wanted = args.filter((arg, index) => !arg.startsWith("--") && args[index - 1] !== "--dialogue");
 
 const client = new ElevenLabsClient();
 
-async function record(voiceId, text, file) {
+async function record(voiceId, text, file, voiceSettings = config.voiceSettings) {
   const audio = await client.textToSpeech.convert(voiceId, {
     text,
     modelId: config.modelId,
     outputFormat: config.outputFormat,
     languageCode: "en",
-    voiceSettings: config.voiceSettings,
+    voiceSettings,
   });
   const chunks = [];
   for await (const chunk of audio) chunks.push(Buffer.from(chunk));
@@ -48,7 +52,7 @@ async function runAll(jobs, width = 3) {
     for (let job = queue.shift(); job; job = queue.shift()) {
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
-          await record(job.voiceId, job.text, job.file);
+          await record(job.voiceId, job.text, job.file, job.voiceSettings);
           done++;
           if (done % 25 === 0) console.log(`${done}/${jobs.length}`);
           break;
@@ -76,6 +80,22 @@ if (flags.has("--samples")) {
     }
   }
   console.log(await runAll(jobs), "samples in", samples);
+} else if (args.includes("--dialogue")) {
+  // Character lines: each character has its own voice, settings and delivery tag.
+  const scene = args[args.indexOf("--dialogue") + 1];
+  mkdirSync(speechDir, { recursive: true });
+  const jobs = Object.entries(dialogue)
+    .filter(([, line]) => scene === "all" || line.scene === scene)
+    .map(([key, line]) => {
+      const character = config.characters[line.speaker];
+      return { key, voiceId: character.voiceId, voiceSettings: character.voiceSettings,
+               text: `${character.deliveryTag ?? ""}${line.text}`, file: join(speechDir, `say_${key}.mp3`) };
+    })
+    .filter((job) => flags.has("--force") || !existsSync(job.file));
+  const characters = jobs.reduce((sum, job) => sum + job.text.length, 0);
+  console.log(`${jobs.length} dialogue lines to record for "${scene}" (${characters} characters)`);
+  for (const job of jobs) console.log(`  ${job.key}  ${job.text}`);
+  if (!flags.has("--count") && jobs.length) console.log(await runAll(jobs));
 } else {
   mkdirSync(speechDir, { recursive: true });
   const jobs = Object.entries(script)

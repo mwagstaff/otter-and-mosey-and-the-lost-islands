@@ -90,10 +90,30 @@ for island in source.ISLANDS:
     for l in island["levels"]:
         if l["reward"] and l["reward"] not in reward_ids: sys.exit(f"unknown reward {l['reward']}")
 if len(set(level_ids)) != len(level_ids): sys.exit("duplicate level ids")
+# Character dialogue that can be voiced: clip key -> who says it, where, and the words.
+# The key is a hash of "speaker:text", computed the same way by DialogueLine.audioKey in Swift.
+def line_key(line):
+    value = 0x811C9DC5
+    for byte in line.encode("utf-8"):
+        value = ((value ^ byte) * 0x01000193) & 0xFFFFFFFF
+    return f"line_{value:08x}"
+
+dialogue = {}
+def collect(scene, lines):
+    for line in lines:
+        speaker, text = line.split(":", 1)
+        if speaker in ("o", "m"):
+            dialogue.setdefault(line_key(line), {"speaker": "otter" if speaker == "o" else "mosey", "scene": scene, "text": text})
+collect("intro", source.INTRO + source.INTRO_AFTER)
+for island in source.ISLANDS:
+    for l in island["levels"]:
+        collect(l["id"], l["intro"] + l["outro"])
+    collect(island["levels"][-1]["id"], island["guardian"]["phases"] + island["guardian"]["befriended"])
+(out / "dialogue.json").write_text(json.dumps(dialogue, indent=0, ensure_ascii=False) + "\n")
 catalogue = {
     "islands": source.ISLANDS,
     "rewards": [{"id": r[0], "kind": r[1], "name": r[2], "emoji": r[3]} for r in source.REWARDS],
     "intro": source.INTRO, "introAfter": source.INTRO_AFTER,
 }
 (out / "islands.json").write_text(json.dumps(catalogue, indent=1, ensure_ascii=False) + "\n")
-print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(lookalikes)} lookalikes, {len(narration)} narration lines ({sum(len(t) for t in narration.values())} characters)")
+print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(dialogue)} voiced dialogue lines ({sum(len(d['text']) for d in dialogue.values())} characters), {len(lookalikes)} lookalikes, {len(narration)} narration lines ({sum(len(t) for t in narration.values())} characters)")

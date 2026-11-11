@@ -224,6 +224,7 @@ struct SettingsControls: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 250 : 300), spacing: 10)], spacing: compact ? 6 : 10) {
                 toggle("🔇 Mute everything", settings.muted)
                 toggle("🗣 Read questions aloud", settings.spokenInstructions)
+                toggle("🦦 Otter and Mosey voices", settings.characterVoices)
                 toggle("🤖 Device voice for other sums", settings.deviceVoice)
                 toggle("📳 Vibration", settings.haptics)
                 toggle("🐢 Calmer motion", settings.reducedMotion)
