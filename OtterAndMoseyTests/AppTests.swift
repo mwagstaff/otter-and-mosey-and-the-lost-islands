@@ -5,8 +5,9 @@ import Testing
 @testable import OtterAndMosey
 
 /// Checks that need the app bundle: bundled art and audio, and the app-level save flow.
+/// Run one at a time: several tests use the shared narrator, and would cut each other off.
 @MainActor
-@Suite struct AppTests {
+@Suite(.serialized) struct AppTests {
     @Test func everyArtAssetTheGameNamesIsBundled() {
         var names = ["logo", "bg_title", "bg_map", "bg_ending", "duo_ride", "crystal_whole", "crystal_shard", "pearl", "ring", "cliff"]
         for kind in ["otter", "mosey"] {
@@ -35,6 +36,12 @@ import Testing
         #expect(Narrator.shared.canSay(key: "word_because", fallback: ""))
         Narrator.shared.deviceVoice = false
         #expect(!Narrator.shared.canSay(key: nil, fallback: "anything"), "no recording and no device voice means silence")
+    }
+
+    @Test func everyOtterAndMoseyLineHasARecording() {
+        let missing = Catalog.voicedLines.filter { Narrator.clipURL($0.key) == nil }.map(\.value.text).sorted()
+        #expect(Catalog.voicedLines.count == 133)
+        #expect(missing.isEmpty, "\(missing.count) character lines missing a recording, e.g. \(missing.prefix(3))")
     }
 
     @Test func speakingALineDrivesTheSpeechStage() async throws {

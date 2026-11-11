@@ -10,7 +10,7 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | --- | --- |
 | Sound effects (21) | Done and bundled. |
 | Question narrator, "Alice" (486 clips) | Done and bundled. |
-| Otter and Mosey voices | **Proof of concept only**: the 9 lines of the opening story. The other 124 lines are not recorded. |
+| Otter and Mosey voices | Done and bundled: all 133 lines. The 9 opening-story lines were recorded first as a proof of concept. |
 | Guardian and "Story" lines | Not voiced. |
 
 ## Setup
@@ -68,7 +68,8 @@ parameters). Script: `tools/sfx/design-voices.mjs`.
 
 Each request returned three previews, saved in `docs/voice-poc/design_<character>_<n>.mp3`. They
 were chosen without listening, using a rough pitch measurement (median pitch, and the range
-between the 10th and 90th percentile). Treat the choice as provisional.
+between the 10th and 90th percentile). The nine proof-of-concept lines were then approved by ear
+before the rest were recorded.
 
 | Preview | Median pitch | Pitch range | Kept |
 | --- | --- | --- | --- |
@@ -136,6 +137,9 @@ Things worth listening for: whether the single tag suits every line (line 4 is w
 gentle; line 5 is alarmed, not excited), and whether "Let us go!" should be written "Let's go!".
 
 ### Continuing
+
+All 133 lines are recorded with the settings above. The commands below are for re-recording
+after a change, or for new lines.
 
 The full script is `Packages/LostIslandsCore/Sources/LostIslandsCore/Resources/dialogue.json`
 (133 lines, about 4,700 characters before tags), built from `tools/content/islands.py` by

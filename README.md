@@ -153,8 +153,7 @@ While a character speaks, a speech badge appears over them and their mouth moves
 voice (or with a made-up rhythm when a line has no recording); see
 [docs/SPEAKING_ANIMATION_PLAN.md](docs/SPEAKING_ANIMATION_PLAN.md).
 
-Otter and Mosey have their own designed voices, so far recorded only for the opening story as a
-proof of concept; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
+Otter and Mosey have their own designed voices and all 133 of their lines are recorded; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
 to ElevenLabs and how to continue. Questions with no exact recording, such as word problems, get
 the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
 have the built-in iOS voice read those word for word.
