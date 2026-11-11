@@ -29,6 +29,14 @@ import Testing
         }
     }
 
+    @Test func everyNarrationLineHasARecording() {
+        let missing = WordBank.narration.keys.filter { Narrator.clipURL($0) == nil }.sorted()
+        #expect(missing.isEmpty, "\(missing.count) narrator clips missing, e.g. \(missing.prefix(5))")
+        #expect(Narrator.shared.canSay(key: "word_because", fallback: ""))
+        Narrator.shared.deviceVoice = false
+        #expect(!Narrator.shared.canSay(key: nil, fallback: "anything"), "no recording and no device voice means silence")
+    }
+
     @Test func progressSurvivesARelaunch() {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("app-test-\(UUID().uuidString)")
         let store = SaveStore(directory: directory)

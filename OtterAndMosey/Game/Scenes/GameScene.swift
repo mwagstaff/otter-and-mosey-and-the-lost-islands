@@ -154,8 +154,11 @@ class GameScene: SKScene {
         bridge.hintText = nil
         bridge.caption = caption(for: question)
         bridge.keyboard = keyboard(for: question)
-        bridge.speakable = question.spoken
-        if options.settings.spokenInstructions, shouldSpeak(question) { Narrator.shared.speak(question.spoken) }
+        let spoken = shouldSpeak(question)
+        bridge.speakable = spoken ? question.spoken : ""
+        bridge.speakableKey = spoken ? question.audioKey : nil
+        bridge.canSpeak = spoken && Narrator.shared.canSay(key: question.audioKey, fallback: question.spoken)
+        if options.settings.spokenInstructions, spoken { Narrator.shared.say(key: question.audioKey, fallback: question.spoken) }
         present(question)
     }
 

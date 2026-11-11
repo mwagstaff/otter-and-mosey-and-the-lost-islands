@@ -32,6 +32,8 @@ public struct Question: Identifiable, Equatable, Sendable {
     /// What the narrator should say aloud.
     public let spoken: String
     public let level: Int
+    /// The pre-recorded narrator clip that reads this question, if one exists (see narration.json).
+    public let audioKey: String?
     /// True when the full word should be shown briefly and then hidden (look, cover, write).
     public let flashThenHide: Bool
 
@@ -39,7 +41,7 @@ public struct Question: Identifiable, Equatable, Sendable {
         id: UUID = UUID(), key: String, skill: Skill, format: AnswerFormat, prompt: String,
         answer: String, choices: [String] = [], correctChoice: String? = nil, masked: String? = nil,
         typingTarget: String? = nil, hint: String, spoken: String? = nil, level: Int,
-        flashThenHide: Bool = false
+        audioKey: String? = nil, flashThenHide: Bool = false
     ) {
         self.id = id
         self.key = key
@@ -54,6 +56,7 @@ public struct Question: Identifiable, Equatable, Sendable {
         self.hint = hint
         self.spoken = spoken ?? prompt
         self.level = level
+        self.audioKey = audioKey
         self.flashThenHide = flashThenHide
     }
 

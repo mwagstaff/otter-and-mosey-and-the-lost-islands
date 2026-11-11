@@ -94,6 +94,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var highContrast = false
     public var easyReadFont = false
     public var spokenInstructions = true
+    /// Let the device's built-in voice read questions that have no narrator recording.
+    public var deviceVoice = false
 
     public init() {}
 
@@ -107,6 +109,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         highContrast = c.value(.highContrast, default: false)
         easyReadFont = c.value(.easyReadFont, default: false)
         spokenInstructions = c.value(.spokenInstructions, default: true)
+        deviceVoice = c.value(.deviceVoice, default: false)
     }
 }
 

@@ -78,6 +78,15 @@ public struct WordBank: Sendable {
         return source
     }
 
+    /// Every narrator clip key and the words spoken in it.
+    public static let narration: [String: String] = {
+        guard let url = Bundle.module.url(forResource: "narration", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let lines = try? JSONDecoder().decode([String: String].self, from: data)
+        else { return [:] }
+        return lines
+    }()
+
     public func sentencePool(level: Int) -> [TypingSentence] {
         let matches = sentences.filter { abs($0.level - level) <= 1 }
         return matches.isEmpty ? sentences : matches
@@ -102,7 +111,8 @@ public enum SpellingGenerator {
                 key: entry.key, skill: .homophones, format: .choice, prompt: entry.sentence,
                 answer: entry.word, choices: [entry.word, partner].shuffled(using: &rng), masked: nil,
                 hint: "Say the sentence aloud. Which spelling has the right meaning?",
-                spoken: entry.sentence.replacingOccurrences(of: "___", with: entry.word), level: level
+                spoken: entry.sentence.replacingOccurrences(of: "___", with: entry.word), level: level,
+                audioKey: "word_\(entry.word)"
             )
         }
 
@@ -115,7 +125,7 @@ public enum SpellingGenerator {
                 key: entry.key, skill: entry.topic, format: .typed, prompt: entry.sentence,
                 answer: entry.word, masked: String(repeating: "_", count: letters.count),
                 typingTarget: entry.word, hint: "It starts with “\(letters[0])” and has \(letters.count) letters.",
-                spoken: "\(entry.word). \(spokenSentence)", level: level, flashThenHide: true
+                spoken: "\(entry.word). \(spokenSentence)", level: level, audioKey: "word_\(entry.word)", flashThenHide: true
             )
         }
 
@@ -131,7 +141,7 @@ public enum SpellingGenerator {
                 key: entry.key, skill: entry.topic, format: .typed, prompt: entry.sentence,
                 answer: entry.word, masked: masked, typingTarget: missing,
                 hint: "The word is “\(entry.word)”. Say it slowly and listen for each sound.",
-                spoken: "\(entry.word). \(spokenSentence)", level: level
+                spoken: "\(entry.word). \(spokenSentence)", level: level, audioKey: "word_\(entry.word)"
             )
         case .choice:
             let options = letterChoices(for: missing, in: letters, hidden: hidden, bank: bank, using: &rng)
@@ -139,7 +149,7 @@ public enum SpellingGenerator {
                 key: entry.key, skill: entry.topic, format: .choice, prompt: entry.sentence,
                 answer: entry.word, choices: options, correctChoice: missing, masked: masked,
                 typingTarget: missing, hint: "Try each one in the gap. Which looks right?",
-                spoken: "\(entry.word). \(spokenSentence)", level: level
+                spoken: "\(entry.word). \(spokenSentence)", level: level, audioKey: "word_\(entry.word)"
             )
         }
     }

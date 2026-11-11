@@ -95,25 +95,51 @@ final class AudioManager {
     }
 }
 
-/// Reads words and questions aloud with the system voice. Works offline.
+/// Reads questions aloud. Uses the pre-recorded narrator clips bundled with the game
+/// (Resources/Speech), so it works offline and sounds the same on every device. Questions
+/// without a recording stay silent unless the grown-up has allowed the device's own voice.
 final class Narrator {
     static let shared = Narrator()
+    private var player: AVAudioPlayer?
     private let synthesizer = AVSpeechSynthesizer()
     private let voice = AVSpeechSynthesisVoice(language: "en-GB")
     var volume: Float = 0.9
+    /// Allow the built-in system voice for questions with no narrator recording.
+    var deviceVoice = false
 
-    func speak(_ text: String) {
-        guard volume > 0, !text.isEmpty else { return }
-        synthesizer.stopSpeaking(at: .immediate)
-        let utterance = AVSpeechUtterance(string: text.replacingOccurrences(of: "___", with: "blank"))
-        utterance.voice = voice
-        utterance.rate = 0.42
-        utterance.pitchMultiplier = 1.1
-        utterance.volume = volume
-        synthesizer.speak(utterance)
+    static func clipURL(_ key: String) -> URL? {
+        Bundle.main.url(forResource: "say_\(key)", withExtension: "mp3")
     }
 
-    func stop() { synthesizer.stopSpeaking(at: .immediate) }
+    /// Whether anything would be heard for this question.
+    func canSay(key: String?, fallback: String) -> Bool {
+        if let key, Self.clipURL(key) != nil { return true }
+        return deviceVoice && !fallback.isEmpty
+    }
+
+    /// Plays the narrator clip for `key`, or reads `fallback` with the device voice if that is allowed.
+    func say(key: String?, fallback: String) {
+        stop()
+        guard volume > 0 else { return }
+        if let key, let url = Self.clipURL(key), let clip = try? AVAudioPlayer(contentsOf: url) {
+            clip.volume = volume
+            clip.play()
+            player = clip
+        } else if deviceVoice, !fallback.isEmpty {
+            let utterance = AVSpeechUtterance(string: fallback.replacingOccurrences(of: "___", with: "blank"))
+            utterance.voice = voice
+            utterance.rate = 0.42
+            utterance.pitchMultiplier = 1.1
+            utterance.volume = volume
+            synthesizer.speak(utterance)
+        }
+    }
+
+    func stop() {
+        player?.stop()
+        player = nil
+        if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
+    }
 }
 
 /// Light, optional touch feedback. Nothing in the game depends on it.

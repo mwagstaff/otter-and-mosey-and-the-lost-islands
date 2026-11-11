@@ -101,6 +101,7 @@ final class AppModel {
         AudioManager.shared.apply(settings)
         Haptics.shared.enabled = settings.haptics
         Narrator.shared.volume = settings.muted ? 0 : Float(max(settings.effectsVolume, 0.3))
+        Narrator.shared.deviceVoice = settings.deviceVoice
         Effects.reducedMotion = settings.reducedMotion
         GameFont.easyRead = settings.easyReadFont
     }

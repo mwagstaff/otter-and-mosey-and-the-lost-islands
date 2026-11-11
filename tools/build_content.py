@@ -58,6 +58,28 @@ if dictionary.exists():
     (out / "lookalikes.json").write_text(json.dumps(sorted(lookalikes)) + "\n")
 else:
     print("warning: /usr/share/dict/words not found; keeping the existing lookalikes.json")
+# The narrator's script: clip key -> exactly what is said. tools/sfx/narrate.mjs records these,
+# and the app plays the clip whose key matches a question's `audioKey`.
+narration = {}
+for entry in words:
+    spoken = entry["sentence"].replace("___", entry["word"])
+    narration[f"word_{entry['word']}"] = f"{entry['word'].capitalize()}. {spoken}"
+for table in (2, 3, 4, 5, 8, 10):
+    for other in range(1, 13):
+        narration[f"mul_{table}x{other}"] = f"{other} times {table}."
+        narration[f"mulq_{table}x{other}"] = f"What times {table} makes {table * other}?"
+        narration[f"div_{table}x{other}"] = f"{table * other} divided by {table}."
+narration.update({
+    "skill_addition": "Add the two numbers together.",
+    "skill_subtraction": "Take the second number away from the first.",
+    "skill_multiplication": "Multiply the two numbers.",
+    "skill_division": "Share the first number equally.",
+    "skill_fractions": "Work out the fraction.",
+    "skill_placeValue": "Think about the hundreds, tens and ones.",
+    "skill_sequences": "Which number is missing from the pattern?",
+    "skill_wordProblems": "Read the number story, then work out the answer.",
+})
+(out / "narration.json").write_text(json.dumps(narration, indent=0, ensure_ascii=False) + "\n")
 (out / "words.json").write_text(json.dumps(words, indent=1, ensure_ascii=False) + "\n")
 (out / "sentences.json").write_text(json.dumps(sentences, indent=1) + "\n")
 sys.path.insert(0, str(root / "tools/content"))
@@ -74,4 +96,4 @@ catalogue = {
     "intro": source.INTRO, "introAfter": source.INTRO_AFTER,
 }
 (out / "islands.json").write_text(json.dumps(catalogue, indent=1, ensure_ascii=False) + "\n")
-print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(lookalikes)} lookalikes")
+print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(lookalikes)} lookalikes, {len(narration)} narration lines ({sum(len(t) for t in narration.values())} characters)")

@@ -37,6 +37,10 @@ final class GameBridge {
     /// Set when the level is over and the celebration should appear.
     var result: LevelResult?
     var speakable = ""
+    /// The narrator clip for the current question, if it has one.
+    var speakableKey: String?
+    /// False when the listen button would be silent for this question.
+    var canSpeak = false
 
     @ObservationIgnored weak var scene: GameScene?
     @ObservationIgnored var onLearnerChanged: ((LearnerModel) -> Void)?
@@ -63,7 +67,7 @@ final class GameBridge {
     func key(_ character: Character) { scene?.handleKey(character) }
     func backspace() { scene?.handleBackspace() }
     func hint() { scene?.requestHint() }
-    func repeatSpeech() { Narrator.shared.speak(speakable) }
+    func repeatSpeech() { Narrator.shared.say(key: speakableKey, fallback: speakable) }
 }
 
 enum InputDetector {

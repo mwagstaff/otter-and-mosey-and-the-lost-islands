@@ -35,6 +35,8 @@ struct GameHUD: View {
                     .transition(.scale.combined(with: .opacity))
             }
             RoundButton(symbol: "speaker.wave.2.fill", size: compact ? 52 : 62 * scale, label: "Hear it again") { bridge.repeatSpeech() }
+                .opacity(bridge.canSpeak ? 1 : 0.35)
+                .disabled(!bridge.canSpeak)
             RoundButton(symbol: "lightbulb.fill", fill: Palette.gold, size: compact ? 52 : 62 * scale, label: "Hint") { bridge.hint() }
         }
         .padding(.horizontal, compact ? 6 : 16)

@@ -53,6 +53,7 @@ public enum MathsGenerator {
         var near: [Int]
         var hint: String
         var spoken: String?
+        var audio: String?
 
         func question<R: RandomNumberGenerator>(
             skill: Skill, level: Int, format: AnswerFormat, using rng: inout R
@@ -61,7 +62,8 @@ public enum MathsGenerator {
             return Question(
                 key: key ?? "\(skill.rawValue):L\(level)", skill: skill, format: format, prompt: prompt,
                 answer: String(answer), choices: options.map(String.init), hint: hint,
-                spoken: spoken ?? MathsGenerator.speakable(prompt), level: level
+                spoken: spoken ?? MathsGenerator.speakable(prompt), level: level,
+                audioKey: audio ?? "skill_\(skill.rawValue)"
             )
         }
     }
@@ -150,7 +152,8 @@ public enum MathsGenerator {
             key: "mul:\(table)x\(other)",
             prompt: "\(other) × \(table) = ?", answer: answer,
             near: [answer + table, answer - table, answer + other, answer - other, answer + 1, answer - 1, answer + 10].filter { $0 > 0 },
-            hint: "Count in \(table)s, \(other) times: \(steps), …"
+            hint: "Count in \(table)s, \(other) times: \(steps), …",
+            audio: recordedFact("mul", table, other)
         )
     }
 
@@ -160,8 +163,14 @@ public enum MathsGenerator {
             key: "div:\(table)x\(quotient)",
             prompt: "\(dividend) ÷ \(table) = ?", answer: quotient,
             near: [quotient + 1, quotient - 1, quotient + 2, quotient - 2, table, quotient * 2].filter { $0 > 0 },
-            hint: "How many \(table)s make \(dividend)? Count in \(table)s."
+            hint: "How many \(table)s make \(dividend)? Count in \(table)s.",
+            audio: recordedFact("div", table, quotient)
         )
+    }
+
+    /// The narrator clip for a times-table fact, when that fact is one of the recorded ones.
+    static func recordedFact(_ kind: String, _ table: Int, _ other: Int) -> String? {
+        defaultTables.contains(table) && (1...12).contains(other) ? "\(kind)_\(table)x\(other)" : nil
     }
 
     static func tables(for level: Int, from enabled: [Int]) -> [Int] {
@@ -196,7 +205,8 @@ public enum MathsGenerator {
                 prompt: "? × \(table) = \(product)", answer: other,
                 near: [other + 1, other - 1, other + 2, other - 2, table].filter { $0 > 0 },
                 hint: "Count in \(table)s until you reach \(product). How many jumps?",
-                spoken: "What times \(table) equals \(product)?"
+                spoken: "What times \(table) equals \(product)?",
+                audio: recordedFact("mulq", table, other)
             )
         }
         return timesFact(table, other)

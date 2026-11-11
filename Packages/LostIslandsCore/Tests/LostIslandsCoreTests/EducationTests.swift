@@ -180,6 +180,33 @@ import Testing
         }
     }
 
+    @Test func everySpokenQuestionHasANarrationLine() {
+        let narration = WordBank.narration
+        #expect(narration.count > 480)
+        var rng = SeededGenerator(seed: 12)
+        for entry in bank.words {
+            for style in [SpellingGenerator.Style.typed, .choice] {
+                let question = SpellingGenerator.make(entry: entry, style: style, level: 3, using: &rng)
+                #expect(question.audioKey == "word_\(entry.word)")
+                #expect(narration[question.audioKey ?? ""]?.lowercased().contains(entry.word) == true, "\(entry.word)")
+            }
+        }
+        var specific = 0
+        for skill in Skill.mathsTopics {
+            for level in 1...5 {
+                for _ in 0..<200 {
+                    let question = MathsGenerator.make(skill: skill, level: level, using: &rng)
+                    let key = question.audioKey ?? "none"
+                    #expect(narration[key] != nil, "no narration for \(key): \(question.prompt)")
+                    if !key.hasPrefix("skill_") { specific += 1 }
+                }
+            }
+        }
+        #expect(specific > 1000, "times-table and division facts get their own recordings")
+        #expect(narration["mul_8x7"] == "7 times 8." && narration["div_4x9"] == "36 divided by 4.")
+        #expect(SpellingGenerator.typing(level: 2, profile: .hardware, using: &rng).audioKey == nil)
+    }
+
     @Test func typingContentAdaptsToInputMethod() {
         var rng = SeededGenerator(seed: 8)
         for _ in 0..<50 {

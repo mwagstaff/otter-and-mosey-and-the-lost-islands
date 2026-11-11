@@ -28,7 +28,7 @@ network calls.
 - **Parent area** behind a gate: playtime, accuracy per subject and skill, items being revisited,
   difficulty, times tables, spelling topics, break reminders and accessibility.
 - **Accessibility**: calmer motion, high contrast, easy-read text, spoken questions, hints,
-  volume controls, no mandatory timers.
+  volume controls, no mandatory timers. Questions are read by a recorded narrator.
 
 ## Build and run
 
@@ -130,6 +130,29 @@ encodes it into `OtterAndMosey/Resources/Audio` with macOS `afconvert`. Edit a p
 `seconds` or its `gain` (dB) in `sounds.json` and regenerate that sound to change it.
 Nothing in the app calls ElevenLabs.
 
+**Narration** is pre-recorded with ElevenLabs text-to-speech, so questions are read by the same
+friendly voice on every device, offline. `tools/build_content.py` writes the script to
+`narration.json` (clip key to spoken text) and `tools/sfx/narrate.mjs` records it:
+
+```bash
+cd tools/sfx
+npm run narrate -- --count    # what is missing, without spending credits
+npm run narrate               # record anything missing
+npm run narrate -- --samples  # short samples of each candidate voice, into tools/sfx/samples
+npm run narrate -- --force    # record everything again (about 13,000 characters)
+```
+
+The voice and model are set in `tools/sfx/narration.config.json`. What is recorded:
+
+- every spelling word followed by its sentence (262 clips)
+- every 2, 3, 4, 5, 8 and 10 times-table fact as a product, a missing factor and a division (216 clips)
+- one short instruction per maths topic, used when a question's exact numbers have no recording
+  (for example "Add the two numbers together.")
+
+Story dialogue is not read aloud. Questions with no exact recording, such as word problems, get
+the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
+have the built-in iOS voice read those word for word.
+
 **Music** is four loops synthesised by `python3 tools/synth_audio.py` (pure Python plus
 `afconvert`). They are simple placeholders: replace any `music_*.m4a` with a file of the same
 name. `python3 tools/synth_audio.py --effects` also writes basic synthesised effects, which
@@ -149,6 +172,8 @@ overwrites the ElevenLabs ones.
 - The four music loops are synthesised placeholders.
 - Characters are animated by swapping painted poses and moving them in code. There are no
   frame-by-frame sprite sheets.
+- Word problems and sums with arbitrary numbers are not narrated word for word: they get a short
+  recorded instruction for their topic, or the device voice if that option is turned on.
 - Typing speed is only recorded when a hardware keyboard is attached. The hardware keyboard path
   has not been exercised in the simulator.
 - Easy-read text uses Verdana with wider spacing rather than a dedicated dyslexia typeface.
