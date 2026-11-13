@@ -1,3 +1,4 @@
+import LostIslandsCore
 import SwiftUI
 
 enum Palette {
@@ -129,14 +130,81 @@ struct StarRow: View {
     }
 }
 
-/// A small pill showing a count next to an emoji, for stars and crystals in top bars.
+/// A small picture: the game's own painted art for an emoji or asset name where it exists,
+/// otherwise the system emoji. `art` names a specific painting (a reward or a sticker).
+struct Glyph: View {
+    var emoji: String
+    var size: CGFloat
+    var art: String?
+
+    init(_ emoji: String, size: CGFloat, art: String? = nil) {
+        self.emoji = emoji
+        self.size = size
+        self.art = art
+    }
+
+    var body: some View {
+        if let name = art.flatMap({ Art.iconName($0) }) ?? Art.iconName(emoji) {
+            Image(name).resizable().scaledToFit().frame(width: size, height: size)
+        } else {
+            Text(emoji).font(.system(size: size * 0.82)).frame(width: size, height: size)
+        }
+    }
+}
+
+/// Words with a picture beside them, for buttons and captions. The picture is either painted
+/// art (`emoji`) or a simple symbol in the text colour (`symbol`).
+struct IconLabel: View {
+    var text: String
+    var emoji: String?
+    var symbol: String?
+    /// The text size the label sits in; the picture is sized to match.
+    var size: CGFloat
+    var trailing = false
+
+    init(_ text: String, emoji: String? = nil, symbol: String? = nil, size: CGFloat, trailing: Bool = false) {
+        self.text = text
+        self.emoji = emoji
+        self.symbol = symbol
+        self.size = size
+        self.trailing = trailing
+    }
+
+    var body: some View {
+        HStack(spacing: size * 0.32) {
+            if !trailing { picture }
+            Text(text)
+            if trailing { picture }
+        }
+    }
+
+    @ViewBuilder private var picture: some View {
+        if let emoji {
+            Glyph(emoji, size: size * 1.35).padding(.vertical, -size * 0.2)
+        } else if let symbol {
+            Image(systemName: symbol).font(.system(size: size * 0.78, weight: .heavy))
+        }
+    }
+}
+
+extension Reward {
+    /// The painting of this reward.
+    var art: String { "reward_\(id)" }
+}
+
+extension Achievement {
+    /// The painted sticker for this achievement.
+    var art: String { "badge_\(id)" }
+}
+
+/// A small pill showing a count next to a picture, for stars and crystals in top bars.
 struct CountChip: View {
     var emoji: String
     var text: String
 
     var body: some View {
         HStack(spacing: 6) {
-            Text(emoji).font(.system(size: 22))
+            Glyph(emoji, size: 28)
             Text(text).font(.game(20)).foregroundStyle(Palette.ink)
         }
         .padding(.horizontal, 14)

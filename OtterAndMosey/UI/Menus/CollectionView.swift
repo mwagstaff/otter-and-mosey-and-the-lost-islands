@@ -5,7 +5,7 @@ import SwiftUI
 struct CollectionView: View {
     @Environment(AppModel.self) private var model
     @State private var tab = 0
-    private let tabs = ["💎 Crystals", "🐾 Pets", "🎩 Hats", "🏅 Stickers"]
+    private let tabs = [("💎", "Crystals"), ("🐾", "Pets"), ("🎩", "Hats"), ("🏅", "Stickers")]
 
     var body: some View {
         GeometryReader { geometry in
@@ -16,7 +16,7 @@ struct CollectionView: View {
                         RoundButton(symbol: "chevron.left", label: "Back to map") { model.route = .map }
                         Spacer()
                         ForEach(tabs.indices, id: \.self) { index in
-                            Button(tabs[index], action: tapped { tab = index })
+                            Button(action: tapped { tab = index }) { IconLabel(tabs[index].1, emoji: tabs[index].0, size: compact ? 15 : 20) }
                                 .buttonStyle(ChunkyButtonStyle(fill: tab == index ? Palette.gold : Palette.cream, size: compact ? 15 : 20))
                         }
                         Spacer()
@@ -53,7 +53,7 @@ struct CollectionView: View {
                 ForEach(Progression.achievements) { achievement in
                     let earned = profile?.achievements[achievement.id] != nil
                     tile(compact: compact, title: achievement.title, subtitle: achievement.detail, earned: earned) {
-                        Text(achievement.emoji).font(.system(size: compact ? 40 : 56)).saturation(earned ? 1 : 0).opacity(earned ? 1 : 0.3)
+                        Glyph(achievement.emoji, size: compact ? 50 : 70, art: achievement.art).saturation(earned ? 1 : 0).opacity(earned ? 1 : 0.3)
                     }
                 }
             }
@@ -73,7 +73,7 @@ struct CollectionView: View {
                     tile(compact: compact, title: owned ? reward.name : "???",
                          subtitle: !owned ? "Keep exploring to find it" : (kind == .accessory ? (worn ? "Wearing it! Tap to take off" : "Tap to wear") : "Your friend"),
                          earned: owned, highlight: worn) {
-                        Text(reward.emoji).font(.system(size: compact ? 40 : 56)).saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.25)
+                        Glyph(reward.emoji, size: compact ? 50 : 70, art: reward.art).saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.25)
                     }
                 }
                 .buttonStyle(.plain)
@@ -106,12 +106,12 @@ struct HomeIslandView: View {
             ZStack {
                 // Pets the player has rescued wander along the beach.
                 ForEach(Array(pets.enumerated()), id: \.element.id) { index, pet in
-                    Text(pet.emoji).font(.system(size: itemSize * 0.7))
+                    Glyph(pet.emoji, size: itemSize * 0.85, art: pet.art)
                         .position(x: geometry.size.width * (0.12 + 0.76 * Double(index) / Double(max(pets.count - 1, 1))), y: geometry.size.height * (index.isMultiple(of: 2) ? 0.8 : 0.72))
                 }
                 ForEach(model.profile?.decorations ?? []) { placed in
                     if let reward = model.catalog.reward(placed.reward) {
-                        Text(reward.emoji).font(.system(size: itemSize))
+                        Glyph(reward.emoji, size: itemSize * 1.25, art: reward.art)
                             .scaleEffect(dragging == placed.id ? 1.2 : 1)
                             .position(x: placed.x * geometry.size.width, y: placed.y * geometry.size.height)
                             .gesture(DragGesture(minimumDistance: 0)
@@ -140,7 +140,7 @@ struct HomeIslandView: View {
                             .font(.game(compact ? 12 : 16, weight: .bold)).foregroundStyle(Palette.ink)
                         ForEach(decorations) { reward in
                             Button(action: tapped { add(reward) }) {
-                                Text(reward.emoji).font(.system(size: compact ? 30 : 42))
+                                Glyph(reward.emoji, size: compact ? 38 : 52, art: reward.art)
                                     .frame(width: compact ? 52 : 68, height: compact ? 52 : 68)
                                     .background(Circle().fill(.white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
                             }
@@ -219,24 +219,24 @@ struct SettingsControls: View {
     var body: some View {
         let settings = Binding(get: { model.settings }, set: { model.settings = $0 })
         VStack(spacing: compact ? 6 : 12) {
-            slider("🎵 Music", value: settings.musicVolume)
-            slider("🔔 Sounds", value: settings.effectsVolume)
+            slider("Music", "music.note", value: settings.musicVolume)
+            slider("Sounds", "bell.fill", value: settings.effectsVolume)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 250 : 300), spacing: 10)], spacing: compact ? 6 : 10) {
-                toggle("🔇 Mute everything", settings.muted)
-                toggle("🗣 Read questions aloud", settings.spokenInstructions)
-                toggle("🦦 Character voices", settings.characterVoices)
-                toggle("🤖 Device voice for other sums", settings.deviceVoice)
-                toggle("📳 Vibration", settings.haptics)
-                toggle("🐢 Calmer motion", settings.reducedMotion)
-                toggle("🔲 High contrast", settings.highContrast)
-                toggle("🔤 Easy-read text", settings.easyReadFont)
+                toggle("Mute everything", "speaker.slash.fill", settings.muted)
+                toggle("Read questions aloud", "text.bubble.fill", settings.spokenInstructions)
+                toggle("Character voices", "person.wave.2.fill", settings.characterVoices)
+                toggle("Device voice for other sums", "waveform", settings.deviceVoice)
+                toggle("Vibration", "iphone.radiowaves.left.and.right", settings.haptics)
+                toggle("Calmer motion", "tortoise.fill", settings.reducedMotion)
+                toggle("High contrast", "circle.lefthalf.filled", settings.highContrast)
+                toggle("Easy-read text", "textformat.size", settings.easyReadFont)
             }
         }
     }
 
-    private func slider(_ title: String, value: Binding<Double>) -> some View {
+    private func slider(_ title: String, _ symbol: String, value: Binding<Double>) -> some View {
         HStack {
-            Text(title).font(.game(compact ? 17 : 22)).foregroundStyle(Palette.ink).frame(width: compact ? 120 : 160, alignment: .leading)
+            Label(title, systemImage: symbol).font(.game(compact ? 17 : 22)).foregroundStyle(Palette.ink).frame(width: compact ? 130 : 170, alignment: .leading)
             Slider(value: value, in: 0...1) { editing in
                 if !editing { AudioManager.shared.play(.correct) }
             }
@@ -245,9 +245,9 @@ struct SettingsControls: View {
         }
     }
 
-    private func toggle(_ title: String, _ value: Binding<Bool>) -> some View {
+    private func toggle(_ title: String, _ symbol: String, _ value: Binding<Bool>) -> some View {
         Toggle(isOn: value) {
-            Text(title).font(.game(compact ? 16 : 20, weight: .bold)).foregroundStyle(Palette.ink)
+            Label(title, systemImage: symbol).font(.game(compact ? 16 : 20, weight: .bold)).foregroundStyle(Palette.ink)
         }
         .tint(Palette.teal)
         .padding(.horizontal, 12)

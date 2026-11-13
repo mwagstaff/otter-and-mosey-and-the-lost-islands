@@ -36,7 +36,7 @@ struct GameView: View {
                             GameKeyboard(kind: bridge.keyboard, width: geometry.size.width - 16,
                                          onKey: { bridge.key($0) }, onBackspace: { bridge.backspace() })
                         } else if hardware, bridge.keyboard != .none, stage == .playing {
-                            Text("⌨️ Type on your keyboard")
+                            IconLabel("Type on your keyboard", symbol: "keyboard.fill", size: compact ? 15 : 19)
                                 .font(.game(compact ? 15 : 19, weight: .bold))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 16)
@@ -50,35 +50,40 @@ struct GameView: View {
                         .opacity(0.01)
                         .allowsHitTesting(false)
                 }
-                overlays
+                overlays(geometry: geometry, compact: compact)
             }
             .environment(\.compact, compact)
             .environment(\.uiScale, ScreenMetrics.scale(geometry))
             .onAppear { makeScene(geometry: geometry, compact: compact) }
             .onChange(of: geometry.size) { _, _ in applyInsets(geometry: geometry, compact: compact) }
             .onChange(of: hardware) { _, _ in applyInsets(geometry: geometry, compact: compact) }
+            .onChange(of: stage) { _, _ in applyInsets(geometry: geometry, compact: compact) }
+            .onChange(of: bridge.dialogue.isEmpty) { _, _ in applyInsets(geometry: geometry, compact: compact) }
         }
         .onChange(of: bridge.result) { _, newValue in
             if let newValue { finish(with: newValue) }
         }
         .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidConnect)) { _ in hardware = true }
         .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidDisconnect)) { _ in hardware = InputDetector.hasHardwareKeyboard }
-        .onDisappear { Narrator.shared.stop() }
     }
 
-    @ViewBuilder private var overlays: some View {
-        let theme = IslandTheme.island(island.id)
+    @ViewBuilder private func overlays(geometry: GeometryProxy, compact: Bool) -> some View {
         if stage == .intro {
-            DialogueView(lines: level.intro, guardianArt: theme.guardian, guardianName: island.guardian.name) {
+            DialogueView(lines: level.intro, guardianName: island.guardian.name) {
                 stage = .playing
+                // Make room for the keys before the first question is laid out.
+                applyInsets(geometry: geometry, compact: compact, playing: true)
                 scene?.begin()
             }
         } else if !bridge.dialogue.isEmpty {
-            DialogueView(lines: bridge.dialogue, guardianArt: bridge.friendship == nil ? theme.guardianHappy : theme.guardian,
-                         guardianName: island.guardian.name) { bridge.finishDialogue() }
+            DialogueView(lines: bridge.dialogue, guardianName: island.guardian.name, belowHUD: true) {
+                // Back to the playing layout before the scene lays out its next question.
+                applyInsets(geometry: geometry, compact: compact, playing: stage == .playing)
+                bridge.finishDialogue()
+            }
                 .id(bridge.dialogue.first?.text ?? "")
         } else if stage == .outro {
-            DialogueView(lines: level.outro, guardianArt: theme.guardianHappy, guardianName: island.guardian.name) { stage = .results }
+            DialogueView(lines: level.outro, guardianName: island.guardian.name, belowHUD: true) { stage = .results }
         } else if stage == .results, let summary, let result {
             LevelCompleteView(level: level, island: island, result: result, summary: summary)
                 .transition(.opacity)
@@ -104,14 +109,18 @@ struct GameView: View {
         }
     }
 
-    private func insets(geometry: GeometryProxy, compact: Bool) -> UIEdgeInsets {
+    private func insets(geometry: GeometryProxy, compact: Bool, playing: Bool) -> UIEdgeInsets {
         let safe = geometry.safeAreaInsets
+        // The keys are only on screen while playing. Whenever someone is talking, the ground sits
+        // just above the speech panel instead, so the panel never covers the characters and the
+        // scenery is not left floating over an empty gap.
+        let bottom = playing ? reservedKeys(compact: compact) : DialogueView.reservedHeight(compact: compact)
         return UIEdgeInsets(top: safe.top + GameHUD.height(compact: compact, scale: ScreenMetrics.scale(geometry)) + 6, left: safe.leading + 8,
-                            bottom: safe.bottom + reservedKeys(compact: compact), right: safe.trailing + 8)
+                            bottom: safe.bottom + bottom, right: safe.trailing + 8)
     }
 
-    private func applyInsets(geometry: GeometryProxy, compact: Bool) {
-        scene?.insets = insets(geometry: geometry, compact: compact)
+    private func applyInsets(geometry: GeometryProxy, compact: Bool, playing: Bool? = nil) {
+        scene?.insets = insets(geometry: geometry, compact: compact, playing: playing ?? (stage == .playing && bridge.dialogue.isEmpty))
     }
 
     private func makeScene(geometry: GeometryProxy, compact: Bool) {
@@ -121,7 +130,7 @@ struct GameView: View {
         let options = SceneOptions(
             settings: model.settings,
             favourite: profile.favourite == "mosey" ? .mosey : .otter,
-            accessory: profile.equippedAccessory.flatMap { model.catalog.reward($0)?.emoji },
+            accessory: profile.equippedAccessory.flatMap { model.catalog.reward($0) }.map { Art.iconName($0.art) ?? $0.emoji },
             island: island,
             inputProfile: InputDetector.profile(compact: compact),
             startRestoration: CGFloat(base * 0.75),
@@ -143,7 +152,7 @@ struct GameView: View {
         case .typingTurbo: made = TypingTurboScene(session: session, bridge: bridge, options: options)
         case .guardian: made = GuardianScene(session: session, bridge: bridge, options: options)
         }
-        made.insets = insets(geometry: geometry, compact: compact)
+        made.insets = insets(geometry: geometry, compact: compact, playing: false)
         scene = made
     }
 
@@ -176,11 +185,11 @@ struct PauseView: View {
             VStack(spacing: compact ? 10 : 18) {
                 Text("Paused").font(.game(compact ? 30 : 44)).foregroundStyle(Palette.ink)
                 Text(title).font(.game(compact ? 16 : 22, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.7))
-                Button("▶  Keep playing", action: tapped(resume)).buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 260))
+                Button(action: tapped(resume)) { IconLabel("Keep playing", symbol: "play.fill", size: compact ? 22 : 28) }.buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 260))
                 HStack(spacing: 12) {
-                    Button("↺ Start again", action: tapped(restart)).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
-                    Button("⚙︎ Sound", action: tapped { model.showSettings = true }).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
-                    Button("🏝 Leave", action: tapped(quit)).buttonStyle(ChunkyButtonStyle(fill: Palette.coral, ink: .white, size: compact ? 17 : 22))
+                    Button(action: tapped(restart)) { IconLabel("Start again", symbol: "arrow.counterclockwise", size: compact ? 17 : 22) }.buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
+                    Button(action: tapped { model.showSettings = true }) { IconLabel("Sound", symbol: "gearshape.fill", size: compact ? 17 : 22) }.buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
+                    Button(action: tapped(quit)) { IconLabel("Leave", emoji: "🏝", size: compact ? 17 : 22) }.buttonStyle(ChunkyButtonStyle(fill: Palette.coral, ink: .white, size: compact ? 17 : 22))
                 }
             }
             .padding(compact ? 20 : 36)
@@ -222,18 +231,18 @@ struct LevelCompleteView: View {
                 }
                 rewards
                 HStack(spacing: 12) {
-                    Button("🏝 Island", action: tapped { model.route = .island(island.id) })
+                    Button(action: tapped { model.route = .island(island.id) }) { IconLabel("Island", emoji: "🏝", size: compact ? 17 : 22) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
-                    Button("↺ Again", action: tapped { replay() })
+                    Button(action: tapped { replay() }) { IconLabel("Again", symbol: "arrow.counterclockwise", size: compact ? 17 : 22) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
                     if summary.gameComplete {
-                        Button("🌈 The ending!", action: tapped { model.route = .ending })
+                        Button(action: tapped { model.route = .ending }) { IconLabel("The ending!", emoji: "🌈", size: compact ? 20 : 26) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26))
                     } else if let next {
-                        Button("Next ▶", action: tapped { model.route = .play(next.id) })
+                        Button(action: tapped { model.route = .play(next.id) }) { IconLabel("Next", symbol: "play.fill", size: compact ? 20 : 26, trailing: true) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))
                     } else if summary.crystalIsland != nil {
-                        Button("🗺 Map", action: tapped { model.route = .map })
+                        Button(action: tapped { model.route = .map }) { IconLabel("Map", emoji: "🗺", size: compact ? 20 : 26) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))
                     }
                 }
@@ -269,18 +278,18 @@ struct LevelCompleteView: View {
     }
 
     @ViewBuilder private var rewards: some View {
-        let items: [(String, String)] =
-            (summary.crystalIsland.map { [("💎", "\($0.name) crystal")] } ?? [])
-            + (summary.reward.map { [($0.emoji, $0.name)] } ?? [])
-            + summary.decorations.map { ($0.emoji, $0.name) }
-            + summary.achievements.map { ($0.emoji, $0.title) }
+        let items: [(String, String?, String)] =
+            (summary.crystalIsland.map { [("💎", nil, "\($0.name) crystal")] } ?? [])
+            + (summary.reward.map { [($0.emoji, $0.art, $0.name)] } ?? [])
+            + summary.decorations.map { ($0.emoji, $0.art, $0.name) }
+            + summary.achievements.map { ($0.emoji, $0.art, $0.title) }
         if !items.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(Array(items.enumerated()), id: \.offset) { _, item in
                         HStack(spacing: 6) {
-                            Text(item.0).font(.system(size: compact ? 24 : 34))
-                            Text(item.1).font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink)
+                            Glyph(item.0, size: compact ? 30 : 42, art: item.1)
+                            Text(item.2).font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)

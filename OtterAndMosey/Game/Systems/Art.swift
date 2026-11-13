@@ -76,12 +76,57 @@ enum Art {
         }
     }
 
+    private static var iconNames: [String: String?] = [:]
+
+    /// The painted picture that stands in for an emoji, if the game has one. `key` is an emoji
+    /// ("⭐️" looks for the asset `icon_2b50`) or already an asset name (`reward_hat-crown`).
+    static func iconName(_ key: String) -> String? {
+        if let cached = iconNames[key] { return cached }
+        let scalars = key.unicodeScalars.filter { $0.value != 0xFE0F }.map { String($0.value, radix: 16) }
+        let candidates = [key, "icon_" + scalars.joined(separator: "-")]
+        let name = candidates.first { hasAsset($0) }
+        iconNames[key] = name
+        return name
+    }
+
+    /// A square picture for an emoji or asset name: the game's own painted art where it exists,
+    /// otherwise the system emoji. Painted art is centred on a square so it never stretches.
     static func emoji(_ emoji: String, size: CGFloat = 96) -> SKTexture {
         let key = "emoji:\(emoji):\(Int(size))"
         if let cached = textures[key] { return cached }
-        let texture = SKTexture(image: emojiImage(emoji, size: size))
+        let picture: UIImage
+        if let name = iconName(emoji) {
+            let source = image(name)
+            let side = max(source.size.width, source.size.height)
+            picture = UIGraphicsImageRenderer(size: CGSize(width: side, height: side)).image { _ in
+                source.draw(at: CGPoint(x: (side - source.size.width) / 2, y: (side - source.size.height) / 2))
+            }
+        } else {
+            picture = emojiImage(emoji, size: size)
+        }
+        let texture = SKTexture(image: picture)
         textures[key] = texture
         return texture
+    }
+
+    /// A copy of a sprite with its colours rotated round the colour wheel, so one painting
+    /// can appear in several colours. `turn` is a fraction of a full turn (0 = unchanged).
+    static func tintedTexture(_ name: String, turn: CGFloat) -> SKTexture {
+        guard turn != 0 else { return texture(name) }
+        let key = "hue:\(name):\(Int(turn * 360))"
+        if let cached = textures[key] { return cached }
+        var result = texture(name)
+        if let cgImage = image(name).cgImage {
+            let filter = CIFilter(name: "CIHueAdjust")
+            filter?.setValue(CIImage(cgImage: cgImage), forKey: kCIInputImageKey)
+            filter?.setValue(turn * 2 * .pi, forKey: kCIInputAngleKey)
+            if let output = filter?.outputImage,
+               let rendered = context.createCGImage(output, from: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height)) {
+                result = SKTexture(cgImage: rendered)
+            }
+        }
+        textures[key] = result
+        return result
     }
 
     // MARK: - Procedural pieces

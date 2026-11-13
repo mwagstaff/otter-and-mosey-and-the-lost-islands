@@ -154,7 +154,7 @@ refresh|pre|3|A cold drink will ___ you.
 reappear|pre|3|The sun will ___ soon.
 rebuild|pre|3|We must ___ the bridge.
 submarine|pre|3|A ___ travels under the sea.
-subway|pre|3|We crossed under the road in a ___.
+submerge|pre|3|Watch the submarine ___ under the waves.
 subheading|pre|4|Write a ___ for each part.
 supermarket|pre|3|We buy food at the ___.
 superstar|pre|3|The singer is a ___.

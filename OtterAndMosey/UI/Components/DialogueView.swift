@@ -4,13 +4,13 @@ import SwiftUI
 /// Speech bubbles for story moments. Tap anywhere to move on; Skip jumps to the end.
 struct DialogueView: View {
     var lines: [DialogueLine]
-    var guardianArt: String?
     var guardianName: String = "Guardian"
+    /// Set when the level's HUD is on screen, so Skip sits under it instead of over its buttons.
+    var belowHUD = false
     var onLineShown: (Int) -> Void = { _ in }
     var onFinish: () -> Void
 
     @State private var index = 0
-    @State private var appear = false
     @Environment(\.compact) private var compact
     @Environment(\.uiScale) private var scale
     @Environment(AppModel.self) private var model
@@ -20,12 +20,8 @@ struct DialogueView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.black.opacity(0.001).ignoresSafeArea().onTapGesture(perform: advance)
-            HStack(alignment: .bottom, spacing: compact ? 10 : 18) {
-                portrait
-                    .frame(width: compact ? 96 : 150 * scale, height: compact ? 96 : 150 * scale)
-                    .scaleEffect(1 + (speaking && !model.settings.reducedMotion ? 0.07 * stage.level : 0), anchor: .bottom)
-                    .scaleEffect(appear ? 1 : 0.6)
-                    .animation(.spring(duration: 0.3, bounce: 0.5), value: appear)
+            // No portrait here: the speaker is already on screen, talking, and named on the badge.
+            Group {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(speakerName)
                         .font(.game(compact ? 15 : 19 * scale))
@@ -41,7 +37,7 @@ struct DialogueView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     HStack {
                         Spacer()
-                        Text("Tap to continue ▶")
+                        IconLabel("Tap to continue", symbol: "play.fill", size: compact ? 13 : 16 * scale, trailing: true)
                             .font(.game(compact ? 13 : 16 * scale, weight: .bold))
                             .foregroundStyle(Palette.ink.opacity(0.55))
                     }
@@ -55,23 +51,16 @@ struct DialogueView: View {
             .frame(maxWidth: 1000 * scale)
         }
         .overlay(alignment: .topTrailing) {
-            Button("Skip ⏭", action: tapped(finish))
+            Button(action: tapped(finish)) { IconLabel("Skip", symbol: "forward.end.fill", size: compact ? 16 : 20 * scale, trailing: true) }
                 .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 16 : 20 * scale))
                 .padding(compact ? 12 : 24)
+                .padding(.top, belowHUD ? GameHUD.height(compact: compact, scale: scale) : 0)
         }
-        .onAppear {
-            appear = true
-            show()
-        }
+        .onAppear(perform: show)
     }
 
-    private var stage: SpeechStage { SpeechStage.shared }
-    private var speaking: Bool { stage.speaker == line.speaker }
-
-    /// The portrait's mouth opens with the voice when a talking frame exists for the character.
-    private func face(_ name: String) -> String {
-        speaking && stage.mouthOpen && Art.hasAsset("\(name)_talk") ? "\(name)_talk" : "\(name)_idle"
-    }
+    /// Room to leave at the bottom of a scene so its ground shows above the speech panel.
+    static func reservedHeight(compact: Bool) -> CGFloat { compact ? 124 : 190 }
 
     private var speakerName: String {
         switch line.speaker {
@@ -91,15 +80,6 @@ struct DialogueView: View {
         }
     }
 
-    @ViewBuilder private var portrait: some View {
-        switch line.speaker {
-        case .otter: Image(face("otter")).resizable().scaledToFit()
-        case .mosey: Image(face("mosey")).resizable().scaledToFit()
-        case .guardian: Image(guardianArt ?? "guardian_tree").resizable().scaledToFit()
-        case .narrator: Text("📖").font(.system(size: compact ? 60 : 96))
-        }
-    }
-
     private func show() {
         onLineShown(index)
         AudioManager.shared.play(.nav, volume: 0.6)
@@ -109,9 +89,7 @@ struct DialogueView: View {
 
     private func advance() {
         if index + 1 < lines.count {
-            appear = false
             index += 1
-            appear = true
             show()
         } else {
             finish()

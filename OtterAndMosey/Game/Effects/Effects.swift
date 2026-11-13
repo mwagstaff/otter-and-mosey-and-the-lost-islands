@@ -159,6 +159,20 @@ enum Effects {
         ]))
     }
 
+    /// A picture that pops up, drifts upward and fades, for big reactions.
+    static func floatPicture(_ emoji: String, at point: CGPoint, size: CGFloat, in parent: SKNode) {
+        let sprite = SKSpriteNode(texture: Art.emoji(emoji, size: 160), size: CGSize(width: size, height: size))
+        sprite.position = point
+        sprite.zPosition = 80
+        sprite.setScale(0.3)
+        parent.addChild(sprite)
+        sprite.run(.sequence([
+            .group([.sequence([.scale(to: 1.15, duration: 0.2), .scale(to: 1, duration: 0.12)]), .moveBy(x: 0, y: 54, duration: 1.3),
+                    .sequence([.wait(forDuration: 0.9), .fadeOut(withDuration: 0.4)])]),
+            .removeFromParent(),
+        ]))
+    }
+
     /// Something small popping up out of the ground with a bounce.
     static func bloom(_ emoji: String, at point: CGPoint, size: CGFloat, in parent: SKNode, z: CGFloat = 6) {
         let sprite = SKSpriteNode(texture: Art.emoji(emoji), size: CGSize(width: size, height: size))

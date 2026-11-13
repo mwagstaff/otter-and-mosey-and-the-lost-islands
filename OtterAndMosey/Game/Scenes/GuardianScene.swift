@@ -228,8 +228,15 @@ final class GuardianScene: GameScene {
         bridge.caption = "Friendship Power is ready. Tap it!"
         AudioManager.shared.play(.portal)
         let buttonSize = CGSize(width: min(play.width * 0.46, 380), height: min(play.height * 0.24, 96))
-        let button = makeSign(text: "💞 Friendship Power!", size: buttonSize, fill: UIColor(hex: "#FF7EB6"), ink: .white, fontSize: buttonSize.height * 0.36)
+        let button = makeSign(text: "Friendship Power!", size: buttonSize, fill: UIColor(hex: "#FF7EB6"), ink: .white, fontSize: buttonSize.height * 0.36)
         signLabel(button)?.colour = .white
+        for side: CGFloat in [-1, 1] {
+            let hearts = SKSpriteNode(texture: Art.emoji("💞"), size: CGSize(width: buttonSize.height * 0.62, height: buttonSize.height * 0.62))
+            hearts.position = CGPoint(x: side * buttonSize.width * 0.5, y: buttonSize.height * 0.34)
+            hearts.zRotation = -side * 0.25
+            hearts.zPosition = 2
+            button.addChild(hearts)
+        }
         button.position = CGPoint(x: play.midX, y: play.midY)
         button.zPosition = 50
         button.setScale(0)
@@ -288,7 +295,7 @@ final class GuardianScene: GameScene {
         cameraPunch(scale: 0.93, hold: 0.15)
         AudioManager.shared.play(.guardian)
         let emoji = ["💫", "😂", "💖"][min(phase, 2)]
-        Effects.floatText(emoji, at: CGPoint(x: point.x, y: point.y + guardian.size.height * 0.35), size: 54, in: self)
+        Effects.floatPicture(emoji, at: CGPoint(x: point.x, y: point.y + guardian.size.height * 0.35), size: min(play.height * 0.26, 110), in: self)
         if !Effects.reducedMotion {
             guardian.run(.sequence([
                 .scaleX(to: 1.15, y: 0.85, duration: 0.1), .scaleX(to: 0.92, y: 1.1, duration: 0.12), .scaleX(to: 1, y: 1, duration: 0.12),

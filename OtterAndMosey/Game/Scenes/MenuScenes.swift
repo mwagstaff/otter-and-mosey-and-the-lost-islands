@@ -144,7 +144,7 @@ final class WorldMapScene: CoverScene {
         addChild(glints)
         for index in 0..<3 {
             let cloud = SKSpriteNode(texture: Art.emoji("☁️", size: 160), size: CGSize(width: 150, height: 150))
-            cloud.alpha = 0.5
+            cloud.alpha = 0.35
             cloud.zPosition = 40
             cloud.position = CGPoint(x: CGFloat(index) * size.width * 0.4, y: size.height * (0.55 + 0.15 * CGFloat(index)))
             cloud.name = "cloud"
@@ -199,11 +199,12 @@ final class WorldMapScene: CoverScene {
                 node.addChild(lock)
             }
             let fontSize = max(12, islandSize * 0.11)
-            let plateSize = CGSize(width: CGFloat(state.name.count) * fontSize * 0.62 + 22, height: fontSize * 1.9)
-            let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
-            plate.position = CGPoint(x: 0, y: -spriteSize.height * 0.56)
-            plate.zPosition = 4
+            // The plate is cut to the measured name, so every typeface gets the same margin.
             let label = GameLabel(state.name, size: fontSize, colour: UIColor(hex: "#0E3B43"))
+            let plateSize = CGSize(width: label.frame.width + fontSize * 2.2, height: fontSize * 2.1)
+            let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
+            plate.position = CGPoint(x: 0, y: -spriteSize.height * 0.58)
+            plate.zPosition = 4
             label.zPosition = 1
             plate.addChild(label)
             node.addChild(plate)
@@ -381,9 +382,16 @@ final class IntroScene: CoverScene {
         let plateSize = CGSize(width: letterWidth * 3 + 26, height: letterWidth * 1.75)
         let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFFDF3"), radius: 16, lineWidth: 3), size: plateSize)
         plate.zPosition = 1
+        plate.position.y = -diameter * 0.12
         node.addChild(plate)
+        // A picture clue: without it "s_n" could just as well be "son" or "sin".
+        let clue = SKSpriteNode(texture: Art.emoji("☀️", size: 160), size: CGSize(width: diameter * 0.3, height: diameter * 0.3))
+        clue.position.y = diameter * 0.27
+        clue.zPosition = 1
+        node.addChild(clue)
         let word = WordSlotsNode(masked: "s_n", answer: "sun", letterWidth: letterWidth, ink: UIColor(hex: "#0E3B43"), accent: UIColor(hex: "#E8743B"))
         word.zPosition = 2
+        word.position.y = plate.position.y
         node.addChild(word)
         slots = word
         node.position = CGPoint(x: flowerPosition.x, y: flowerPosition.y + play.height * 0.42)

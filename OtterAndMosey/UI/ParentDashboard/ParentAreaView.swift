@@ -32,7 +32,7 @@ struct ParentGateView: View {
             Text("Grown-ups only").font(.system(size: 30, weight: .bold, design: .rounded))
             Text("To continue, please answer:").font(.system(size: 18, design: .rounded)).foregroundStyle(.secondary)
             Text("\(a) × \(b) = \(entry.isEmpty ? "?" : entry)").font(.system(size: 38, weight: .heavy, design: .rounded)).monospacedDigit()
-            if wrong { Text("That is not right. Here is a new one.").font(.system(size: 15, design: .rounded)).foregroundStyle(.red) }
+            if wrong { Text("That's not right. Here's a new one.").font(.system(size: 15, design: .rounded)).foregroundStyle(.red) }
             HStack(spacing: 8) {
                 ForEach(Array("1234567890"), id: \.self) { digit in
                     Button(String(digit)) { if entry.count < 3 { entry.append(digit) } }

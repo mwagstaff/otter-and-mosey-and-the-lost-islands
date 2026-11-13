@@ -11,11 +11,11 @@
     "kind": "tree",
     "phases": [
      "g:Harrumph! My leaves have gone grey and so has my mood!",
-     "g:Stop it. I am NOT smiling. That is just how my bark sits.",
+     "g:Stop it. I am NOT smiling. That's just how my bark sits.",
      "g:Oh no. I can feel a giggle coming. Hold it in, Grumblebark!"
     ],
     "befriended": [
-     "g:Ha ha ha! I have not laughed in a hundred years!",
+     "g:Ha ha ha! I haven't laughed in a hundred years!",
      "g:Take the crystal fragment. And come back for a story, little ones.",
      "o:A talking tree who tells stories? Best. Day. Ever."
     ]
@@ -31,7 +31,7 @@
      "count": 6,
      "intro": [
       "o:Look, Mosey! Word bubbles are stuck in the trees.",
-      "m:Fill in the missing letters and they will pop!",
+      "m:Fill in the missing letters and they'll pop!",
       "o:Popping things is my favourite subject."
      ],
      "outro": [
@@ -113,7 +113,7 @@
      "count": 9,
      "intro": [
       "g:WHO is making all that cheerful noise in MY woods?",
-      "o:Hello, Mr Tree! We are looking for a crystal fragment.",
+      "o:Hello, Mr Tree! We're looking for a crystal fragment.",
       "g:Bah! Spell my word muddles first. If you can!"
      ],
      "outro": [
@@ -135,14 +135,14 @@
     "name": "Inky",
     "kind": "octopus",
     "phases": [
-     "g:Eight arms… or is it nine? I have lost count of EVERYTHING!",
+     "g:Eight arms… or is it nine? I've lost count of EVERYTHING!",
      "g:Wait, that helps! But now my sums are all in a knot.",
      "g:Nearly untangled! Do I add this arm or take it away?"
     ],
     "befriended": [
      "g:Eight! I have EIGHT arms! Thank you, clever friends!",
      "g:Here, I was sitting on this shiny thing.",
-     "m:That is the crystal fragment! Good sitting, Inky."
+     "m:That's the crystal fragment! Good sitting, Inky."
     ]
    },
    "levels": [
@@ -160,7 +160,7 @@
       "m:The one with the right answer. Follow me!"
      ],
      "outro": [
-      "o:You swim so fast when you are right!",
+      "o:You swim so fast when you're right!",
       "m:Maths makes me zoomy."
      ],
      "reward": "pet-turtle",
@@ -177,11 +177,11 @@
      "count": 6,
      "intro": [
       "o:A canyon. Under the sea. How?",
-      "m:Do not ask how. Ask how many!",
+      "m:Don't ask how. Ask how many!",
       "o:Fine. Rainbow bridge time."
      ],
      "outro": [
-      "m:A rainbow under water. Now I have seen everything."
+      "m:A rainbow under water. Now I've seen everything."
      ],
      "reward": "deco-fountain",
      "blurb": "Bridge the sea canyon"
@@ -196,7 +196,7 @@
      ],
      "count": 6,
      "intro": [
-      "o:Treasure chests! But they are locked.",
+      "o:Treasure chests! But they're locked.",
       "m:Type the answer to pop each lock.",
       "o:I hope one is full of fish biscuits."
      ],
@@ -218,8 +218,8 @@
      "count": 8,
      "intro": [
       "m:The old shipwreck! Stay close, Otter.",
-      "o:I am not scared. You are scared.",
-      "m:I am a mosasaur. I am never scared."
+      "o:I'm not scared. You're scared.",
+      "m:I'm a mosasaur. I'm never scared."
      ],
      "outro": [
       "o:We made it! Was that a ghost?",
@@ -262,7 +262,7 @@
     "kind": "dragon",
     "phases": [
      "g:Behold my mighty fl… is something burning?",
-     "g:It is my TROUSERS! Again! Quick, distract me with times tables!",
+     "g:It's my TROUSERS! Again! Quick, distract me with times tables!",
      "g:Still a bit toasty back there. One more round!"
     ],
     "befriended": [
@@ -281,12 +281,12 @@
      ],
      "count": 6,
      "intro": [
-      "o:Dragon eggs! They are getting cold.",
+      "o:Dragon eggs! They're getting cold.",
       "m:Type the answer to hatch each one.",
       "o:Come out, little dragons!"
      ],
      "outro": [
-      "o:They think I am their mum.",
+      "o:They think I'm their mum.",
       "m:You do have the right hair."
      ],
      "reward": "pet-ember",
@@ -322,11 +322,11 @@
      "count": 7,
      "intro": [
       "o:That lava looks very… lava-y.",
-      "m:Then let us not fall in. Bridge time!",
+      "m:Then let's not fall in. Bridge time!",
       "o:Rainbow planks, do your thing."
      ],
      "outro": [
-      "o:My tail did not get toasted. Success!"
+      "o:My tail didn't get toasted. Success!"
      ],
      "reward": "pet-cinder",
      "blurb": "Cross the lava safely"
@@ -362,7 +362,7 @@
      "intro": [
       "g:Halt! I am Sir Scorch, the fearsome… ouch. Warm.",
       "o:Excuse me. Your trousers are on fire.",
-      "g:Nonsense! Dragons do not… oh. OH! Not again!"
+      "g:Nonsense! Dragons don't… oh. OH! Not again!"
      ],
      "outro": [
       "m:Three fragments. Halfway there!",
@@ -403,8 +403,8 @@
      ],
      "count": 5,
      "intro": [
-      "o:We are flying! On a cloud! Mosey, you are flying!",
-      "m:I am a sky mosasaur now. Type to keep us going!"
+      "o:We're flying! On a cloud! Mosey, you're flying!",
+      "m:I'm a sky mosasaur now. Type to keep us going!"
      ],
      "outro": [
       "m:Flying is just swimming with extra air."
@@ -483,7 +483,7 @@
      "intro": [
       "g:Ooh, visitors! Want to see a trick?",
       "o:Is it a nice trick?",
-      "g:Nope! It is a WORD MUDDLE! Tee hee!"
+      "g:Nope! It's a WORD MUDDLE! Tee hee!"
      ],
      "outro": [
       "m:Four fragments. The sky is clear!",
@@ -505,7 +505,7 @@
     "kind": "marshmallow",
     "phases": [
      "g:MINE! All the sweets are MINE! …How many is that?",
-     "g:Sharing? What is sharing? Show Puff!",
+     "g:Sharing? What's sharing? Show Puff!",
      "g:Half for you, half for me… Puff is getting it!"
     ],
     "befriended": [
@@ -525,8 +525,8 @@
      "count": 6,
      "intro": [
       "o:Everything here is made of SWEETS.",
-      "m:Do not lick the scenery, Otter.",
-      "o:Too late. Let us open these jars by sharing equally!"
+      "m:Don't lick the scenery, Otter.",
+      "o:Too late. Let's open these jars by sharing equally!"
      ],
      "outro": [
       "o:Fair shares for everyone. Mostly me."
@@ -548,7 +548,7 @@
       "m:Half of a thing is that thing shared by two."
      ],
      "outro": [
-      "m:I am now one quarter chocolate."
+      "m:I'm now one quarter chocolate."
      ],
      "reward": "deco-carousel",
      "blurb": "Swim the chocolate river"
@@ -565,7 +565,7 @@
      "intro": [
       "o:The biscuit bridge got nibbled.",
       "m:Somebody had a midnight snack.",
-      "o:It was not me. This time."
+      "o:It wasn't me. This time."
      ],
      "outro": [
       "o:A rainbow biscuit bridge. Can I keep it?"
@@ -583,11 +583,11 @@
      ],
      "count": 8,
      "intro": [
-      "m:Hold your nose. We are going under the fudge falls.",
+      "m:Hold your nose. We're going under the fudge falls.",
       "o:Best. Waterfall. Ever."
      ],
      "outro": [
-      "o:I have fudge in my ears.",
+      "o:I've got fudge in my ears.",
       "m:Save some for later."
      ],
      "reward": "hat-bow",
@@ -605,12 +605,12 @@
      "count": 9,
      "intro": [
       "g:PUFF is the biggest! Puff keeps ALL the sweets!",
-      "m:That does not sound very fair, Puff.",
-      "g:Fair? Puff does not know how to share!"
+      "m:That doesn't sound very fair, Puff.",
+      "g:Fair? Puff doesn't know how to share!"
      ],
      "outro": [
       "o:Five fragments! Only one left.",
-      "m:And it is on Starlight Island."
+      "m:And it's on Starlight Island."
      ],
      "reward": null,
      "blurb": "Teach Puff to share"
@@ -627,14 +627,14 @@
     "name": "Umbra",
     "kind": "shadow",
     "phases": [
-     "g:Go away. Shadows do not have friends.",
+     "g:Go away. Shadows don't have friends.",
      "g:Why are you being kind to me? It makes me feel… warm.",
      "g:If the crystal comes back… will I disappear?"
     ],
     "befriended": [
-     "m:You will not disappear, Umbra. Shadows need the light.",
+     "m:You won't disappear, Umbra. Shadows need the light.",
      "o:And friends need friends. Come with us!",
-     "g:I… I would like that. Here. I kept it safe for you."
+     "g:I… I'd like that. Here. I kept it safe for you."
     ]
    },
    "levels": [
@@ -651,7 +651,7 @@
      "intro": [
       "o:The stars have gone dim.",
       "m:Every word we spell lights one up.",
-      "o:Then let us light the whole sky!"
+      "o:Then let's light the whole sky!"
      ],
      "outro": [
       "m:Look at them twinkle."
@@ -676,7 +676,7 @@
       "m:Only a little. Tunnels ahead!"
      ],
      "outro": [
-      "o:I have stardust in my scarf. Fancy."
+      "o:I've got stardust in my scarf. Fancy."
      ],
      "reward": "deco-rainbow",
      "blurb": "Swim through the stardust"
@@ -691,7 +691,7 @@
      "count": 6,
      "intro": [
       "o:To the last portal!",
-      "m:Type carefully and we will fly straight."
+      "m:Type carefully and we'll fly straight."
      ],
      "outro": [
       "m:That was our best flying yet."
@@ -735,12 +735,12 @@
      "intro": [
       "g:You came all this way for a crystal?",
       "o:And to find out who broke it.",
-      "g:I did not mean to. I only wanted to hold something bright."
+      "g:I didn't mean to. I only wanted to hold something bright."
      ],
      "outro": [
       "n:The six fragments joined together, and colour rushed across every island.",
       "o:We did it, Mosey!",
-      "m:We did it together. That is the real magic."
+      "m:We did it together. That's the real magic."
      ],
      "reward": null,
      "blurb": "Befriend the lonely shadow"
@@ -920,8 +920,8 @@
  ],
  "intro": [
   "n:One sunny morning on Rainbow Island…",
-  "o:Mosey! I spelled 'breakfast' in the sand. Now I am hungry.",
-  "m:You are always hungry. That is three breakfasts today.",
+  "o:Mosey! I spelled 'breakfast' in the sand. Now I'm hungry.",
+  "m:You're always hungry. That's three breakfasts today.",
   "o:Three is a very good number.",
   "n:Suddenly, the Great Rainbow Crystal began to shake…",
   "n:CRACK! It shattered into six fragments and flew across the sea!",
@@ -932,6 +932,6 @@
  "introAfter": [
   "o:It bloomed! The colour came back!",
   "m:So our answers bring the world back to life.",
-  "o:Six islands. Six fragments. One snack break. Let us go!"
+  "o:Six islands. Six fragments. One snack break. Let's go!"
  ]
 }

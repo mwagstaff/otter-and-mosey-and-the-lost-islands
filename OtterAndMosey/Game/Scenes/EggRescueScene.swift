@@ -12,6 +12,23 @@ final class EggRescueScene: GameScene {
     private var entry = ""
     private var rescued: [SKSpriteNode] = []
     private var busy = false
+    private var looks: [(art: String, turn: CGFloat, size: CGFloat)] = []
+
+    /// Deals friends from a shuffled set of every shape in a handful of colours, so the same
+    /// one does not come out twice until all the others have had a turn.
+    private func nextLook() -> (art: String, turn: CGFloat, size: CGFloat) {
+        if looks.isEmpty {
+            let turns: [CGFloat] = [0, 0.12, 0.3, 0.5, 0.68, 0.85]
+            // Painted friends that are missing from the bundle are left out rather than shown as stand-ins.
+            let shapes = theme.friends.filter { Art.hasAsset($0) }
+            looks = (shapes.isEmpty ? [theme.friends[0]] : shapes).flatMap { art in
+                turns.map { (art: art, turn: $0, size: CGFloat.random(in: 0.8...1.15)) }
+            }.shuffled()
+            // Start each level with the friends in their own colours.
+            looks.sort { ($0.turn == 0 ? 1 : 0) < ($1.turn == 0 ? 1 : 0) }
+        }
+        return looks.removeLast()
+    }
 
     override func build() {
         addChild(otter)
@@ -156,23 +173,27 @@ final class EggRescueScene: GameScene {
         ]))
         container = nil
 
-        let friend = SKSpriteNode(texture: Art.texture(theme.friend))
+        // Every rescue is a small surprise: a different friend, colour and size each time.
+        let look = nextLook()
+        let friend = SKSpriteNode(texture: Art.tintedTexture(look.art, turn: look.turn))
+        if Bool.random() { friend.xScale = -1 }
         let texture = friend.texture!.size()
         let big = containerSize * 0.8 / max(texture.width, texture.height)
         friend.size = CGSize(width: texture.width * big, height: texture.height * big)
         friend.position = point
         friend.zPosition = 22
         // Work this out before scaling: a sprite's size follows its scale.
-        let small = friendSize / max(friend.size.width, friend.size.height)
+        let facing = friend.xScale
+        let small = friendSize * look.size / max(friend.size.width, friend.size.height)
         friend.setScale(0)
         addChild(friend)
         let index = rescued.count
         rescued.append(friend)
         friend.run(.sequence([
             .wait(forDuration: 0.55),
-            .scale(to: 1.15, duration: 0.18), .scale(to: 1, duration: 0.1),
+            .scaleX(to: 1.15 * facing, y: 1.15, duration: 0.18), .scaleX(to: facing, y: 1, duration: 0.1),
             .repeat(.sequence([.moveBy(x: 0, y: 16, duration: 0.14), .moveBy(x: 0, y: -16, duration: 0.14)]), count: 2),
-            .group([SKAction.move(to: perch(index), duration: 0.45).eased(), .scale(to: small, duration: 0.45)]),
+            .group([SKAction.move(to: perch(index), duration: 0.45).eased(), .scaleX(to: small * facing, y: small, duration: 0.45)]),
         ]))
         if outcome?.isLevelComplete == true {
             finishLevel(after: 1.8)

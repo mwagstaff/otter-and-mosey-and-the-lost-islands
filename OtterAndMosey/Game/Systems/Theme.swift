@@ -13,7 +13,8 @@ struct IslandTheme {
     let blooms: [String]
     /// Art for the "type the answer to open it" mode: what is locked, and who comes out.
     let container: String
-    let friend: String
+    /// Who can come out. Each rescue picks one at random, in a random colour.
+    let friends: [String]
     let music: String
     /// True when the heroes swim or float through this island's travel levels.
     let underwater: Bool
@@ -39,22 +40,22 @@ struct IslandTheme {
         switch id {
         case "woods":
             IslandTheme(id: id, tint: UIColor(hex: "#3FBF6B"), ambient: .fireflies, blooms: ["🌸", "🌼", "🌷", "🍄", "🦋"],
-                        container: "chest", friend: "friend_fish", music: "music_woods", underwater: false)
+                        container: "chest", friends: ["friend_fish", "friend_fish_b", "friend_fish_c", "friend_fish_d"], music: "music_woods", underwater: false)
         case "bay":
             IslandTheme(id: id, tint: UIColor(hex: "#29B6E8"), ambient: .bubbles, blooms: ["🐠", "🐚", "🪸", "⭐️", "🐟"],
-                        container: "chest", friend: "friend_fish", music: "music_bay", underwater: true)
+                        container: "chest", friends: ["friend_fish", "friend_fish_b", "friend_fish_c", "friend_fish_d"], music: "music_bay", underwater: true)
         case "dragon":
             IslandTheme(id: id, tint: UIColor(hex: "#F2683C"), ambient: .embers, blooms: ["🔥", "💎", "🌋", "✨", "🌺"],
-                        container: "egg", friend: "babydragon", music: "music_dragon", underwater: false)
+                        container: "egg", friends: ["babydragon", "babydragon_b", "babydragon_c"], music: "music_dragon", underwater: false)
         case "cloud":
             IslandTheme(id: id, tint: UIColor(hex: "#8FA8FF"), ambient: .sparkles, blooms: ["🌈", "☁️", "🕊️", "🌼", "🎈"],
-                        container: "chest", friend: "friend_fish", music: "music_cloud", underwater: false)
+                        container: "chest", friends: ["friend_fish", "friend_fish_b", "friend_fish_c", "friend_fish_d"], music: "music_cloud", underwater: false)
         case "candy":
             IslandTheme(id: id, tint: UIColor(hex: "#FF7EB6"), ambient: .sprinkles, blooms: ["🍭", "🍬", "🧁", "🍓", "🍩"],
-                        container: "jar", friend: "friend_gummy", music: "music_candy", underwater: false)
+                        container: "jar", friends: ["friend_gummy", "friend_gummy_b", "friend_gummy_c"], music: "music_candy", underwater: false)
         default:
             IslandTheme(id: "star", tint: UIColor(hex: "#9B6BFF"), ambient: .stars, blooms: ["⭐️", "🌟", "🪐", "💫", "☄️"],
-                        container: "chest", friend: "friend_fish", music: "music_star", underwater: false)
+                        container: "chest", friends: ["friend_fish", "friend_fish_b", "friend_fish_c", "friend_fish_d"], music: "music_star", underwater: false)
         }
     }
 }

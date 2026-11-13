@@ -2,7 +2,7 @@ import LostIslandsCore
 import SpriteKit
 import UIKit
 
-/// Game mode C. A canyon blocks the way. Dragging the right answer into the gap adds a
+/// Game mode C. A canyon blocks the way. Tapping the right answer (or dragging it into the gap) adds a
 /// rainbow plank; the last plank completes the bridge under a full rainbow.
 final class BridgeBuilderScene: GameScene {
     private let leftCliff = SKSpriteNode(texture: Art.texture("cliff"))
@@ -92,7 +92,7 @@ final class BridgeBuilderScene: GameScene {
 
     override func caption(for question: Question) -> String {
         if question.skill.subject == .spelling { return question.prompt }
-        return question.prompt.count <= 22 ? "Drag the right answer into the gap" : question.prompt
+        return question.prompt.count <= 22 ? "Tap the right answer to fill the gap" : question.prompt
     }
 
     override func present(_ question: Question) {

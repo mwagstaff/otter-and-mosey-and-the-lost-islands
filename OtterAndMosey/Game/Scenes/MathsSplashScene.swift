@@ -42,6 +42,8 @@ final class MathsSplashScene: GameScene {
         otter.resize(mosey.size * 0.42)
         otter.position = CGPoint(x: -mosey.size * 0.06, y: mosey.size * 0.02)
         if targetY == 0 { targetY = lanes[1] }
+        // The play area shrinks when the speech panel appears; keep Mosey in view above it.
+        targetY = min(max(targetY, lanes[2]), lanes[0])
         mosey.position = CGPoint(x: swimmerX, y: targetY)
         for (index, gate) in gates.enumerated() where phase == .choosing { gate.position = CGPoint(x: gateX, y: lanes[index]) }
     }

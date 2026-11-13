@@ -23,7 +23,11 @@ nonisolated enum SaveWriter {
 final class AppModel {
     private(set) var save: SaveFile
     @ObservationIgnored private let store: SaveStore
-    var route: Route = .title
+    var route: Route = .title {
+        // Silence the screen being left now. Doing it when that screen disappears is too late:
+        // it fades out over the next one, whose first line would be cut off.
+        didSet { if route != oldValue { Narrator.shared.stop() } }
+    }
     var showSettings = false
     /// Seconds played since the app was opened, for the optional break reminder.
     var sessionSeconds = 0.0

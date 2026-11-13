@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# Copied from the iOS project by scripts/sync-assets.mjs
+public/assets/
+src/generated/

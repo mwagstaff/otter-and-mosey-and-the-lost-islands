@@ -26,7 +26,11 @@ struct GameHUD: View {
                 .frame(maxWidth: .infinity, minHeight: compact ? 52 : 68 * scale)
                 .panel(fill: model.settings.highContrast ? .white : Palette.cream, radius: 18)
             if bridge.combo >= 2 {
-                Text("×\(bridge.multiplier) 🔥\(bridge.combo)")
+                HStack(spacing: 2) {
+                    Text("×\(bridge.multiplier)")
+                    Glyph("🔥", size: compact ? 22 : 28).padding(.vertical, -4)
+                    Text("\(bridge.combo)")
+                }
                     .font(.game(compact ? 16 : 20))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
@@ -80,7 +84,7 @@ struct HUDExtras: View {
         VStack(spacing: 6) {
             if let hint = bridge.hintText {
                 HStack(spacing: 8) {
-                    Text("💡")
+                    Image(systemName: "lightbulb.fill").font(.system(size: compact ? 16 : 22, weight: .heavy)).foregroundStyle(Palette.ink)
                     Text(hint).font(.game(compact ? 16 : 22, weight: .bold)).gameTracking().foregroundStyle(Palette.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -125,7 +129,7 @@ struct FriendshipMeter: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Text("💞").font(.system(size: compact ? 22 : 30))
+            Glyph("💞", size: compact ? 28 : 38).padding(.vertical, -4)
             ZStack(alignment: .leading) {
                 Capsule().fill(.white.opacity(0.85))
                 Capsule().fill(LinearGradient(colors: [Palette.pink, Palette.gold], startPoint: .leading, endPoint: .trailing))

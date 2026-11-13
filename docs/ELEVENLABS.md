@@ -125,18 +125,22 @@ game plays are `OtterAndMosey/Resources/Speech/say_<key>.mp3`.
 
 | # | File | Key | Text sent |
 | --- | --- | --- | --- |
-| 1 | `01_otter.mp3` | `line_4b3595f3` | [excited] Mosey! I spelled 'breakfast' in the sand. Now I am hungry. |
-| 2 | `02_mosey.mp3` | `line_346f97c9` | [gently] You are always hungry. That is three breakfasts today. |
+| 1 | `01_otter.mp3` | `line_061aa139` | [excited] Mosey! I spelled 'breakfast' in the sand. Now I'm hungry. |
+| 2 | `02_mosey.mp3` | `line_2cc2589b` | [gently] You're always hungry. That's three breakfasts today. |
 | 3 | `03_otter.mp3` | `line_6370a177` | [excited] Three is a very good number. |
 | 4 | `04_mosey.mp3` | `line_4b10a9e0` | [gently] Otter… the colours are fading! |
 | 5 | `05_otter.mp3` | `line_0db2687c` | [excited] The flowers have gone grey. We have to fix this! |
 | 6 | `06_mosey.mp3` | `line_441c4686` | [gently] Look, a word bubble by that flower. Try the missing letter! |
 | 7 | `07_otter.mp3` | `line_044ac971` | [excited] It bloomed! The colour came back! |
 | 8 | `08_mosey.mp3` | `line_47a1f912` | [gently] So our answers bring the world back to life. |
-| 9 | `09_otter.mp3` | `line_f8eb8524` | [excited] Six islands. Six fragments. One snack break. Let us go! |
+| 9 | `09_otter.mp3` | `line_db063bbc` | [excited] Six islands. Six fragments. One snack break. Let's go! |
 
 Things worth listening for: whether the single tag suits every line (line 4 is worried, not
-gentle; line 5 is alarmed, not excited), and whether "Let us go!" should be written "Let's go!".
+gentle; line 5 is alarmed, not excited).
+
+Lines 1, 2 and 9 were later reworded with contractions ("Let's go!") and re-recorded, along with
+39 other lines across the islands; the table shows the current text and keys. The copies in
+`docs/voice-poc` are the original takes.
 
 ### Continuing
 

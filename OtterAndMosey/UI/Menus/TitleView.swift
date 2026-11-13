@@ -47,12 +47,12 @@ struct TitleView: View {
                     Spacer(minLength: 0)
                     VStack(spacing: compact ? 8 : 14) {
                         if let profile = model.profile, profile.seenIntro {
-                            Button("▶  Continue", action: tapped { model.continueGame() })
+                            Button(action: tapped { model.continueGame() }) { IconLabel("Continue", symbol: "play.fill", size: compact ? 26 : 36) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 26 : 36, minWidth: compact ? 250 : 320))
-                            Button("🗺  World map", action: tapped { model.play() })
+                            Button(action: tapped { model.play() }) { IconLabel("World map", emoji: "🗺", size: compact ? 19 : 26) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 19 : 26, minWidth: compact ? 210 : 270))
                         } else {
-                            Button("▶  Play", action: tapped { model.play() })
+                            Button(action: tapped { model.play() }) { IconLabel("Play", symbol: "play.fill", size: compact ? 30 : 40) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 30 : 40, minWidth: compact ? 250 : 320))
                         }
                     }
@@ -64,7 +64,7 @@ struct TitleView: View {
                     HStack(alignment: .bottom) {
                         Button(action: tapped { model.route = .profiles }) {
                             HStack(spacing: 6) {
-                                Text(model.profile?.avatar ?? "🙂")
+                                Glyph(model.profile?.avatar ?? "🙂", size: compact ? 26 : 34).padding(.vertical, -6)
                                 Text(model.profile?.nickname ?? "Players")
                             }
                         }
@@ -95,7 +95,7 @@ struct ProfilesView: View {
     @State private var favourite = "otter"
     @State private var deleting: Profile?
     @FocusState private var nameFocused: Bool
-    private let avatars = ["🦦", "🐬", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"]
+    private let avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"]
 
     var body: some View {
         GeometryReader { geometry in
@@ -135,11 +135,11 @@ struct ProfilesView: View {
                         model.play()
                     }) {
                         VStack(spacing: 6) {
-                            Text(profile.avatar).font(.system(size: compact ? 50 : 76))
+                            Glyph(profile.avatar, size: compact ? 62 : 92)
                             Text(profile.nickname).font(.game(compact ? 20 : 26)).foregroundStyle(Palette.ink)
                             HStack(spacing: 10) {
-                                Text("⭐️ \(profile.totalStars)")
-                                Text("💎 \(profile.crystals.count)/6")
+                                HStack(spacing: 3) { Glyph("⭐️", size: compact ? 18 : 24); Text("\(profile.totalStars)") }
+                                HStack(spacing: 3) { Glyph("💎", size: compact ? 18 : 24); Text("\(profile.crystals.count)/6") }
                             }
                             .font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.7))
                         }
@@ -166,7 +166,7 @@ struct ProfilesView: View {
     private func form(compact: Bool) -> some View {
         VStack(spacing: compact ? 8 : 16) {
             HStack(spacing: 12) {
-                Text(avatar).font(.system(size: compact ? 40 : 56))
+                Glyph(avatar, size: compact ? 52 : 72)
                 TextField("Nickname", text: $nickname)
                     .font(.game(compact ? 24 : 32))
                     .textInputAutocapitalization(.words)
@@ -183,8 +183,8 @@ struct ProfilesView: View {
                 HStack(spacing: 8) {
                     ForEach(avatars, id: \.self) { choice in
                         Button(action: tapped { avatar = choice }) {
-                            Text(choice).font(.system(size: compact ? 30 : 40))
-                                .frame(width: compact ? 52 : 64, height: compact ? 52 : 64)
+                            Glyph(choice, size: compact ? 40 : 50)
+                                .frame(width: compact ? 56 : 68, height: compact ? 56 : 68)
                                 .background(Circle().fill(choice == avatar ? Palette.gold : .white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
                         }
                         .buttonStyle(.plain)
@@ -211,13 +211,13 @@ struct ProfilesView: View {
                 if !model.save.profiles.isEmpty {
                     Button("Cancel", action: tapped { adding = false }).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
                 }
-                Button("Let's go! ▶", action: tapped {
+                Button(action: tapped {
                     nameFocused = false
                     model.createProfile(nickname: nickname, avatar: avatar, favourite: favourite)
                     adding = false
                     nickname = ""
                     model.play()
-                })
+                }) { IconLabel("Let's go!", symbol: "play.fill", size: compact ? 22 : 28, trailing: true) }
                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 200))
             }
         }
@@ -237,7 +237,7 @@ struct IntroView: View {
         GeometryReader { geometry in
             let compact = geometry.size.height < 480
             ZStack {
-                SceneBackdrop(scene: scene, extraBottom: step == 1 ? KeyMetrics.trayHeight(compact: compact) + 14 : (compact ? 96 : 150))
+                SceneBackdrop(scene: scene, extraBottom: step == 1 ? KeyMetrics.trayHeight(compact: compact) + 14 : DialogueView.reservedHeight(compact: compact))
                 if step == 0 {
                     DialogueView(lines: model.catalog.intro, onLineShown: { index in
                         // The story beats drive the scene: line 5 shakes the crystal, line 6 breaks it.
@@ -258,7 +258,7 @@ struct IntroView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            Button("Skip ⏭", action: tapped { model.finishIntro() })
+                            Button(action: tapped { model.finishIntro() }) { IconLabel("Skip", symbol: "forward.end.fill", size: compact ? 16 : 20, trailing: true) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 16 : 20))
                         }
                         Spacer()
@@ -273,7 +273,10 @@ struct IntroView: View {
             .environment(\.compact, compact)
         }
         .onAppear {
-            scene.onTutorialDone = { step = 2 }
+            scene.onTutorialDone = {
+                Narrator.shared.stop()
+                step = 2
+            }
         }
     }
 
@@ -281,7 +284,12 @@ struct IntroView: View {
         // Skipping the story still breaks the crystal, so the tutorial makes sense.
         scene.shatter()
         step = 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { scene.startTutorial() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+            guard step == 1 else { return }
+            scene.startTutorial()
+            // The word is also said aloud, like every spelling question in the game.
+            if model.settings.spokenInstructions { Narrator.shared.say(key: "word_sun", fallback: "Sun. The sun is hot and bright.") }
+        }
     }
 }
 
@@ -297,7 +305,7 @@ struct EndingView: View {
                     Text("The Rainbow Crystal is whole again!").font(.game(compact ? 24 : 38)).foregroundStyle(Palette.ink)
                     Text("Thank you, \(model.profile?.nickname ?? "explorer"). Every island is full of colour because of you.")
                         .font(.game(compact ? 16 : 22, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.8)).multilineTextAlignment(.center)
-                    Button("🗺  Keep exploring", action: tapped { model.route = .map })
+                    Button(action: tapped { model.route = .map }) { IconLabel("Keep exploring", emoji: "🗺", size: compact ? 20 : 26) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26))
                 }
                 .padding(compact ? 14 : 24)

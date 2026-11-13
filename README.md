@@ -84,6 +84,38 @@ files. The rules that would need re-implementing (generators, adaptive level, sp
 star thresholds, unlocks) are small, pure and covered by the tests, which double as a spec.
 Save files are versioned JSON.
 
+## Web version (in progress)
+
+`web/` holds a browser version built with TypeScript, Vite and PixiJS. It reuses this project's
+art, audio and content rather than keeping its own copies:
+
+- `web/scripts/sync-assets.mjs` copies the pictures from `Assets.xcassets` and the sound and
+  voice clips from `OtterAndMosey/Resources` into `web/public/assets` (git-ignored) and writes a
+  manifest. It runs automatically before `npm run dev` and `npm run build`.
+- The content JSON is imported straight from `Packages/LostIslandsCore/.../Resources`.
+- `web/src/core` is a TypeScript port of `LostIslandsCore`, and `web/tests` is a port of its
+  tests. A rule changed in Swift needs the same change there. Save files have the same shape.
+
+```bash
+cd web && npm install
+npm run dev     # http://localhost:5173
+npm test        # the ported core tests
+npm run build   # type-check, then build into web/dist
+```
+
+Every screen of the iOS game now has a web counterpart: the dedication and title screens, players
+(nickname, picture and favourite), the opening story with its one-question tutorial, the map and
+island screens, all six game modes (story dialogue with voices, HUD, hints, on-screen or real
+keyboard, touch and mouse, pause, results), treasures, the home island, settings, the grown-ups'
+area behind its gate (progress, learning settings, reset) and the ending. Progress, settings and
+playtime are saved in the browser. The menu screens are web layouts in the game's style rather
+than copies of the iOS ones, and there is no vibration.
+
+`web/src/engine` holds the small SpriteKit-style pieces the scenes are built on (actions,
+particles, procedural art); `web/src/game` holds the scenes and audio; `web/src/ui` holds the
+page screens. Adding `?level=woods-1` to the address opens a level directly, and `?short` limits
+levels to three questions.
+
 ## Content pipeline
 
 Edit `tools/content/words.txt`, `sentences.txt` or `islands.py`, then:

@@ -3,7 +3,9 @@
   "sprite": "Art style: premium children's storybook video-game art, soft painterly cel shading, clean confident dark-brown outlines, rounded friendly shapes, gentle rim light, rich saturated colours. Full subject visible and centred with generous empty margin on every side. Fully transparent background, no ground, no cast shadow, no text, no border.",
   "scene": "Art style: premium children's storybook video-game background, soft painterly rendering, rich saturated colours, gentle atmospheric depth, soft lighting, rounded friendly shapes. No characters, no animals, no text, no logos, no borders.",
   "scene_with_characters": "Art style: premium children's storybook video-game art, soft painterly cel shading, rich saturated colours, soft lighting.",
-  "logo": "Art style: premium children's video-game logo, glossy, bold and friendly. Fully transparent background, no scenery, no characters, no extra words."
+  "logo": "Art style: premium children's video-game logo, glossy, bold and friendly. Fully transparent background, no scenery, no characters, no extra words.",
+  "icon": "Art style: premium children's storybook video-game icon, soft painterly cel shading, clean confident dark-brown outlines, rounded chunky friendly shapes, glossy highlights, rich saturated colours, bold simple silhouette that reads clearly at small size. One single subject, centred, with generous empty margin on every side. Fully transparent background, no ground, no cast shadow, no text, no letters, no numbers, no border.",
+  "badge": "Art style: premium children's storybook video-game reward sticker, soft painterly cel shading, clean confident dark-brown outlines, glossy highlights, rich saturated colours. A single round sticker badge with a thick cream scalloped rim, centred, with generous empty margin on every side. Fully transparent background, no ground, no cast shadow, no text, no letters, no numbers."
  },
  "assets": [
   {
@@ -443,6 +445,657 @@
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
    "prompt": "Exactly the same image, unchanged in every detail, same pose, same size and same position, except that her mouth is slightly open in a gentle, mid-sentence talking shape, rounded, with a little pink tongue and no sharp teeth. Do not move or redraw anything else."
+  },
+  {
+   "name": "icon_1f5fa",
+   "style": "icon",
+   "label": "🗺",
+   "prompt": "A rolled-open treasure map with a dotted trail, tiny islands and a red X."
+  },
+  {
+   "name": "icon_1f3dd",
+   "style": "icon",
+   "label": "🏝",
+   "prompt": "A tiny round tropical island with one palm tree and a ring of golden sand."
+  },
+  {
+   "name": "icon_2b50",
+   "style": "icon",
+   "label": "⭐️",
+   "prompt": "A plump glossy golden five-pointed star with rounded points."
+  },
+  {
+   "name": "icon_1f48e",
+   "style": "icon",
+   "label": "💎",
+   "prompt": "A sparkling faceted crystal gem shimmering with rainbow colours."
+  },
+  {
+   "name": "icon_1f512",
+   "style": "icon",
+   "label": "🔒",
+   "prompt": "A chunky golden padlock, closed, with a small keyhole."
+  },
+  {
+   "name": "icon_1f392",
+   "style": "icon",
+   "label": "🎒",
+   "prompt": "A cheerful red and teal explorer's backpack with a buckle and a rolled blanket on top."
+  },
+  {
+   "name": "icon_1f319",
+   "style": "icon",
+   "label": "🌙",
+   "prompt": "A sleepy smiling yellow crescent moon wearing a little blue nightcap."
+  },
+  {
+   "name": "icon_1f642",
+   "style": "icon",
+   "label": "🙂",
+   "prompt": "A friendly round yellow smiling face with rosy cheeks and big kind eyes."
+  },
+  {
+   "name": "icon_1f525",
+   "style": "icon",
+   "label": "🔥",
+   "prompt": "A cute happy orange and yellow flame with a small smiling face."
+  },
+  {
+   "name": "icon_1f49e",
+   "style": "icon",
+   "label": "💞",
+   "prompt": "Two glossy hearts, one pink and one teal, hugging side by side with tiny sparkles."
+  },
+  {
+   "name": "icon_1f308",
+   "style": "icon",
+   "label": "🌈",
+   "prompt": "A chunky glossy rainbow arch with a small fluffy white cloud at each end."
+  },
+  {
+   "name": "icon_1f43e",
+   "style": "icon",
+   "label": "🐾",
+   "prompt": "A single big rounded brown animal paw print with soft pink pads."
+  },
+  {
+   "name": "icon_1f3a9",
+   "style": "icon",
+   "label": "🎩",
+   "prompt": "A jaunty purple top hat with a golden band and a little star on it."
+  },
+  {
+   "name": "icon_1f3c5",
+   "style": "icon",
+   "label": "🏅",
+   "prompt": "A golden medal with a star embossed on it, hanging on a red and blue striped ribbon."
+  },
+  {
+   "name": "icon_1fae7",
+   "style": "icon",
+   "label": "🫧",
+   "prompt": "Three shiny soap bubbles of different sizes clustered together, with bright highlights."
+  },
+  {
+   "name": "icon_1f30a",
+   "style": "icon",
+   "label": "🌊",
+   "prompt": "A playful curling turquoise ocean wave with white foam."
+  },
+  {
+   "name": "icon_1f95a",
+   "style": "icon",
+   "label": "🥚",
+   "prompt": "A big speckled dragon egg, orange with yellow spots, with one small crack."
+  },
+  {
+   "name": "icon_1f36c",
+   "style": "icon",
+   "label": "🍬",
+   "prompt": "A wrapped boiled sweet with twisted ends, pink and white swirled stripes."
+  },
+  {
+   "name": "icon_1f5dd",
+   "style": "icon",
+   "label": "🗝️",
+   "prompt": "An ornate old golden key with a heart-shaped handle."
+  },
+  {
+   "name": "icon_26a1",
+   "style": "icon",
+   "label": "⚡️",
+   "prompt": "A bold glossy yellow lightning bolt with rounded corners."
+  },
+  {
+   "name": "icon_1f451",
+   "style": "icon",
+   "label": "👑",
+   "prompt": "A golden crown set with red, blue and green jewels."
+  },
+  {
+   "name": "icon_1f300",
+   "style": "icon",
+   "label": "🌀",
+   "prompt": "A dizzy purple and blue swirling spiral, like a little whirlwind of muddle."
+  },
+  {
+   "name": "icon_1f496",
+   "style": "icon",
+   "label": "💖",
+   "prompt": "A glossy pink heart with white sparkles twinkling around it."
+  },
+  {
+   "name": "icon_1f4ab",
+   "style": "icon",
+   "label": "💫",
+   "prompt": "A golden shooting star looping in a circle with a sparkling trail."
+  },
+  {
+   "name": "icon_1f602",
+   "style": "icon",
+   "label": "😂",
+   "prompt": "A round yellow face laughing joyfully with eyes squeezed shut and happy tears."
+  },
+  {
+   "name": "icon_2601",
+   "style": "icon",
+   "label": "☁️",
+   "prompt": "A soft fluffy white cloud with pale blue shading."
+  },
+  {
+   "name": "icon_1f940",
+   "style": "icon",
+   "label": "🥀",
+   "prompt": "A sad drooping wilted rose with a bent stem and one falling petal."
+  },
+  {
+   "name": "icon_2600",
+   "style": "icon",
+   "label": "☀️",
+   "prompt": "A cheerful golden sun with chunky rounded rays and a happy smiling face."
+  },
+  {
+   "name": "icon_1f33b",
+   "style": "icon",
+   "label": "🌻",
+   "prompt": "A big bright sunflower in full bloom with a green stem and two leaves."
+  },
+  {
+   "name": "icon_1f338",
+   "style": "icon",
+   "label": "🌸",
+   "prompt": "A pink cherry blossom flower with five rounded petals and a yellow centre."
+  },
+  {
+   "name": "icon_1f33c",
+   "style": "icon",
+   "label": "🌼",
+   "prompt": "A sunny yellow daisy flower with an orange centre."
+  },
+  {
+   "name": "icon_1f337",
+   "style": "icon",
+   "label": "🌷",
+   "prompt": "A pink tulip with a green stem and two leaves."
+  },
+  {
+   "name": "icon_1f33a",
+   "style": "icon",
+   "label": "🌺",
+   "prompt": "A red hibiscus flower with a long yellow stamen."
+  },
+  {
+   "name": "icon_1f98b",
+   "style": "icon",
+   "label": "🦋",
+   "prompt": "A bright blue butterfly with open wings edged in black and dotted with white."
+  },
+  {
+   "name": "icon_1f3c1",
+   "style": "icon",
+   "label": "🏁",
+   "prompt": "A black and white chequered racing flag waving on a wooden pole."
+  },
+  {
+   "name": "icon_1f344",
+   "style": "icon",
+   "label": "🍄",
+   "prompt": "A red toadstool mushroom with white spots and a chubby cream stalk."
+  },
+  {
+   "name": "icon_1f420",
+   "style": "icon",
+   "label": "🐠",
+   "prompt": "A cute orange and white striped tropical fish with a big happy eye, seen from the side."
+  },
+  {
+   "name": "icon_1f41a",
+   "style": "icon",
+   "label": "🐚",
+   "prompt": "A pink and cream spiral seashell."
+  },
+  {
+   "name": "icon_1fab8",
+   "style": "icon",
+   "label": "🪸",
+   "prompt": "A branch of bright coral in pink and orange."
+  },
+  {
+   "name": "icon_1f41f",
+   "style": "icon",
+   "label": "🐟",
+   "prompt": "A cute round blue fish with a yellow tail and a big happy eye, seen from the side."
+  },
+  {
+   "name": "icon_1f30b",
+   "style": "icon",
+   "label": "🌋",
+   "prompt": "A small friendly cartoon volcano with glowing orange lava dribbling over the top and a puff of smoke."
+  },
+  {
+   "name": "icon_2728",
+   "style": "icon",
+   "label": "✨",
+   "prompt": "A cluster of three golden four-pointed sparkles, one large and two small."
+  },
+  {
+   "name": "icon_1f54a",
+   "style": "icon",
+   "label": "🕊️",
+   "prompt": "A gentle white dove in flight carrying a tiny green sprig."
+  },
+  {
+   "name": "icon_1f388",
+   "style": "icon",
+   "label": "🎈",
+   "prompt": "A shiny red balloon on a curly string."
+  },
+  {
+   "name": "icon_1f36d",
+   "style": "icon",
+   "label": "🍭",
+   "prompt": "A big round swirly lollipop in rainbow colours on a white stick."
+  },
+  {
+   "name": "icon_1f9c1",
+   "style": "icon",
+   "label": "🧁",
+   "prompt": "A cupcake with swirled pink icing, rainbow sprinkles and a cherry on top."
+  },
+  {
+   "name": "icon_1f353",
+   "style": "icon",
+   "label": "🍓",
+   "prompt": "A plump shiny red strawberry with a green leafy top."
+  },
+  {
+   "name": "icon_1f369",
+   "style": "icon",
+   "label": "🍩",
+   "prompt": "A ring doughnut with pink icing and rainbow sprinkles."
+  },
+  {
+   "name": "icon_1f31f",
+   "style": "icon",
+   "label": "🌟",
+   "prompt": "A glowing golden star with a soft halo of light and tiny sparkles."
+  },
+  {
+   "name": "icon_1fa90",
+   "style": "icon",
+   "label": "🪐",
+   "prompt": "A purple ringed planet with a golden ring and tiny stars nearby."
+  },
+  {
+   "name": "icon_2604",
+   "style": "icon",
+   "label": "☄️",
+   "prompt": "A blue-white comet with a long glowing tail streaking diagonally."
+  },
+  {
+   "name": "icon_1f422",
+   "style": "icon",
+   "label": "🐢",
+   "prompt": "The head and shoulders of an adorable smiling green sea turtle with big friendly eyes."
+  },
+  {
+   "name": "icon_1f980",
+   "style": "icon",
+   "label": "🦀",
+   "prompt": "An adorable smiling bright red crab waving both claws, seen from the front."
+  },
+  {
+   "name": "icon_1f432",
+   "style": "icon",
+   "label": "🐲",
+   "prompt": "The head of an adorable friendly green baby dragon with small horns, big eyes and a happy grin."
+  },
+  {
+   "name": "icon_1f989",
+   "style": "icon",
+   "label": "🦉",
+   "prompt": "The head and shoulders of an adorable round brown owl with huge friendly eyes."
+  },
+  {
+   "name": "icon_1f430",
+   "style": "icon",
+   "label": "🐰",
+   "prompt": "The head of an adorable white bunny with long ears, pink nose and a happy smile."
+  },
+  {
+   "name": "icon_1f680",
+   "style": "icon",
+   "label": "🚀",
+   "prompt": "A chunky red and white toy rocket with a round blue window, blasting upward with a flame."
+  },
+  {
+   "name": "icon_1f3a8",
+   "style": "icon",
+   "label": "🎨",
+   "prompt": "A wooden painter's palette with blobs of rainbow paint and a paintbrush."
+  },
+  {
+   "name": "icon_1f9a6",
+   "style": "icon",
+   "label": "🦦",
+   "refs": [
+    "tools/raw/otter_ref.png"
+   ],
+   "prompt": "This is Otter. Draw exactly the same character in the same art style: just his head and shoulders as a round portrait, facing the viewer with a big happy smile, teal scarf visible. One figure only."
+  },
+  {
+   "name": "icon_1f42c",
+   "style": "icon",
+   "label": "🐬",
+   "refs": [
+    "tools/raw/mosey_ref.png"
+   ],
+   "prompt": "This is Mosey. Draw exactly the same character in the same art style: just her head and neck as a portrait, turned towards the viewer with a gentle happy smile, pearl frill and star necklace visible. One figure only."
+  },
+  {
+   "name": "reward_pet-firefly",
+   "style": "icon",
+   "prompt": "An adorable chubby firefly with big happy eyes, tiny wings and a softly glowing golden tail."
+  },
+  {
+   "name": "reward_pet-squirrel",
+   "style": "icon",
+   "prompt": "An adorable red squirrel with a big fluffy tail, holding an acorn and smiling."
+  },
+  {
+   "name": "reward_hat-leaf",
+   "style": "icon",
+   "prompt": "An explorer's hat woven from big green leaves, with a small red feather tucked in the band."
+  },
+  {
+   "name": "reward_deco-mushroom",
+   "style": "icon",
+   "prompt": "A big glowing purple mushroom with luminous pale spots, with two tiny mushrooms at its foot."
+  },
+  {
+   "name": "reward_pet-turtle",
+   "style": "icon",
+   "prompt": "An adorable smiling green sea turtle with a patterned shell, swimming, seen from the side."
+  },
+  {
+   "name": "reward_pet-crab",
+   "style": "icon",
+   "prompt": "An adorable bright red crab with big happy eyes, waving one claw."
+  },
+  {
+   "name": "reward_hat-pirate",
+   "style": "icon",
+   "prompt": "A black pirate captain's tricorn hat with gold trim and a friendly smiling starfish badge on the front."
+  },
+  {
+   "name": "reward_deco-fountain",
+   "style": "icon",
+   "prompt": "A small stone fountain shaped like an open clam shell with a giant pearl, water sparkling over the edge."
+  },
+  {
+   "name": "reward_pet-ember",
+   "style": "icon",
+   "prompt": "An adorable chubby baby dragon, bright orange-red with a cream tummy and tiny wings, sitting up and puffing a tiny heart-shaped flame."
+  },
+  {
+   "name": "reward_pet-cinder",
+   "style": "icon",
+   "prompt": "An adorable little orange lizard with a curly tail, big happy eyes and glowing yellow spots."
+  },
+  {
+   "name": "reward_hat-crown",
+   "style": "icon",
+   "prompt": "A golden crown set with red, blue and green jewels, on a small red velvet cushion band."
+  },
+  {
+   "name": "reward_deco-lantern",
+   "style": "icon",
+   "prompt": "A round red paper lantern glowing warmly, with a golden tassel."
+  },
+  {
+   "name": "reward_pet-owl",
+   "style": "icon",
+   "prompt": "An adorable round fluffy white and pale-blue owl with huge friendly eyes, perched on a tiny cloud."
+  },
+  {
+   "name": "reward_pet-butterfly",
+   "style": "icon",
+   "prompt": "An adorable butterfly with big rainbow wings and a tiny smiling face."
+  },
+  {
+   "name": "reward_hat-wizard",
+   "style": "icon",
+   "prompt": "A tall purple wizard's top hat covered in golden stars and moons, with a slightly bent tip."
+  },
+  {
+   "name": "reward_deco-kite",
+   "style": "icon",
+   "prompt": "A diamond-shaped rainbow kite with a tail of coloured bows."
+  },
+  {
+   "name": "reward_pet-bunny",
+   "style": "icon",
+   "prompt": "An adorable caramel-coloured bunny with long floppy ears, sitting up and smiling."
+  },
+  {
+   "name": "reward_pet-bee",
+   "style": "icon",
+   "prompt": "An adorable chubby bumblebee with yellow and brown stripes, tiny wings and a big smile."
+  },
+  {
+   "name": "reward_hat-bow",
+   "style": "icon",
+   "prompt": "A big glossy pink hair bow with white polka dots."
+  },
+  {
+   "name": "reward_deco-carousel",
+   "style": "icon",
+   "prompt": "A small candy-coloured carousel with a striped pink and white roof and two tiny horses."
+  },
+  {
+   "name": "reward_pet-comet",
+   "style": "icon",
+   "prompt": "An adorable golden puppy with a star-shaped patch on its forehead and a sparkling tail like a comet."
+  },
+  {
+   "name": "reward_pet-moonmoth",
+   "style": "icon",
+   "prompt": "An adorable pale green luna moth with long trailing wings, fluffy antennae and big gentle eyes."
+  },
+  {
+   "name": "reward_hat-shades",
+   "style": "icon",
+   "prompt": "A pair of bright yellow star-shaped sunglasses with dark lenses."
+  },
+  {
+   "name": "reward_deco-rainbow",
+   "style": "icon",
+   "prompt": "A chunky glossy rainbow arch standing on two small fluffy clouds."
+  },
+  {
+   "name": "reward_deco-palm",
+   "style": "icon",
+   "prompt": "A tropical palm tree with a curved trunk, big green fronds and two coconuts."
+  },
+  {
+   "name": "reward_deco-flowers",
+   "style": "icon",
+   "prompt": "A cheerful patch of pink, yellow and red flowers growing in a little mound of grass."
+  },
+  {
+   "name": "reward_deco-castle",
+   "style": "icon",
+   "prompt": "A sandcastle with four towers, a little flag on top and shells pressed into the walls."
+  },
+  {
+   "name": "reward_deco-tent",
+   "style": "icon",
+   "prompt": "A round red and yellow striped party tent with a flag on top and bunting."
+  },
+  {
+   "name": "badge_first-steps",
+   "style": "badge",
+   "prompt": "The badge shows two little footprints on a sandy path."
+  },
+  {
+   "name": "badge_three-stars",
+   "style": "badge",
+   "prompt": "The badge shows three golden stars in an arc on deep blue."
+  },
+  {
+   "name": "badge_perfect",
+   "style": "badge",
+   "prompt": "The badge shows a bullseye target with an arrow right in the centre."
+  },
+  {
+   "name": "badge_combo-5",
+   "style": "badge",
+   "prompt": "The badge shows a happy orange flame on a red background."
+  },
+  {
+   "name": "badge_combo-8",
+   "style": "badge",
+   "prompt": "The badge shows a rainbow streaking across a blue sky."
+  },
+  {
+   "name": "badge_crystal-1",
+   "style": "badge",
+   "prompt": "The badge shows a single sparkling rainbow crystal shard on teal."
+  },
+  {
+   "name": "badge_crystal-3",
+   "style": "badge",
+   "prompt": "The badge shows three sparkling crystal shards, green, blue and orange."
+  },
+  {
+   "name": "badge_crystal-6",
+   "style": "badge",
+   "prompt": "The badge shows a whole rainbow crystal glowing with a small golden crown above it."
+  },
+  {
+   "name": "badge_friendship",
+   "style": "badge",
+   "prompt": "The badge shows two hearts, pink and teal, linked together."
+  },
+  {
+   "name": "badge_pets-5",
+   "style": "badge",
+   "prompt": "The badge shows a big paw print surrounded by tiny hearts."
+  },
+  {
+   "name": "badge_answers-50",
+   "style": "badge",
+   "prompt": "The badge shows a glowing light bulb with a happy face."
+  },
+  {
+   "name": "badge_answers-250",
+   "style": "badge",
+   "prompt": "The badge shows a red rocket blasting through stars."
+  },
+  {
+   "name": "badge_wordsmith",
+   "style": "badge",
+   "prompt": "The badge shows a stack of three colourful storybooks with a feather quill."
+  },
+  {
+   "name": "badge_number-ninja",
+   "style": "badge",
+   "prompt": "The badge shows a happy abacus with colourful beads."
+  },
+  {
+   "name": "badge_fast-fingers",
+   "style": "badge",
+   "prompt": "The badge shows a small keyboard with speed lines and a lightning bolt."
+  },
+  {
+   "name": "badge_stars-30",
+   "style": "badge",
+   "prompt": "The badge shows a jar overflowing with golden stars."
+  },
+  {
+   "name": "friend_fish_b",
+   "quality": "high",
+   "prompt": "A single cute tropical angelfish, tall and triangular, purple with pink stripes and long trailing fins, with big happy eyes and a wide smile, seen from the side facing left."
+  },
+  {
+   "name": "friend_fish_c",
+   "quality": "high",
+   "prompt": "A single cute chubby pufferfish, round as a ball, orange with small soft spikes and white tummy, with big happy eyes and a wide smile, seen from the side facing left."
+  },
+  {
+   "name": "friend_fish_d",
+   "quality": "high",
+   "prompt": "A single cute little seahorse, green with a curly tail and a tiny crown-like crest, with big happy eyes and a smile, seen from the side facing left."
+  },
+  {
+   "name": "babydragon_b",
+   "quality": "high",
+   "prompt": "A single adorable chubby baby dragon, emerald green with a yellow tummy, two tiny horns, tiny wings and big happy eyes, flapping and hovering just off the ground with joy."
+  },
+  {
+   "name": "babydragon_c",
+   "quality": "high",
+   "prompt": "A single adorable chubby baby dragon, purple with a lilac tummy, a spiky crest, tiny wings and big happy eyes, lying on its tummy with its tail curled up, giggling."
+  },
+  {
+   "name": "friend_gummy_b",
+   "quality": "high",
+   "prompt": "A single adorable shiny green gummy-bunny creature with long ears and big happy eyes, hopping joyfully."
+  },
+  {
+   "name": "friend_gummy_c",
+   "quality": "high",
+   "prompt": "A single adorable shiny orange gummy-star creature with stubby arms and big happy eyes, waving joyfully."
+  },
+  {
+   "name": "icon_1f984",
+   "style": "icon",
+   "label": "🦄",
+   "prompt": "The head and neck of an adorable white unicorn with a flowing rainbow mane, a golden spiral horn and big happy eyes."
+  },
+  {
+   "name": "icon_1f996",
+   "style": "icon",
+   "label": "🦖",
+   "prompt": "An adorable chubby green baby tyrannosaurus dinosaur with tiny arms, big happy eyes and a wide friendly smile, standing and waving."
+  },
+  {
+   "name": "icon_1f47e",
+   "style": "icon",
+   "label": "👾",
+   "prompt": "An adorable friendly fluffy purple monster with two small horns, big round happy eyes, one snaggle tooth and a huge smile, waving."
+  },
+  {
+   "name": "icon_1f47b",
+   "style": "icon",
+   "label": "👻",
+   "prompt": "An adorable friendly little white ghost with rosy cheeks, big happy eyes and a wide smile, waving one arm."
+  },
+  {
+   "name": "icon_1f478",
+   "style": "icon",
+   "label": "👸",
+   "prompt": "The head and shoulders of a cheerful cartoon storybook princess with a small golden crown, a pink dress and a big friendly smile."
   }
  ]
 }

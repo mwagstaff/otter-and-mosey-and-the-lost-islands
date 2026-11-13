@@ -31,16 +31,16 @@ struct MapView: View {
                         Spacer()
                         CountChip(emoji: "⭐️", text: "\(model.profile?.totalStars ?? 0)")
                         CountChip(emoji: "💎", text: "\(model.profile?.crystals.count ?? 0)/6")
-                        Button("🎒 Treasures", action: tapped { model.route = .collection })
+                        Button(action: tapped { model.route = .collection }) { IconLabel("Treasures", emoji: "🎒", size: compact ? 16 : 20) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 16 : 20))
-                        Button("🏝 Home", action: tapped { model.route = .home })
+                        Button(action: tapped { model.route = .home }) { IconLabel("Home", emoji: "🏝", size: compact ? 16 : 20) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 16 : 20))
                     }
                     .padding(.horizontal, compact ? 6 : 20)
                     .padding(.top, compact ? 6 : 14)
                     Spacer()
                     if model.breakSuggested {
-                        Text("🌙 Great playing today! This is a good moment for a break.")
+                        IconLabel("Great playing today! This is a good moment for a break.", emoji: "🌙", size: compact ? 14 : 18)
                             .font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink)
                             .padding(.horizontal, 14).padding(.vertical, 6).panel(fill: Palette.gold, radius: 16)
                             .padding(.bottom, 6)
@@ -75,16 +75,28 @@ struct MapView: View {
             Image("island_\(island.id)").resizable().scaledToFit().frame(height: compact ? 64 : 100).saturation(unlocked ? 0.25 + 0.75 * model.restoration(of: island) : 0)
             VStack(alignment: .leading, spacing: 2) {
                 Text(island.name).font(.game(compact ? 22 : 30)).foregroundStyle(Palette.ink)
-                Text(unlocked ? "\(island.focus)  ·  ⭐️ \(stars)/15\(profile.crystals.contains(island.id) ? "  ·  💎 found" : "")"
-                              : "Find the \(model.catalog.islands[max(index - 1, 0)].name) crystal first")
+                HStack(spacing: 4) {
+                    if unlocked {
+                        Text("\(island.focus)  ·")
+                        Glyph("⭐️", size: compact ? 18 : 22)
+                        Text("\(stars)/15")
+                        if profile.crystals.contains(island.id) {
+                            Text(" ·")
+                            Glyph("💎", size: compact ? 18 : 22)
+                            Text("found")
+                        }
+                    } else {
+                        Text("Find the \(model.catalog.islands[max(index - 1, 0)].name) crystal first")
+                    }
+                }
                     .font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.7))
             }
             Spacer(minLength: 8)
             if unlocked {
-                Button("Explore ▶", action: tapped { model.route = .island(island.id) })
+                Button(action: tapped { model.route = .island(island.id) }) { IconLabel("Explore", symbol: "play.fill", size: compact ? 20 : 26, trailing: true) }
                     .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26))
             } else {
-                Text("🔒").font(.system(size: compact ? 34 : 48))
+                Glyph("🔒", size: compact ? 42 : 58)
             }
         }
         .padding(.horizontal, compact ? 14 : 22)
@@ -146,11 +158,11 @@ struct IslandView: View {
                     Circle().fill(unlocked ? Color(theme.tint.mixed(with: .white, amount: 0.55)) : Color.gray.opacity(0.85))
                     Circle().strokeBorder(isNext ? Palette.gold : Palette.ink, lineWidth: isNext ? 6 : 4)
                     if !unlocked {
-                        Text("🔒").font(.system(size: size * 0.4))
+                        Glyph("🔒", size: size * 0.5)
                     } else if level.mode == .guardian {
                         Image(stars > 0 ? theme.guardianHappy : theme.guardian).resizable().scaledToFit().padding(size * 0.1)
                     } else {
-                        Text(icon(level.mode)).font(.system(size: size * 0.46))
+                        Glyph(icon(level.mode), size: size * 0.62)
                     }
                 }
                 .frame(width: size, height: size)

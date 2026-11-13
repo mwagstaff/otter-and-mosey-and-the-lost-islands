@@ -4,15 +4,15 @@
 "scene": "intro",
 "text": "One sunny morning on Rainbow Island…"
 },
-"line_4b3595f3": {
+"line_061aa139": {
 "speaker": "otter",
 "scene": "intro",
-"text": "Mosey! I spelled 'breakfast' in the sand. Now I am hungry."
+"text": "Mosey! I spelled 'breakfast' in the sand. Now I'm hungry."
 },
-"line_346f97c9": {
+"line_2cc2589b": {
 "speaker": "mosey",
 "scene": "intro",
-"text": "You are always hungry. That is three breakfasts today."
+"text": "You're always hungry. That's three breakfasts today."
 },
 "line_6370a177": {
 "speaker": "otter",
@@ -54,20 +54,20 @@
 "scene": "intro",
 "text": "So our answers bring the world back to life."
 },
-"line_f8eb8524": {
+"line_db063bbc": {
 "speaker": "otter",
 "scene": "intro",
-"text": "Six islands. Six fragments. One snack break. Let us go!"
+"text": "Six islands. Six fragments. One snack break. Let's go!"
 },
 "line_c6ed7ad3": {
 "speaker": "otter",
 "scene": "woods-1",
 "text": "Look, Mosey! Word bubbles are stuck in the trees."
 },
-"line_73310ce7": {
+"line_bd392938": {
 "speaker": "mosey",
 "scene": "woods-1",
-"text": "Fill in the missing letters and they will pop!"
+"text": "Fill in the missing letters and they'll pop!"
 },
 "line_6aafc015": {
 "speaker": "otter",
@@ -154,10 +154,10 @@
 "scene": "woods-5",
 "text": "WHO is making all that cheerful noise in MY woods?"
 },
-"line_b283540b": {
+"line_b9e1d241": {
 "speaker": "otter",
 "scene": "woods-5",
-"text": "Hello, Mr Tree! We are looking for a crystal fragment."
+"text": "Hello, Mr Tree! We're looking for a crystal fragment."
 },
 "line_75ccacd5": {
 "speaker": "tree",
@@ -179,20 +179,20 @@
 "scene": "woods-5",
 "text": "Harrumph! My leaves have gone grey and so has my mood!"
 },
-"line_1b341c14": {
+"line_681c2870": {
 "speaker": "tree",
 "scene": "woods-5",
-"text": "Stop it. I am NOT smiling. That is just how my bark sits."
+"text": "Stop it. I am NOT smiling. That's just how my bark sits."
 },
 "line_7454ac5a": {
 "speaker": "tree",
 "scene": "woods-5",
 "text": "Oh no. I can feel a giggle coming. Hold it in, Grumblebark!"
 },
-"line_0945f2cf": {
+"line_a1fc1bf5": {
 "speaker": "tree",
 "scene": "woods-5",
-"text": "Ha ha ha! I have not laughed in a hundred years!",
+"text": "Ha ha ha! I haven't laughed in a hundred years!",
 "mood": "befriended"
 },
 "line_e198253e": {
@@ -222,10 +222,10 @@
 "scene": "bay-1",
 "text": "The one with the right answer. Follow me!"
 },
-"line_760300f7": {
+"line_347d3f69": {
 "speaker": "otter",
 "scene": "bay-1",
-"text": "You swim so fast when you are right!"
+"text": "You swim so fast when you're right!"
 },
 "line_b9b2ba5c": {
 "speaker": "mosey",
@@ -237,25 +237,25 @@
 "scene": "bay-2",
 "text": "A canyon. Under the sea. How?"
 },
-"line_6e70fb68": {
+"line_95907262": {
 "speaker": "mosey",
 "scene": "bay-2",
-"text": "Do not ask how. Ask how many!"
+"text": "Don't ask how. Ask how many!"
 },
 "line_4c4d2a14": {
 "speaker": "otter",
 "scene": "bay-2",
 "text": "Fine. Rainbow bridge time."
 },
-"line_0f4cf957": {
+"line_b1d45bb9": {
 "speaker": "mosey",
 "scene": "bay-2",
-"text": "A rainbow under water. Now I have seen everything."
+"text": "A rainbow under water. Now I've seen everything."
 },
-"line_168475a1": {
+"line_59a3f6c5": {
 "speaker": "otter",
 "scene": "bay-3",
-"text": "Treasure chests! But they are locked."
+"text": "Treasure chests! But they're locked."
 },
 "line_94055a91": {
 "speaker": "mosey",
@@ -277,15 +277,15 @@
 "scene": "bay-4",
 "text": "The old shipwreck! Stay close, Otter."
 },
-"line_f0ee2edf": {
+"line_86bc2367": {
 "speaker": "otter",
 "scene": "bay-4",
-"text": "I am not scared. You are scared."
+"text": "I'm not scared. You're scared."
 },
-"line_266d517c": {
+"line_ebe08382": {
 "speaker": "mosey",
 "scene": "bay-4",
-"text": "I am a mosasaur. I am never scared."
+"text": "I'm a mosasaur. I'm never scared."
 },
 "line_6dd93b2a": {
 "speaker": "otter",
@@ -322,10 +322,10 @@
 "scene": "bay-5",
 "text": "The reef is glowing again!"
 },
-"line_43ceeb74": {
+"line_5f013dce": {
 "speaker": "octopus",
 "scene": "bay-5",
-"text": "Eight arms… or is it nine? I have lost count of EVERYTHING!"
+"text": "Eight arms… or is it nine? I've lost count of EVERYTHING!"
 },
 "line_26367f35": {
 "speaker": "octopus",
@@ -349,16 +349,16 @@
 "text": "Here, I was sitting on this shiny thing.",
 "mood": "befriended"
 },
-"line_ced185bb": {
+"line_080efb97": {
 "speaker": "mosey",
 "scene": "bay-5",
-"text": "That is the crystal fragment! Good sitting, Inky.",
+"text": "That's the crystal fragment! Good sitting, Inky.",
 "mood": "befriended"
 },
-"line_b48310e2": {
+"line_1fd16c88": {
 "speaker": "otter",
 "scene": "dragon-1",
-"text": "Dragon eggs! They are getting cold."
+"text": "Dragon eggs! They're getting cold."
 },
 "line_e7d41269": {
 "speaker": "mosey",
@@ -370,10 +370,10 @@
 "scene": "dragon-1",
 "text": "Come out, little dragons!"
 },
-"line_c461c9aa": {
+"line_81b6036e": {
 "speaker": "otter",
 "scene": "dragon-1",
-"text": "They think I am their mum."
+"text": "They think I'm their mum."
 },
 "line_e0a3e45b": {
 "speaker": "mosey",
@@ -405,20 +405,20 @@
 "scene": "dragon-3",
 "text": "That lava looks very… lava-y."
 },
-"line_76276166": {
+"line_99e9e4a4": {
 "speaker": "mosey",
 "scene": "dragon-3",
-"text": "Then let us not fall in. Bridge time!"
+"text": "Then let's not fall in. Bridge time!"
 },
 "line_f5771cd9": {
 "speaker": "otter",
 "scene": "dragon-3",
 "text": "Rainbow planks, do your thing."
 },
-"line_dd10f21a": {
+"line_e2ec3ce0": {
 "speaker": "otter",
 "scene": "dragon-3",
-"text": "My tail did not get toasted. Success!"
+"text": "My tail didn't get toasted. Success!"
 },
 "line_587481e0": {
 "speaker": "mosey",
@@ -450,10 +450,10 @@
 "scene": "dragon-5",
 "text": "Excuse me. Your trousers are on fire."
 },
-"line_6e03c375": {
+"line_d78c493f": {
 "speaker": "dragon",
 "scene": "dragon-5",
-"text": "Nonsense! Dragons do not… oh. OH! Not again!"
+"text": "Nonsense! Dragons don't… oh. OH! Not again!"
 },
 "line_5a728bb0": {
 "speaker": "mosey",
@@ -470,10 +470,10 @@
 "scene": "dragon-5",
 "text": "Behold my mighty fl… is something burning?"
 },
-"line_d6704ca7": {
+"line_88e063c3": {
 "speaker": "dragon",
 "scene": "dragon-5",
-"text": "It is my TROUSERS! Again! Quick, distract me with times tables!"
+"text": "It's my TROUSERS! Again! Quick, distract me with times tables!"
 },
 "line_085bdeb9": {
 "speaker": "dragon",
@@ -498,15 +498,15 @@
 "text": "Take the fragment. It was making my pocket itchy.",
 "mood": "befriended"
 },
-"line_9a441d98": {
+"line_4f62ad6c": {
 "speaker": "otter",
 "scene": "cloud-1",
-"text": "We are flying! On a cloud! Mosey, you are flying!"
+"text": "We're flying! On a cloud! Mosey, you're flying!"
 },
-"line_c99bbc77": {
+"line_ecebc6ab": {
 "speaker": "mosey",
 "scene": "cloud-1",
-"text": "I am a sky mosasaur now. Type to keep us going!"
+"text": "I'm a sky mosasaur now. Type to keep us going!"
 },
 "line_30677b50": {
 "speaker": "mosey",
@@ -583,10 +583,10 @@
 "scene": "cloud-5",
 "text": "Is it a nice trick?"
 },
-"line_bfdc8640": {
+"line_989991ee": {
 "speaker": "wizard",
 "scene": "cloud-5",
-"text": "Nope! It is a WORD MUDDLE! Tee hee!"
+"text": "Nope! It's a WORD MUDDLE! Tee hee!"
 },
 "line_044898e9": {
 "speaker": "mosey",
@@ -636,15 +636,15 @@
 "scene": "candy-1",
 "text": "Everything here is made of SWEETS."
 },
-"line_346bee55": {
+"line_8c933c4b": {
 "speaker": "mosey",
 "scene": "candy-1",
-"text": "Do not lick the scenery, Otter."
+"text": "Don't lick the scenery, Otter."
 },
-"line_76a6c3a1": {
+"line_af706179": {
 "speaker": "otter",
 "scene": "candy-1",
-"text": "Too late. Let us open these jars by sharing equally!"
+"text": "Too late. Let's open these jars by sharing equally!"
 },
 "line_91e2e61c": {
 "speaker": "otter",
@@ -666,10 +666,10 @@
 "scene": "candy-2",
 "text": "Half of a thing is that thing shared by two."
 },
-"line_1ce188a7": {
+"line_d74840a3": {
 "speaker": "mosey",
 "scene": "candy-2",
-"text": "I am now one quarter chocolate."
+"text": "I'm now one quarter chocolate."
 },
 "line_23ab72d9": {
 "speaker": "otter",
@@ -681,30 +681,30 @@
 "scene": "candy-3",
 "text": "Somebody had a midnight snack."
 },
-"line_703e15c6": {
+"line_76c48936": {
 "speaker": "otter",
 "scene": "candy-3",
-"text": "It was not me. This time."
+"text": "It wasn't me. This time."
 },
 "line_237ec439": {
 "speaker": "otter",
 "scene": "candy-3",
 "text": "A rainbow biscuit bridge. Can I keep it?"
 },
-"line_8021fd8b": {
+"line_96b71637": {
 "speaker": "mosey",
 "scene": "candy-4",
-"text": "Hold your nose. We are going under the fudge falls."
+"text": "Hold your nose. We're going under the fudge falls."
 },
 "line_1a9d50ce": {
 "speaker": "otter",
 "scene": "candy-4",
 "text": "Best. Waterfall. Ever."
 },
-"line_a2859bb2": {
+"line_1ac5c3aa": {
 "speaker": "otter",
 "scene": "candy-4",
-"text": "I have fudge in my ears."
+"text": "I've got fudge in my ears."
 },
 "line_4432c172": {
 "speaker": "mosey",
@@ -716,35 +716,35 @@
 "scene": "candy-5",
 "text": "PUFF is the biggest! Puff keeps ALL the sweets!"
 },
-"line_521ba7f3": {
+"line_93fe0ecb": {
 "speaker": "mosey",
 "scene": "candy-5",
-"text": "That does not sound very fair, Puff."
+"text": "That doesn't sound very fair, Puff."
 },
-"line_c2663dd6": {
+"line_c8d6385c": {
 "speaker": "marshmallow",
 "scene": "candy-5",
-"text": "Fair? Puff does not know how to share!"
+"text": "Fair? Puff doesn't know how to share!"
 },
 "line_e798815f": {
 "speaker": "otter",
 "scene": "candy-5",
 "text": "Five fragments! Only one left."
 },
-"line_c5388f9c": {
+"line_5e8c02da": {
 "speaker": "mosey",
 "scene": "candy-5",
-"text": "And it is on Starlight Island."
+"text": "And it's on Starlight Island."
 },
 "line_c67ffce0": {
 "speaker": "marshmallow",
 "scene": "candy-5",
 "text": "MINE! All the sweets are MINE! …How many is that?"
 },
-"line_d167234b": {
+"line_ccab1267": {
 "speaker": "marshmallow",
 "scene": "candy-5",
-"text": "Sharing? What is sharing? Show Puff!"
+"text": "Sharing? What's sharing? Show Puff!"
 },
 "line_6aa57a78": {
 "speaker": "marshmallow",
@@ -779,10 +779,10 @@
 "scene": "star-1",
 "text": "Every word we spell lights one up."
 },
-"line_378e2412": {
+"line_1477ed80": {
 "speaker": "otter",
 "scene": "star-1",
-"text": "Then let us light the whole sky!"
+"text": "Then let's light the whole sky!"
 },
 "line_96d9382a": {
 "speaker": "mosey",
@@ -804,20 +804,20 @@
 "scene": "star-2",
 "text": "Only a little. Tunnels ahead!"
 },
-"line_b4c88c0c": {
+"line_316bf8a4": {
 "speaker": "otter",
 "scene": "star-2",
-"text": "I have stardust in my scarf. Fancy."
+"text": "I've got stardust in my scarf. Fancy."
 },
 "line_5033f68f": {
 "speaker": "otter",
 "scene": "star-3",
 "text": "To the last portal!"
 },
-"line_9e4db1c1": {
+"line_ed87f26c": {
 "speaker": "mosey",
 "scene": "star-3",
-"text": "Type carefully and we will fly straight."
+"text": "Type carefully and we'll fly straight."
 },
 "line_4d1c8f57": {
 "speaker": "mosey",
@@ -854,10 +854,10 @@
 "scene": "star-5",
 "text": "And to find out who broke it."
 },
-"line_3e24359b": {
+"line_6a7d573f": {
 "speaker": "shadow",
 "scene": "star-5",
-"text": "I did not mean to. I only wanted to hold something bright."
+"text": "I didn't mean to. I only wanted to hold something bright."
 },
 "line_3f8c9225": {
 "speaker": "narrator",
@@ -869,15 +869,15 @@
 "scene": "star-5",
 "text": "We did it, Mosey!"
 },
-"line_10b91d0f": {
+"line_58f6f523": {
 "speaker": "mosey",
 "scene": "star-5",
-"text": "We did it together. That is the real magic."
+"text": "We did it together. That's the real magic."
 },
-"line_3c8e8ac2": {
+"line_3b73948a": {
 "speaker": "shadow",
 "scene": "star-5",
-"text": "Go away. Shadows do not have friends."
+"text": "Go away. Shadows don't have friends."
 },
 "line_cadc9899": {
 "speaker": "shadow",
@@ -889,10 +889,10 @@
 "scene": "star-5",
 "text": "If the crystal comes back… will I disappear?"
 },
-"line_ee5f9b80": {
+"line_b9e36c1c": {
 "speaker": "mosey",
 "scene": "star-5",
-"text": "You will not disappear, Umbra. Shadows need the light.",
+"text": "You won't disappear, Umbra. Shadows need the light.",
 "mood": "befriended"
 },
 "line_701d85be": {
@@ -901,10 +901,10 @@
 "text": "And friends need friends. Come with us!",
 "mood": "befriended"
 },
-"line_0383e1fc": {
+"line_971dac26": {
 "speaker": "shadow",
 "scene": "star-5",
-"text": "I… I would like that. Here. I kept it safe for you.",
+"text": "I… I'd like that. Here. I kept it safe for you.",
 "mood": "befriended"
 }
 }
