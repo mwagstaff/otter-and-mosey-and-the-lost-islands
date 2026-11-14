@@ -24,7 +24,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "Redraw this plush toy as ONE single 2D cartoon character illustration (one figure only: not a character sheet, no extra poses, no labels, no scenery, no water). She is a cute, friendly female mosasaur, a prehistoric sea reptile (not a land dinosaur, whale, shark or dolphin). Keep the toy's identity: bright ocean-blue body, a soft pale-grey bobbly frill running along her back and a second frill along her side, pale turquoise belly, golden-amber eyes, exactly four long paddle-shaped swimming flippers edged with pale frill, and a long aquatic tail ending in a fluke. Rounded friendly snout, gentle closed-mouth smile with no teeth showing, large expressive eyes with bright highlights and little eyelashes, and a small golden star charm on a cord round her neck. Relaxed floating pose, side-on three-quarter view with her head pointing to the RIGHT of the picture, whole body including tail and all four flippers visible."
+   "prompt": "Redraw this plush toy as ONE single 2D cartoon character illustration (one figure only: not a character sheet, no extra poses, no labels, no scenery, no water). He is a cute, friendly male mosasaur, a prehistoric sea reptile (not a land dinosaur, whale, shark or dolphin). Keep the toy's identity: bright ocean-blue body, a soft pale-grey bobbly frill running along his back and a second frill along his side, pale turquoise belly, golden-amber eyes, exactly four long paddle-shaped swimming flippers edged with pale frill, and a long aquatic tail ending in a fluke. Rounded friendly snout, gentle closed-mouth smile with no teeth showing, large expressive eyes with bright highlights and little eyelashes, and a small golden star charm on a cord round his neck. Relaxed floating pose, side-on three-quarter view with his head pointing to the RIGHT of the picture, whole body including tail and all four flippers visible."
   },
   {
    "name": "otter_blink",
@@ -78,7 +78,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: identical floating pose to the reference, but with her eyes closed in a happy contented blink."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: identical floating pose to the reference, but with his eyes closed in a happy contented blink."
   },
   {
    "name": "mosey_cheer",
@@ -96,7 +96,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: floating upright and thinking, one front flipper touching her chin, eyes looking up, curious little smile."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: floating upright and thinking, one front flipper touching his chin, eyes looking up, curious little smile."
   },
   {
    "name": "mosey_oops",
@@ -105,7 +105,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: a funny surprised 'oops' reaction: very wide eyes, one flipper over her mouth, slightly leaning back."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: a funny surprised 'oops' reaction: very wide eyes, one flipper over his mouth, slightly leaning back."
   },
   {
    "name": "mosey_swim",
@@ -124,7 +124,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "These are Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace). Draw exactly these two characters together as one isolated sticker-style sprite in the same art style: Otter sits on Mosey's back riding her, holding on with one paw and punching the air with the other, scarf streaming behind; Mosey is stretched out swimming fast towards the right in full side view, both grinning with delight. Mosey is much bigger than Otter. Only the two figures: absolutely no water, no waves, no splashes, no sky, no scenery.",
+   "prompt": "These are Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace). Draw exactly these two characters together as one isolated sticker-style sprite in the same art style: Otter sits on Mosey's back riding him, holding on with one paw and punching the air with the other, scarf streaming behind; Mosey is stretched out swimming fast towards the right in full side view, both grinning with delight. Mosey is much bigger than Otter. Only the two figures: absolutely no water, no waves, no splashes, no sky, no scenery.",
    "size": "1536x1024"
   },
   {
@@ -444,7 +444,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "Exactly the same image, unchanged in every detail, same pose, same size and same position, except that her mouth is slightly open in a gentle, mid-sentence talking shape, rounded, with a little pink tongue and no sharp teeth. Do not move or redraw anything else."
+   "prompt": "Exactly the same image, unchanged in every detail, same pose, same size and same position, except that his mouth is slightly open in a gentle, mid-sentence talking shape, rounded, with a little pink tongue and no sharp teeth. Do not move or redraw anything else."
   },
   {
    "name": "icon_1f5fa",
@@ -810,7 +810,7 @@
    "refs": [
     "tools/raw/mosey_ref.png"
    ],
-   "prompt": "This is Mosey. Draw exactly the same character in the same art style: just her head and neck as a portrait, turned towards the viewer with a gentle happy smile, pearl frill and star necklace visible. One figure only."
+   "prompt": "This is Mosey. Draw exactly the same character in the same art style: just his head and neck as a portrait, turned towards the viewer with a gentle happy smile, pearl frill and star necklace visible. One figure only."
   },
   {
    "name": "reward_pet-firefly",
@@ -1096,6 +1096,161 @@
    "style": "icon",
    "label": "👸",
    "prompt": "The head and shoulders of a cheerful cartoon storybook princess with a small golden crown, a pink dress and a big friendly smile."
+  },
+  {
+   "name": "trophy_champion",
+   "style": "icon",
+   "prompt": "A shiny golden trophy cup with two curly handles, a little rainbow crystal set in the front and a short teal base."
+  },
+  {
+   "name": "trophy_cabinet",
+   "quality": "high",
+   "prompt": "A friendly wooden trophy cabinet with a rounded golden crest on top, two glass doors and three shelves holding little gold cups, round medals and rosettes, glowing softly from inside."
+  },
+  {
+   "name": "trophy_parcel",
+   "style": "icon",
+   "prompt": "A small wrapped present in teal paper with a big golden ribbon bow and a little star-shaped tag, with a few sparkles around it."
+  },
+  {
+   "name": "badge_pearls",
+   "style": "badge",
+   "prompt": "The badge shows a heap of shiny pink and white pearls spilling from an open scallop shell on deep sea blue."
+  },
+  {
+   "name": "badge_sharp-shooter",
+   "style": "badge",
+   "prompt": "The badge shows a cheerful little bow with a golden arrow flying straight towards a small star, on soft purple."
+  },
+  {
+   "name": "badge_combo-9",
+   "style": "badge",
+   "prompt": "The badge shows nine glowing stars in a ring around a happy flame, on deep blue."
+  },
+  {
+   "name": "badge_adventurer",
+   "style": "badge",
+   "prompt": "The badge shows a little explorer's compass with a red needle on top of a rolled treasure map, on sandy yellow."
+  },
+  {
+   "name": "badge_explorer",
+   "style": "badge",
+   "prompt": "The badge shows a bright sunrise over the sea with a tiny sailing boat, on warm orange."
+  },
+  {
+   "name": "badge_tables",
+   "style": "badge",
+   "prompt": "The badge shows a friendly cartoon multiplication sign made of golden stars with sparkles, on teal."
+  },
+  {
+   "name": "badge_prefixes",
+   "style": "badge",
+   "prompt": "The badge shows a small green sprout pushing a wooden letter block forward, on light green."
+  },
+  {
+   "name": "badge_suffixes",
+   "style": "badge",
+   "prompt": "The badge shows a wooden letter block with a curly ribbon trailing from its back, on light blue."
+  },
+  {
+   "name": "badge_homophones",
+   "style": "badge",
+   "prompt": "The badge shows two identical happy pears side by side, one wearing a tiny bow, on pale pink."
+  },
+  {
+   "name": "badge_tricky-words",
+   "style": "badge",
+   "prompt": "The badge shows a friendly purple snake curled into a loose knot, smiling, on lilac."
+  },
+  {
+   "name": "badge_fractions",
+   "style": "badge",
+   "prompt": "The badge shows a round pizza cut into four slices with one slice pulled out, on red."
+  },
+  {
+   "name": "badge_division",
+   "style": "badge",
+   "prompt": "The badge shows twelve red apples shared out into three little baskets, on light green."
+  },
+  {
+   "name": "badge_place-value",
+   "style": "badge",
+   "prompt": "The badge shows three stacked coloured blocks of different sizes, small, medium and large, on yellow."
+  },
+  {
+   "name": "badge_word-problems",
+   "style": "badge",
+   "prompt": "The badge shows an open storybook with a pencil and little floating numbers above it, on cream and teal."
+  },
+  {
+   "name": "badge_pets-all",
+   "style": "badge",
+   "prompt": "The badge shows a happy group of cute animal friends: a turtle, a crab, a baby dragon and an owl, squeezed together, on green."
+  },
+  {
+   "name": "badge_hats-all",
+   "style": "badge",
+   "prompt": "The badge shows a tall stack of four different hats: a pirate hat, a crown, a wizard's hat and a leafy explorer hat, on blue."
+  },
+  {
+   "name": "badge_decorator",
+   "style": "badge",
+   "prompt": "The badge shows a small paintbrush and a tiny sandcastle beside a palm tree, on turquoise."
+  },
+  {
+   "name": "badge_treasure-all",
+   "style": "badge",
+   "prompt": "The badge shows an open treasure chest overflowing with gold coins, gems and pearls, on deep red."
+  },
+  {
+   "name": "badge_comeback",
+   "style": "badge",
+   "prompt": "The badge shows a little bouncy ball springing back up from the ground with motion lines, on bright orange."
+  },
+  {
+   "name": "badge_never-give-up",
+   "style": "badge",
+   "prompt": "The badge shows a small determined snail climbing to the top of a hill with a flag, on green."
+  },
+  {
+   "name": "badge_pearl-perfect",
+   "style": "badge",
+   "prompt": "The badge shows a single huge glowing pearl inside an open shell, with sparkles, on dark blue."
+  },
+  {
+   "name": "badge_turbo-ace",
+   "style": "badge",
+   "prompt": "The badge shows a speedy little rocket with a flame trail racing past a keyboard key, on purple."
+  },
+  {
+   "name": "badge_hat-trick",
+   "style": "badge",
+   "prompt": "The badge shows three different little hats in a neat row, a top hat in the middle, on red."
+  },
+  {
+   "name": "badge_old-friends",
+   "style": "badge",
+   "prompt": "The badge shows two hands, a small furry paw and a big blue flipper, giving a high five, on pink."
+  },
+  {
+   "name": "badge_back-for-more",
+   "style": "badge",
+   "prompt": "The badge shows a curved circular arrow wrapped around a gold star, on teal."
+  },
+  {
+   "name": "badge_weekend",
+   "style": "badge",
+   "prompt": "The badge shows a smiling sun and a smiling crescent moon side by side, on sky blue."
+  },
+  {
+   "name": "badge_no-hints",
+   "style": "badge",
+   "prompt": "The badge shows a light bulb wearing a tiny crown, glowing proudly, on navy blue."
+  },
+  {
+   "name": "badge_rainbow-day",
+   "style": "badge",
+   "prompt": "The badge shows a bright rainbow arching over three tiny islands, on light blue."
   }
  ]
 }

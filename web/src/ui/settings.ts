@@ -30,7 +30,7 @@ export function settingsControls(model: AppModel): HTMLElement {
       toggle("Mute everything", "muted"),
       toggle("Read questions aloud", "spokenInstructions"),
       toggle("Character voices", "characterVoices"),
-      voices && toggle("Device voice for other sums", "deviceVoice"),
+      voices && toggle("Read every sum word for word", "deviceVoice"),
       toggle("Calmer motion", "reducedMotion"),
       toggle("High contrast", "highContrast"),
       toggle("Easy-read text", "easyReadFont"),

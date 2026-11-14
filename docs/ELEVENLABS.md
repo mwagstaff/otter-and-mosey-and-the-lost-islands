@@ -10,7 +10,7 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | --- | --- |
 | Sound effects (21) | Done and bundled. |
 | Question narrator, "Alice" (486 clips) | Done and bundled. |
-| Otter and Mosey voices | Done and bundled: all 133 lines. The 9 opening-story lines were recorded first as a proof of concept. |
+| Otter and Mosey voices | Done and bundled: all 137 lines, including 4 "ask a grown-up" lines (scene `help`). The 9 opening-story lines were recorded first as a proof of concept. |
 | Guardian voices | Done and bundled: all 41 lines, six designed voices. |
 | Music (7 loops) | Done and bundled: one for the menus, one per island. See section 4. |
 | "Story" lines (4 clips) | Done and bundled, read by Alice with her question settings and no tag. Copies in `docs/voice-poc/story/`. |
@@ -39,8 +39,9 @@ guidelines"): it does not generate children's voices. These were the rejected de
   kind and reassuring, thoughtful and unhurried, with quiet youthful wonder and a little playful
   humour. Clean studio recording."
 
-The voices in use are therefore adult voice actresses performing youthful cartoon characters,
-which is how most animation is voiced. Do not try to reword the request to obtain a child's voice.
+The voices in use are therefore adult voice actors performing youthful cartoon characters,
+which is how most animation is voiced. Otter is a girl, voiced by a woman; Mosey is a boy, voiced
+by a young man. Do not try to reword the request to obtain a child's voice.
 
 ### Voice Design requests that were accepted
 
@@ -57,11 +58,17 @@ parameters). Script: `tools/sfx/design-voices.mjs`.
   things is my favourite subject. I crossed a rainbow, and now my feet feel all fizzy. Again! Again!
   Can we do it again? Six islands, six fragments, and one snack break. Let's go!"
 
-**Mosey**
+**Mosey** (current voice, designed 14 November 2026)
 
-- `voiceDescription`: "An adult British voice actress in her twenties performing a gentle cartoon
-  sea creature for a family animated film. Soft, light and youthful, calm, steady, kind and
-  reassuring, unhurried, with quiet wonder and a little playful humour. Clean studio recording."
+- `voiceDescription`: "A young adult British voice actor performing a gentle boy mosasaur, a
+  friendly cartoon sea dinosaur, for a family animated film. Warm, youthful and mid-low in pitch, a
+  little deeper and rounder than a child, with a soft, slightly rumbly, dinosaur-like quality. Calm,
+  steady, kind and reassuring, unhurried, with quiet wonder and a little playful humour. Clear
+  southern English accent. Clean studio recording."
+
+Mosey's first voice was "an adult British voice actress in her twenties performing a gentle cartoon
+sea creature", which made him sound like a girl. It was replaced with the voice above and all of
+his lines were re-recorded.
 - `text`: "Welcome to my favourite place. Maths, under the sea. Stay close, Otter, and follow me.
   Each right answer builds a rainbow plank, so there is no need to rush. Look, the flowers are
   waking up. We did it together, and that is the real magic."
@@ -78,9 +85,15 @@ before the rest were recorded.
 | Otter 1 | 400 Hz | 281 Hz | **Yes** |
 | Otter 2 | 457 Hz | 312 Hz | |
 | Otter 3 | 314 Hz | 314 Hz | |
-| Mosey 1 | 286 Hz | 118 Hz | **Yes** |
-| Mosey 2 | 258 Hz | 71 Hz | |
-| Mosey 3 | 235 Hz | 113 Hz | |
+| Mosey 1 (first voice, retired) | 286 Hz | 118 Hz | Was kept, since replaced |
+| Mosey 2 (first voice) | 258 Hz | 71 Hz | |
+| Mosey 3 (first voice) | 235 Hz | 113 Hz | |
+| Mosey boy 1 | 286 Hz | 168 Hz | |
+| Mosey boy 2 | 302 Hz | 167 Hz | |
+| Mosey boy 3 | 200 Hz | 91 Hz | **Yes**, chosen by ear |
+
+The boy previews are in `docs/voice-poc/mosey-boy/`. The pitch measurement only looks between
+120 Hz and 600 Hz, so it can read a man's voice an octave high; judge deeper voices by ear.
 
 Kept previews were saved to the account with `client.textToVoice.create({ voiceName,
 voiceDescription, generatedVoiceId })`:
@@ -88,7 +101,7 @@ voiceDescription, generatedVoiceId })`:
 | Character | Voice name in the account | Voice ID |
 | --- | --- | --- |
 | Otter | Otter (Lost Islands) | `sYN0fMdsZGmW5GjQDfRo` |
-| Mosey | Mosey (Lost Islands) | `K0lydB7PoIvM0LcxjPER` |
+| Mosey | Mosey (Lost Islands) | `pdpnPCm7zMxCzdfHpCyH` |
 
 Preview IDs expire, so previews 2 and 3 can no longer be saved as they are. To get a different
 voice, run the design step again (new previews each time), listen, then keep one:
@@ -144,11 +157,11 @@ Lines 1, 2 and 9 were later reworded with contractions ("Let's go!") and re-reco
 
 ### Continuing
 
-All of Otter's and Mosey's 133 lines are recorded with the settings above. The commands below are for re-recording
+All of Otter's and Mosey's 137 lines are recorded with the settings above. The commands below are for re-recording
 after a change, or for new lines.
 
 The full script is `Packages/LostIslandsCore/Sources/LostIslandsCore/Resources/dialogue.json`
-(178 lines, about 6,800 characters before tags: 133 for Otter and Mosey, 41 for guardians, 4 story lines), built from `tools/content/islands.py` by
+(182 lines, about 7,000 characters before tags: 137 for Otter and Mosey, 41 for guardians, 4 story lines), built from `tools/content/islands.py` by
 `python3 tools/build_content.py`. Each entry has a `speaker`, a `scene` (`intro` or a level id such
 as `woods-1`) and the `text`.
 
@@ -158,6 +171,7 @@ npm run narrate -- --dialogue woods-1 --count   # list a scene's lines, spend no
 npm run narrate -- --dialogue woods-1           # record one scene
 npm run narrate -- --dialogue all               # record everything still missing
 npm run narrate -- --dialogue intro --force     # re-record a scene after changing settings
+npm run narrate -- --dialogue all --speaker mosey --force   # re-record one character
 ```
 
 How the pieces fit:

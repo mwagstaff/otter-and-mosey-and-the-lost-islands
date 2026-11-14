@@ -59,6 +59,26 @@
 "scene": "intro",
 "text": "Six islands. Six fragments. One snack break. Let's go!"
 },
+"line_821832a9": {
+"speaker": "otter",
+"scene": "help",
+"text": "Hey, don't worry! Why don't you ask a grown-up for some help?"
+},
+"line_85b7cf61": {
+"speaker": "mosey",
+"scene": "help",
+"text": "This one's a bit tricky. How about asking a grown-up to help us?"
+},
+"line_b00136d4": {
+"speaker": "otter",
+"scene": "help",
+"text": "You're trying really hard! Shall we get a grown-up to help with this one?"
+},
+"line_1ae1971d": {
+"speaker": "mosey",
+"scene": "help",
+"text": "Even the best explorers ask for help. Why don't you find a grown-up?"
+},
 "line_c6ed7ad3": {
 "speaker": "otter",
 "scene": "woods-1",

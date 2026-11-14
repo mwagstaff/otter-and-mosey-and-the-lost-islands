@@ -8,6 +8,7 @@
 //   npm run narrate -- --count            # show what would be recorded, spend nothing
 //   npm run narrate -- --dialogue intro   # character lines for one scene (intro, woods-1, ...)
 //   npm run narrate -- --dialogue all     # every Otter, Mosey, guardian and story line
+//   npm run narrate -- --dialogue all --speaker mosey --force   # re-record one character's lines
 //
 // The script (what is said) comes from narration.json, which tools/build_content.py writes.
 // The voice and model are set in narration.config.json. The API key is read from
@@ -26,7 +27,7 @@ const dialogue = JSON.parse(readFileSync(join(resources, "dialogue.json"), "utf8
 const speechDir = join(here, "../../OtterAndMosey/Resources/Speech");
 const args = process.argv.slice(2);
 const flags = new Set(args.filter((arg) => arg.startsWith("--")));
-const wanted = args.filter((arg, index) => !arg.startsWith("--") && args[index - 1] !== "--dialogue");
+const wanted = args.filter((arg, index) => !arg.startsWith("--") && args[index - 1] !== "--dialogue" && args[index - 1] !== "--speaker");
 
 const client = new ElevenLabsClient();
 
@@ -83,9 +84,11 @@ if (flags.has("--samples")) {
 } else if (args.includes("--dialogue")) {
   // Character lines: each character has its own voice, settings and delivery tag.
   const scene = args[args.indexOf("--dialogue") + 1];
+  const speaker = args.includes("--speaker") ? args[args.indexOf("--speaker") + 1] : null;
   mkdirSync(speechDir, { recursive: true });
   const jobs = Object.entries(dialogue)
     .filter(([, line]) => scene === "all" || line.scene === scene)
+    .filter(([, line]) => !speaker || line.speaker === speaker)
     .map(([key, line]) => {
       // Story lines are read by the question narrator, with her usual settings and no tag.
       const character = line.speaker === "narrator"

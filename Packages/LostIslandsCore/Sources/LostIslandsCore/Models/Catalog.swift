@@ -132,6 +132,8 @@ public struct Catalog: Codable, Sendable {
     public let rewards: [Reward]
     public let intro: [DialogueLine]
     public let introAfter: [DialogueLine]
+    /// Kind suggestions from Otter or Mosey to fetch a grown-up when a child keeps getting stuck.
+    public let askGrownUp: [DialogueLine]
 
     public static let shared: Catalog = {
         do {
@@ -141,7 +143,7 @@ public struct Catalog: Codable, Sendable {
             return try JSONDecoder().decode(Catalog.self, from: Data(contentsOf: url))
         } catch {
             assertionFailure("Bundled catalogue failed to load: \(error)")
-            return Catalog(islands: [], rewards: [], intro: [], introAfter: [])
+            return Catalog(islands: [], rewards: [], intro: [], introAfter: [], askGrownUp: [])
         }
     }()
 

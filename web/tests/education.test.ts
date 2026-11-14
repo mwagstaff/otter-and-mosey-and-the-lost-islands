@@ -2,7 +2,8 @@
 import { describe, expect, test } from "vitest";
 import {
   Chatter, isCorrectChoice, isCorrectTyped, LearnerModel, makeMaths, makeMathsFact, makeSpelling, makeTyping,
-  mathsTopics, MouthGate, narration, SeededGenerator, spellingTopics, subjectOf, TypingMeter, wordBank as bank,
+  averageTouchWordsPerMinuteOf, mathsTopics, MouthGate, narration, newTypingStats, recordTypingStats, SeededGenerator, spellingTopics,
+  subjectOf, TypingMeter, wordBank as bank,
   type Question, type Skill, type SpellingStyle,
 } from "../src/core";
 
@@ -306,6 +307,19 @@ describe("learner", () => {
     expect(copy).not.toEqual(learner);
     expect(learner.answerCount).toBe(1);
     expect(learner.items["mul:8x7"]!.lapses).toBe(1);
+  });
+
+  test("on-screen typing speed is kept apart from keyboard speed", () => {
+    const stats = newTypingStats();
+    recordTypingStats(stats, 20, 19, 24);
+    recordTypingStats(stats, 20, 18, 8, true);
+    recordTypingStats(stats, 20, 20, 10, true);
+    expect(stats.samples).toEqual([24]);
+    expect(stats.bestWordsPerMinute).toBe(24);
+    expect(stats.touchSamples).toEqual([8, 10]);
+    expect(stats.bestTouchWordsPerMinute).toBe(10);
+    expect(averageTouchWordsPerMinuteOf(stats)).toBe(9);
+    expect([stats.keystrokes, stats.correctKeystrokes]).toEqual([60, 57]);
   });
 
   test("typing meter measures speed and accuracy", () => {

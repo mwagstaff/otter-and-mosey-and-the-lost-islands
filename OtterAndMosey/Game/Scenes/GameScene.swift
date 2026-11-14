@@ -5,7 +5,7 @@ import UIKit
 /// Everything a level scene needs to know about who is playing and how it should look.
 struct SceneOptions {
     var settings: AppSettings
-    var favourite: CharacterNode.Kind
+    /// The picture or emoji for Otter's hat, if one is being worn.
     var accessory: String?
     var island: Island
     var inputProfile: InputProfile
@@ -34,6 +34,9 @@ class GameScene: SKScene {
     private(set) var current: Question?
     private(set) var firstTry = true
     private(set) var usedHint = false
+    /// Pearls scooped and pearls there were to scoop, for the trophy cabinet (Maths Splash).
+    var pearlsScooped = 0
+    var pearlsOffered = 0
     private(set) var slips = 0
     private var questionStart = Date()
     private var bloomCount = 0
@@ -70,7 +73,7 @@ class GameScene: SKScene {
     /// Where characters stand.
     var groundY: CGFloat { play.minY + backdrop.foregroundHeight * 0.3 }
 
-    var lead: CharacterNode { options.favourite == .otter ? otter : mosey }
+    var lead: CharacterNode { otter }
 
     // MARK: - Lifecycle
 
@@ -94,8 +97,8 @@ class GameScene: SKScene {
         addChild(backdrop)
         backdrop.setRestoration(options.startRestoration, duration: 0)
         backdrop.resize(to: size, groundY: insets.bottom)
-        otter = CharacterNode(kind: .otter, size: 100, accessory: options.favourite == .otter ? options.accessory : nil)
-        mosey = CharacterNode(kind: .mosey, size: 160, accessory: options.favourite == .mosey ? options.accessory : nil)
+        otter = CharacterNode(kind: .otter, size: 100, accessory: options.accessory)
+        mosey = CharacterNode(kind: .mosey, size: 160, accessory: nil)
         build()
         layout()
         otter.startIdle()
@@ -188,16 +191,26 @@ class GameScene: SKScene {
 
     /// A wrong attempt: reassure, never punish.
     func slip() {
-        session.recordSlip()
+        let needsHelp = session.recordSlip()
         firstTry = false
         slips += 1
         AudioManager.shared.play(.wrong, volume: 0.7)
         Haptics.shared.nudge()
         bridge.combo = 0
         bridge.multiplier = 1
-        bridge.showToast(session.retryMessage())
         lead.oops()
         if slips >= 2, !usedHint { requestHint() }
+        if needsHelp, suggestGrownUp() { return }
+        bridge.showToast(session.retryMessage())
+    }
+
+    /// Otter or Mosey kindly suggests fetching a grown-up. The question stays open behind it.
+    /// Returns false when nothing could be said (another conversation is already showing).
+    private func suggestGrownUp() -> Bool {
+        guard bridge.dialogue.isEmpty, let line = Catalog.shared.askGrownUp.randomElement() else { return false }
+        (line.speaker == .mosey ? mosey : otter).think()
+        bridge.say([line]) {}
+        return true
     }
 
     /// The current question is done. Celebrates and returns the outcome so the mode can carry on.
@@ -274,7 +287,10 @@ class GameScene: SKScene {
             .wait(forDuration: 2.4),
             .run { [weak self] in
                 guard let self else { return }
-                self.bridge.result = self.session.result
+                var result = self.session.result
+                result.pearls = self.pearlsScooped
+                result.pearlsOffered = self.pearlsOffered
+                self.bridge.result = result
             },
         ]))
     }

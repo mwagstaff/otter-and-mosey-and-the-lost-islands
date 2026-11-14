@@ -1,11 +1,11 @@
 import LostIslandsCore
 import SwiftUI
 
-/// Everything the player has collected: crystals, pets, hats and stickers.
+/// Everything the player has collected: crystals, pets and hats. Trophies have their own cabinet.
 struct CollectionView: View {
     @Environment(AppModel.self) private var model
     @State private var tab = 0
-    private let tabs = [("💎", "Crystals"), ("🐾", "Pets"), ("🎩", "Hats"), ("🏅", "Stickers")]
+    private let tabs = [("💎", "Crystals"), ("🐾", "Pets"), ("🎩", "Hats")]
 
     var body: some View {
         GeometryReader { geometry in
@@ -47,16 +47,7 @@ struct CollectionView: View {
                 }
             }
         case 1: rewardGrid(.pet, columns: columns, compact: compact)
-        case 2: rewardGrid(.accessory, columns: columns, compact: compact)
-        default:
-            LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(Progression.achievements) { achievement in
-                    let earned = profile?.achievements[achievement.id] != nil
-                    tile(compact: compact, title: achievement.title, subtitle: achievement.detail, earned: earned) {
-                        Glyph(achievement.emoji, size: compact ? 50 : 70, art: achievement.art).saturation(earned ? 1 : 0).opacity(earned ? 1 : 0.3)
-                    }
-                }
-            }
+        default: rewardGrid(.accessory, columns: columns, compact: compact)
         }
     }
 
@@ -68,7 +59,7 @@ struct CollectionView: View {
                 let worn = profile?.equippedAccessory == reward.id
                 Button(action: tapped {
                     guard owned, kind == .accessory else { return }
-                    model.update { $0.equippedAccessory = worn ? nil : reward.id }
+                    model.update { $0.wear(worn ? nil : reward.id) }
                 }) {
                     tile(compact: compact, title: owned ? reward.name : "???",
                          subtitle: !owned ? "Keep exploring to find it" : (kind == .accessory ? (worn ? "Wearing it! Tap to take off" : "Tap to wear") : "Your friend"),
@@ -126,6 +117,17 @@ struct HomeIslandView: View {
                             .onTapGesture(count: 2) { model.update { $0.decorations.removeAll { $0.id == placed.id } } }
                     }
                 }
+                // The trophy cabinet stands on the island too.
+                Button(action: tapped { model.openTrophies() }) {
+                    VStack(spacing: 2) {
+                        Image("trophy_cabinet").resizable().scaledToFit().frame(height: itemSize * 2)
+                        Text("Trophies").font(.game(compact ? 12 : 16)).foregroundStyle(Palette.ink)
+                            .padding(.horizontal, 10).padding(.vertical, 2).panel(radius: 10)
+                    }
+                }
+                .buttonStyle(.plain)
+                .position(x: geometry.size.width * 0.88, y: geometry.size.height * 0.4)
+                .accessibilityLabel("Trophy cabinet")
                 VStack {
                     HStack {
                         RoundButton(symbol: "chevron.left", label: "Back to map") { model.route = .map }
@@ -225,7 +227,7 @@ struct SettingsControls: View {
                 toggle("Mute everything", "speaker.slash.fill", settings.muted)
                 toggle("Read questions aloud", "text.bubble.fill", settings.spokenInstructions)
                 toggle("Character voices", "person.wave.2.fill", settings.characterVoices)
-                toggle("Device voice for other sums", "waveform", settings.deviceVoice)
+                toggle("Read every sum word for word", "waveform", settings.deviceVoice)
                 toggle("Vibration", "iphone.radiowaves.left.and.right", settings.haptics)
                 toggle("Calmer motion", "tortoise.fill", settings.reducedMotion)
                 toggle("High contrast", "circle.lefthalf.filled", settings.highContrast)

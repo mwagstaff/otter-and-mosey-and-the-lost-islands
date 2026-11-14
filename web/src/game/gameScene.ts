@@ -1,20 +1,19 @@
 import { Container, Sprite } from "pixi.js";
-import type { AnswerOutcome, ChallengeSession, InputProfile, Island, Question } from "../core";
+import { catalog, type AnswerOutcome, type ChallengeSession, type InputProfile, type Island, type Question } from "../core";
 import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, run, scaleTo, sequence, wait } from "../engine/actions";
 import { loadArt, iconName, mix, palette, panel } from "../engine/art";
 import { GameLabel } from "../engine/label";
 import { audio, narrator } from "./audio";
 import { Backdrop } from "./backdrop";
 import type { GameBridge, KeyboardKind } from "./bridge";
-import { characterArt, CharacterNode, type CharacterKind } from "./character";
+import { characterArt, CharacterNode } from "./character";
 import { bloom, burst, confetti, floatText } from "./effects";
 import { options } from "./options";
 import { islandTheme, type IslandTheme } from "./theme";
 
 /** Everything a level scene needs to know about who is playing and how it should look. */
 export interface SceneOptions {
-  favourite: CharacterKind;
-  /** The picture or emoji for the favourite's hat, if one is being worn. */
+  /** The picture or emoji for Otter's hat, if one is being worn. */
   accessory?: string;
   island: Island;
   inputProfile: InputProfile;
@@ -73,6 +72,9 @@ export abstract class GameScene {
   protected current?: Question;
   protected firstTry = true;
   protected usedHint = false;
+  /** Pearls scooped and pearls there were to scoop, for the trophy cabinet (Maths Splash). */
+  pearlsScooped = 0;
+  pearlsOffered = 0;
   protected slips = 0;
   private questionStart = 0;
   private bloomCount = 0;
@@ -122,7 +124,7 @@ export abstract class GameScene {
   }
 
   get lead(): CharacterNode {
-    return this.options.favourite === "otter" ? this.otter : this.mosey;
+    return this.otter;
   }
 
   // Lifecycle
@@ -141,9 +143,8 @@ export abstract class GameScene {
       this.world.addChild(this.backdrop);
       this.backdrop.setRestoration(this.options.startRestoration, 0);
       this.backdrop.resize(width, height, insets.bottom);
-      const favourite = this.options.favourite;
-      this.otter = new CharacterNode("otter", 100, favourite === "otter" ? this.options.accessory : undefined);
-      this.mosey = new CharacterNode("mosey", 160, favourite === "mosey" ? this.options.accessory : undefined);
+      this.otter = new CharacterNode("otter", 100, this.options.accessory);
+      this.mosey = new CharacterNode("mosey", 160);
       this.build();
       this.layout();
       this.otter.startIdle();
@@ -242,14 +243,28 @@ export abstract class GameScene {
 
   /** A wrong attempt: reassure, never punish. */
   protected slip(): void {
-    this.session.recordSlip();
+    const needsHelp = this.session.recordSlip();
     this.firstTry = false;
     this.slips += 1;
     audio.play("wrong", 0.7);
     this.bridge.set({ combo: 0, multiplier: 1 });
-    this.bridge.showToast(this.session.retryMessage());
     this.lead.oops();
     if (this.slips >= 2 && !this.usedHint) this.requestHint();
+    if (needsHelp && this.suggestGrownUp()) return;
+    this.bridge.showToast(this.session.retryMessage());
+  }
+
+  /**
+   * Otter or Mosey kindly suggests fetching a grown-up. The question stays open behind it.
+   * Returns false when nothing could be said (another conversation is already showing).
+   */
+  private suggestGrownUp(): boolean {
+    const lines = catalog.askGrownUp;
+    if (this.bridge.dialogue.length > 0 || lines.length === 0) return false;
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    (line.speaker === "mosey" ? this.mosey : this.otter).think();
+    this.bridge.say([line], () => {});
+    return true;
   }
 
   /** The current question is done. Celebrates and returns the outcome so the mode can carry on. */
@@ -316,7 +331,7 @@ export abstract class GameScene {
       this.bloom(6);
       this.otter.celebrate();
       this.mosey.celebrate();
-      this.after(2.4, () => this.bridge.set({ result: this.session.result }));
+      this.after(2.4, () => this.bridge.set({ result: { ...this.session.result, pearls: this.pearlsScooped, pearlsOffered: this.pearlsOffered } }));
     });
   }
 

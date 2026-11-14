@@ -182,3 +182,10 @@ INTRO_AFTER = [
     "m:So our answers bring the world back to life.",
     "o:Six islands. Six fragments. One snack break. Let's go!",
 ]
+# When a child keeps getting answers wrong, Otter or Mosey kindly suggests asking a grown-up.
+ASK_GROWN_UP = [
+    "o:Hey, don't worry! Why don't you ask a grown-up for some help?",
+    "m:This one's a bit tricky. How about asking a grown-up to help us?",
+    "o:You're trying really hard! Shall we get a grown-up to help with this one?",
+    "m:Even the best explorers ask for help. Why don't you find a grown-up?",
+]

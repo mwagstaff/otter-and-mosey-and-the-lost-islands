@@ -271,6 +271,19 @@ final class WorldMapScene: CoverScene {
         highlight(id ?? "")
     }
 
+    /// The moment a newly unlocked island comes into play: it is picked out and sparkles.
+    func celebrateUnlock(_ id: String) {
+        select(id)
+        guard let node = islands[id] else { return }
+        AudioManager.shared.play(.unlock)
+        Haptics.shared.success()
+        let colour = UIColor(hex: Catalog.shared.island(id)?.colour ?? "#FFC83D")
+        Effects.burst(at: node.position, colour: colour, count: 26, in: self)
+        Effects.burst(at: node.position, colour: UIColor(hex: "#FFE066"), count: 18, in: self)
+        guard !Effects.reducedMotion else { return }
+        node.run(.sequence([SKAction.scale(to: 1.3, duration: 0.25).eased(), SKAction.scale(to: 1.14, duration: 0.3).eased()]))
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
         // Forgiving touch: the nearest island within a generous radius.

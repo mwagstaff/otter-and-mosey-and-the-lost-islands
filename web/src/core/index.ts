@@ -11,4 +11,5 @@ export * from "./save";
 export * from "./session";
 export * from "./skill";
 export * from "./speech";
+export * from "./trophies";
 export * from "./wordbank";

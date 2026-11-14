@@ -52,6 +52,14 @@ export interface LevelResult {
   total: number;
   wordsPerMinute?: number;
   typingAccuracy?: number;
+  /** Pearls scooped, and how many there were to scoop (Maths Splash only). */
+  pearls?: number;
+  pearlsOffered?: number;
+  hintsUsed?: number;
+  /** A question was answered right after at least two wrong tries. */
+  comeback?: boolean;
+  /** Right-first-time answers per times table, keyed by the table ("3"). */
+  tableFirstTry?: Record<string, number>;
 }
 
 export const Encouragement = {
@@ -99,6 +107,21 @@ export class ChallengeSession {
   keystrokes = 0;
   correctKeystrokes = 0;
   readonly wordsPerMinuteSamples: number[] = [];
+  hintsUsed = 0;
+  comeback = false;
+  readonly tableFirstTry: Record<string, number> = {};
+
+  /** Wrong attempts on one question before suggesting a grown-up (the hint arrives at two). */
+  static readonly slipsBeforeHelp = 4;
+  /** Tricky questions in a row after which two slips on the next one are enough. */
+  static readonly trickyStreakBeforeHelp = 3;
+
+  /** Wrong attempts on the current question. */
+  slipsOnQuestion = 0;
+  /** Questions in a row that needed more than one go. */
+  trickyStreak = 0;
+  /** At most one suggestion per question, so it never nags while a child is still trying. */
+  private suggestedHelpThisQuestion = false;
 
   private readonly rng: SeededGenerator;
   private readonly usedKeys = new Set<string>();
@@ -142,6 +165,8 @@ export class ChallengeSession {
   next(): Question | undefined {
     if (this.asked >= this.total) return undefined;
     this.asked += 1;
+    this.slipsOnQuestion = 0;
+    this.suggestedHelpThisQuestion = false;
     const skills = this.activeSkills;
 
     // Spaced repetition: bring back something the child found tricky.
@@ -215,14 +240,30 @@ export class ChallengeSession {
     return makeMathsFact(key, this.learner.level(skill, this.settings.difficulty), this.rng, this.format(skill));
   }
 
-  /** A wrong attempt. The question stays open; only the combo is lost. */
-  recordSlip(): void {
+  /**
+   * A wrong attempt. The question stays open; only the combo is lost.
+   * Returns true when the child seems stuck and it's time to suggest asking a grown-up.
+   */
+  recordSlip(): boolean {
     this.combo = 0;
+    this.slipsOnQuestion += 1;
+    if (this.suggestedHelpThisQuestion) return false;
+    const stuckHere = this.slipsOnQuestion >= ChallengeSession.slipsBeforeHelp;
+    const strugglingLately = this.trickyStreak >= ChallengeSession.trickyStreakBeforeHelp && this.slipsOnQuestion >= 2;
+    if (!stuckHere && !strugglingLately) return false;
+    this.suggestedHelpThisQuestion = true;
+    this.trickyStreak = 0;
+    return true;
   }
 
   /** The question has been answered correctly (possibly after slips or a hint). */
   complete(question: Question, firstTry: boolean, seconds: number, usedHint: boolean): AnswerOutcome {
     this.completed += 1;
+    this.trickyStreak = firstTry ? 0 : this.trickyStreak + 1;
+    if (usedHint) this.hintsUsed += 1;
+    if (!firstTry && this.slipsOnQuestion >= 2) this.comeback = true;
+    const table = ChallengeSession.tableOf(question.key);
+    if (firstTry && table !== undefined) this.tableFirstTry[String(table)] = (this.tableFirstTry[String(table)] ?? 0) + 1;
     this.learner.record(question.key, question.skill, firstTry, seconds, usedHint);
     let points = 40;
     if (firstTry) {
@@ -238,16 +279,23 @@ export class ChallengeSession {
     return { points, combo: this.combo, multiplier: this.multiplier, praise, isLevelComplete: this.isFinished };
   }
 
+  /** The times table a number fact belongs to: "mul:3x4" and "div:3x4" are both the 3 times table. */
+  static tableOf(key: string): number | undefined {
+    if (!key.startsWith("mul:") && !key.startsWith("div:")) return undefined;
+    const table = Number.parseInt(key.slice(4).split("x")[0] ?? "", 10);
+    return Number.isNaN(table) ? undefined : table;
+  }
+
   retryMessage(): string {
     return pick(this.rng, Encouragement.retry);
   }
 
   /** Typing measurements for one finished word or sentence. */
-  recordTyping(keystrokes: number, correct: number, wordsPerMinute?: number): void {
+  recordTyping(keystrokes: number, correct: number, wordsPerMinute?: number, onScreenKeys = false): void {
     this.keystrokes += keystrokes;
     this.correctKeystrokes += correct;
     if (wordsPerMinute !== undefined) this.wordsPerMinuteSamples.push(wordsPerMinute);
-    recordTypingStats(this.learner.typing, keystrokes, correct, wordsPerMinute);
+    recordTypingStats(this.learner.typing, keystrokes, correct, wordsPerMinute, onScreenKeys);
   }
 
   get result(): LevelResult {
@@ -265,6 +313,9 @@ export class ChallengeSession {
       total: this.total,
       wordsPerMinute: samples.length === 0 ? undefined : samples.reduce((sum, sample) => sum + sample, 0) / samples.length,
       typingAccuracy,
+      hintsUsed: this.hintsUsed,
+      comeback: this.comeback,
+      tableFirstTry: { ...this.tableFirstTry },
     };
   }
 }

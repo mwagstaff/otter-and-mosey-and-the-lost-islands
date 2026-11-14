@@ -69,8 +69,12 @@ public struct TypingStats: Codable, Equatable, Sendable {
     public var keystrokes = 0
     public var correctKeystrokes = 0
     public var bestWordsPerMinute = 0.0
-    /// Recent words-per-minute samples, newest last.
+    /// Recent words-per-minute samples typed on a real keyboard, newest last.
     public var samples: [Double] = []
+    /// The same, typed on the game's on-screen keys. Kept apart because tapping is much
+    /// slower than typing, so mixing the two would make either figure misleading.
+    public var touchSamples: [Double] = []
+    public var bestTouchWordsPerMinute = 0.0
 
     public init() {}
 
@@ -80,15 +84,24 @@ public struct TypingStats: Codable, Equatable, Sendable {
         correctKeystrokes = c.value(.correctKeystrokes, default: 0)
         bestWordsPerMinute = c.value(.bestWordsPerMinute, default: 0)
         samples = c.value(.samples, default: [])
+        touchSamples = c.value(.touchSamples, default: [])
+        bestTouchWordsPerMinute = c.value(.bestTouchWordsPerMinute, default: 0)
     }
 
     public var accuracy: Double { keystrokes == 0 ? 0 : Double(correctKeystrokes) / Double(keystrokes) }
     public var averageWordsPerMinute: Double { samples.isEmpty ? 0 : samples.reduce(0, +) / Double(samples.count) }
+    public var averageTouchWordsPerMinute: Double { touchSamples.isEmpty ? 0 : touchSamples.reduce(0, +) / Double(touchSamples.count) }
 
-    public mutating func record(keystrokes: Int, correct: Int, wordsPerMinute: Double?) {
+    /// Adds one finished word or sentence. `onScreenKeys` says it was tapped rather than typed.
+    public mutating func record(keystrokes: Int, correct: Int, wordsPerMinute: Double?, onScreenKeys: Bool = false) {
         self.keystrokes += keystrokes
         correctKeystrokes += correct
-        if let wordsPerMinute, wordsPerMinute > 0 {
+        guard let wordsPerMinute, wordsPerMinute > 0 else { return }
+        if onScreenKeys {
+            touchSamples.append(wordsPerMinute)
+            if touchSamples.count > 20 { touchSamples.removeFirst(touchSamples.count - 20) }
+            bestTouchWordsPerMinute = max(bestTouchWordsPerMinute, wordsPerMinute)
+        } else {
             samples.append(wordsPerMinute)
             if samples.count > 20 { samples.removeFirst(samples.count - 20) }
             bestWordsPerMinute = max(bestWordsPerMinute, wordsPerMinute)

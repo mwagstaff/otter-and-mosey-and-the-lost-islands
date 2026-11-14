@@ -1,11 +1,11 @@
 // Ported from Packages/LostIslandsCore/Tests/LostIslandsCoreTests/GameTests.swift.
 import { describe, expect, test } from "vitest";
 import {
-  activeProfile, allGameModes, applyResult, catalog, ChallengeSession, currentSaveVersion, dialogueAudioKey, encodeSave,
+  activeProfile, addPlaytime, dayKey, playHistoryDays, playSecondsOver, allGameModes, applyResult, catalog, ChallengeSession, currentSaveVersion, dialogueAudioKey, encodeSave,
   isLevelUnlocked, LearnerModel, loadSave, newAppSettings, newParentSettings, newProfile, newSaveFile, nextLevelFor,
   placeDecoration, SaveFromTheFutureError, SaveStore, starDecorations, starsFor, starsForAccuracy, subjectOf, timestamp,
   totalStars, voicedLines, type DialogueLine, type KeyValueStorage, type LevelDef, type LevelResult, type Question,
-  type RewardSummary, type SaveFile,
+  type RewardSummary, type SaveFile, allTrophies, prepareTrophies, trophiesPerLevel, trophyProgress, trophy, wear,
 } from "../src/core";
 
 /** Asks every question in a session, handing each one to `body`. */
@@ -42,7 +42,7 @@ describe("catalogue", () => {
   test("dialogue clip keys match the built script", () => {
     const script = voicedLines;
     expect(Object.keys(script).length).toBeGreaterThan(100);
-    const lines: { line: DialogueLine; guardian?: string }[] = [...catalog.intro, ...catalog.introAfter].map((line) => ({ line }));
+    const lines: { line: DialogueLine; guardian?: string }[] = [...catalog.intro, ...catalog.introAfter, ...catalog.askGrownUp].map((line) => ({ line }));
     for (const island of catalog.islands) {
       const guardian = island.guardian.kind;
       const spoken = [...island.guardian.phases, ...island.guardian.befriended, ...island.levels.flatMap((level) => [...level.intro, ...level.outro])];
@@ -133,6 +133,47 @@ describe("session", () => {
       const prompts: string[] = [];
       play(new ChallengeSession({ level: level(id), learner: new LearnerModel(), seed: 31 }), (question) => prompts.push(question.answer + question.prompt));
       expect(new Set(prompts).size, id).toBe(prompts.length);
+    }
+  });
+
+  test("grown-up help is suggested after repeated slips on one question", () => {
+    const session = new ChallengeSession({ level: level("woods-1"), learner: new LearnerModel(), seed: 1 });
+    session.next();
+    expect([1, 2, 3].map(() => session.recordSlip())).toEqual([false, false, false]);
+    expect(session.recordSlip()).toBe(true);
+    expect(session.recordSlip(), "only suggested once per question").toBe(false);
+  });
+
+  test("grown-up help comes sooner after several tricky questions", () => {
+    const session = new ChallengeSession({ level: level("woods-1"), learner: new LearnerModel(), seed: 1 });
+    for (let index = 0; index < ChallengeSession.trickyStreakBeforeHelp; index += 1) {
+      const question = session.next()!;
+      session.recordSlip();
+      session.complete(question, false, 10, false);
+    }
+    session.next();
+    expect(session.recordSlip()).toBe(false);
+    expect(session.recordSlip()).toBe(true);
+  });
+
+  test("grown-up help is offered again on later questions", () => {
+    const session = new ChallengeSession({ level: level("woods-1"), learner: new LearnerModel(), seed: 1 });
+    const suggestions: boolean[] = [];
+    for (let index = 0; index < 4; index += 1) {
+      const question = session.next()!;
+      let suggested = false;
+      for (let slip = 0; slip < ChallengeSession.slipsBeforeHelp; slip += 1) suggested = session.recordSlip() || suggested;
+      suggestions.push(suggested);
+      session.complete(question, false, 10, true);
+    }
+    expect(suggestions).toEqual([true, true, true, true]);
+  });
+
+  test("grown-up help lines come from Otter and Mosey", () => {
+    expect(catalog.askGrownUp.length).toBeGreaterThanOrEqual(2);
+    for (const line of catalog.askGrownUp) {
+      expect(["otter", "mosey"]).toContain(line.speaker);
+      expect(line.text).toContain("grown-up");
     }
   });
 
@@ -228,12 +269,13 @@ describe("progression", () => {
     const first = applyResult(perfect(level), level.id, profile.learner, profile);
     expect(first.isFirstClear).toBe(true);
     expect(first.reward?.id).toBe("pet-firefly");
-    expect(first.achievements.map((achievement) => achievement.id)).toContain("first-steps");
+    expect(first.trophies.map((item) => item.id)).toEqual(["first-steps", "superstar-woods-1"]);
+    expect(profile.pendingTrophies).toEqual(["flawless-woods-1", "combo-5"]);
     expect(first.decorations.map((decoration) => decoration.id)).toEqual(["deco-palm"]);
     const second = applyResult(perfect(level), level.id, profile.learner, profile);
     expect(second.isFirstClear).toBe(false);
     expect(second.reward).toBeUndefined();
-    expect(second.achievements).toEqual([]);
+    expect(second.trophies.map((item) => item.id)).toEqual(["flawless-woods-1", "combo-5"]);
     expect(second.decorations).toEqual([]);
     expect(profile.rewards.filter((reward) => reward === "pet-firefly").length).toBe(1);
     expect(profile.levels[level.id]?.plays).toBe(2);
@@ -258,8 +300,33 @@ describe("progression", () => {
     expect(last?.gameComplete).toBe(true);
     expect(profile.crystals.length).toBe(6);
     expect(totalStars(profile)).toBe(90);
-    for (const id of ["crystal-6", "friendship", "pets-5"]) expect(profile.achievements[id], id).toBeDefined();
+    expect(profile.achievements["friend-star"], "the guardian's own trophy is never held back").toBeDefined();
+    expect(Object.keys(profile.achievements).length + profile.pendingTrophies.length).toBeGreaterThanOrEqual(60);
     expect(nextLevelFor(profile)).toBeUndefined();
+  });
+});
+
+describe("playtime", () => {
+  const day = (offset: number) => new Date(2026, 2, 10 + offset, 23, 30);
+
+  test("playtime is tracked per day", () => {
+    const profile = newProfile("Pip");
+    addPlaytime(profile, 600, day(0));
+    addPlaytime(profile, 300, day(-3));
+    addPlaytime(profile, 120, day(-7));
+    addPlaytime(profile, 60, day(0));
+    expect(profile.playSeconds).toBe(1080);
+    expect(dayKey(day(0))).toBe("2026-03-10");
+    expect(playSecondsOver(profile, 1, day(0))).toBe(660);
+    expect(playSecondsOver(profile, 7, day(0)), "a week ago is outside the last 7 days").toBe(960);
+    expect(playSecondsOver(profile, 1, day(1))).toBe(0);
+  });
+
+  test("old daily playtime is pruned", () => {
+    const profile = newProfile("Pip");
+    for (let offset = 0; offset < 60; offset += 1) addPlaytime(profile, 10, day(offset));
+    expect(Object.keys(profile.dailyPlaySeconds).length).toBeLessThanOrEqual(playHistoryDays);
+    expect(profile.playSeconds, "the running total keeps everything").toBe(600);
   });
 });
 
@@ -272,9 +339,9 @@ describe("saves", () => {
 
   function sampleFile(): SaveFile {
     const file = newSaveFile();
-    const profile = newProfile("Pip", "🐬", "mosey");
+    const profile = newProfile("Pip", "🐬");
     profile.learner.record("mul:8x7", "multiplication", false, 4, false);
-    profile.levels["woods-1"] = { stars: 2, bestScore: 0, plays: 0 };
+    profile.levels["woods-1"] = { stars: 2, bestScore: 0, plays: 0, flawless: false };
     profile.achievements["first-steps"] = timestamp(new Date(1_700_000_000_000));
     profile.decorations = [placeDecoration("deco-palm", 0.4, 0.6)];
     file.profiles = [profile, newProfile("Sam")];
@@ -350,5 +417,99 @@ describe("saves", () => {
     activeProfile(file)!.seenIntro = true;
     expect(file.profiles[0]!.seenIntro).toBe(true);
     expect(file.profiles.length).toBe(2);
+  });
+});
+
+describe("trophies", () => {
+  const monday = new Date(2026, 10, 9, 10);
+  const result = (level: LevelDef, firstTry = level.count): LevelResult => ({
+    stars: starsForAccuracy(firstTry / level.count), accuracy: firstTry / level.count, score: 100, bestCombo: firstTry,
+    correctFirstTry: firstTry, total: level.count,
+  });
+
+  test("there are 145 trophies with unique ids, the same as on iOS", () => {
+    const all = allTrophies();
+    expect(all.length).toBe(145);
+    expect(new Set(all.map((item) => item.id)).size).toBe(all.length);
+    const count = (group: string) => all.filter((item) => item.group === group).length;
+    expect([count("islands"), count("milestones"), count("learning"), count("collections"), count("secret")]).toEqual([72, 43, 14, 6, 10]);
+  });
+
+  test("no more than two are handed out and the rest wait", () => {
+    const profile = newProfile("Pip");
+    const level = catalog.level("woods-1")!;
+    let awarded = 0;
+    for (let run = 0; run < 12; run += 1) {
+      const summary = applyResult(result(level), level.id, profile.learner, profile, { now: monday });
+      expect(summary.trophies.length).toBeLessThanOrEqual(trophiesPerLevel);
+      awarded += summary.trophies.length;
+    }
+    expect(awarded).toBe(Object.keys(profile.achievements).length);
+    expect(profile.achievements["back-for-more"]).toBeDefined();
+    expect(profile.achievements["levels-10"]).toBeDefined();
+  });
+
+  test("this level's medals come before waiting ones", () => {
+    const profile = newProfile("Pip");
+    profile.pendingTrophies = ["first-steps"];
+    profile.levels["woods-1"] = { stars: 0, bestScore: 0, plays: 0, flawless: false };
+    profile.trophiesReady = true;
+    const level = catalog.level("woods-2")!;
+    const summary = applyResult(result(level), level.id, profile.learner, profile, { now: monday });
+    expect(summary.trophies.map((item) => item.id)).toEqual(["superstar-woods-2", "flawless-woods-2"]);
+    expect(profile.pendingTrophies[0]).toBe("first-steps");
+  });
+
+  test("old stickers move into the cabinet", () => {
+    const profile = newProfile("Pip");
+    const when = timestamp(monday);
+    profile.achievements = { "wordsmith": when, "first-steps": when, "three-stars": when };
+    profile.levels["woods-1"] = { stars: 3, bestScore: 0, plays: 1, flawless: false };
+    prepareTrophies(profile, catalog, monday);
+    expect(profile.achievements["words-40"]).toBeDefined();
+    expect(profile.achievements["three-stars"]).toBeUndefined();
+    expect(profile.achievements["superstar-woods-1"]).toBeDefined();
+    expect(profile.trophiesReady).toBe(true);
+  });
+
+  test("lifetime counts add up, with weekdays counted as on iOS", () => {
+    const profile = newProfile("Pip");
+    const level = catalog.level("bay-1")!;
+    const run = { ...result(level), pearls: 12, tableFirstTry: { "3": 2 } };
+    const saturday = new Date(2026, 10, 14, 9);
+    const sunday = new Date(2026, 10, 15, 9);
+    applyResult(run, level.id, profile.learner, profile, { now: saturday });
+    applyResult(run, level.id, profile.learner, profile, { now: saturday });
+    applyResult(run, level.id, profile.learner, profile, { now: sunday });
+    expect(profile.stats.pearls).toBe(36);
+    expect(profile.stats.tableFirstTry["3"]).toBe(6);
+    expect(profile.stats.playDays).toBe(2);
+    expect([...profile.stats.weekendDays].sort()).toEqual([1, 7]);
+    expect(trophyProgress(trophy("pearls-100")!, profile)).toEqual({ now: 36, needed: 100 });
+  });
+
+  test("sessions count hints, comebacks and times tables", () => {
+    const session = new ChallengeSession({ level: catalog.level("dragon-1")!, learner: new LearnerModel(), seed: 7 });
+    const question = session.next()!;
+    session.recordSlip();
+    session.recordSlip();
+    session.complete(question, false, 3, true);
+    session.complete(session.next()!, true, 2, false);
+    expect(session.result.hintsUsed).toBe(1);
+    expect(session.result.comeback).toBe(true);
+    expect(ChallengeSession.tableOf("mul:8x7")).toBe(8);
+    expect(ChallengeSession.tableOf("word:said")).toBeUndefined();
+  });
+
+  test("hats tried are remembered and survive a save", () => {
+    const file = newSaveFile();
+    const profile = newProfile("Pip");
+    wear(profile, "hat-leaf");
+    wear(profile, undefined);
+    wear(profile, "hat-crown");
+    file.profiles = [profile];
+    const loaded = loadSave(encodeSave(file)).profiles[0]!;
+    expect(loaded.stats.hatsWorn).toEqual(["hat-leaf", "hat-crown"]);
+    expect(loaded.equippedAccessory).toBe("hat-crown");
   });
 });

@@ -117,6 +117,7 @@ export interface RawCatalog {
   rewards: { id: string; kind: string; name: string; emoji: string }[];
   intro: string[];
   introAfter: string[];
+  askGrownUp: string[];
 }
 
 /** Decorations everyone starts with or earns from star totals. */
@@ -133,6 +134,8 @@ export class Catalog {
   readonly rewards: Reward[];
   readonly intro: DialogueLine[];
   readonly introAfter: DialogueLine[];
+  /** Kind suggestions from Otter or Mosey to fetch a grown-up when a child keeps getting stuck. */
+  readonly askGrownUp: DialogueLine[];
 
   constructor(raw: RawCatalog) {
     const lines = (list: string[]) => list.map(parseDialogueLine);
@@ -151,6 +154,7 @@ export class Catalog {
     this.rewards = raw.rewards.map((reward) => ({ ...reward, kind: reward.kind as RewardKind }));
     this.intro = lines(raw.intro);
     this.introAfter = lines(raw.introAfter);
+    this.askGrownUp = lines(raw.askGrownUp ?? []);
   }
 
   get allLevels(): LevelDef[] {

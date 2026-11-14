@@ -192,10 +192,7 @@ extension Reward {
     var art: String { "reward_\(id)" }
 }
 
-extension Achievement {
-    /// The painted sticker for this achievement.
-    var art: String { "badge_\(id)" }
-}
+
 
 /// A small pill showing a count next to a picture, for stars and crystals in top bars.
 struct CountChip: View {

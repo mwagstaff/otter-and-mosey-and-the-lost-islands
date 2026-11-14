@@ -1,6 +1,6 @@
 // Designs the two character voices with ElevenLabs Voice Design and saves previews to ./samples.
 // ElevenLabs does not allow designing children's voices, so both are described as adult voice
-// actresses performing youthful cartoon characters.
+// actors performing youthful cartoon characters (Otter by a woman, Mosey, a boy, by a man).
 //
 //   node --env-file=../../.env.local design-voices.mjs                 # make previews for both characters
 //   node --env-file=../../.env.local design-voices.mjs --keep otter 2  # save preview 2 as Otter's voice
@@ -28,7 +28,7 @@ const characters = {
   },
   mosey: {
     name: "Mosey (Lost Islands)",
-    description: "An adult British voice actress in her twenties performing a gentle cartoon sea creature for a family animated film. Soft, light and youthful, calm, steady, kind and reassuring, unhurried, with quiet wonder and a little playful humour. Clean studio recording.",
+    description: "A young adult British voice actor performing a gentle boy mosasaur, a friendly cartoon sea dinosaur, for a family animated film. Warm, youthful and mid-low in pitch, a little deeper and rounder than a child, with a soft, slightly rumbly, dinosaur-like quality. Calm, steady, kind and reassuring, unhurried, with quiet wonder and a little playful humour. Clear southern English accent. Clean studio recording.",
     text: "Welcome to my favourite place. Maths, under the sea. Stay close, Otter, and follow me. Each right answer builds a rainbow plank, so there is no need to rush. Look, the flowers are waking up. We did it together, and that is the real magic.",
   },
   // The six guardians: funny, never frightening. Keys match the guardian "kind" in islands.py.

@@ -23,8 +23,12 @@ network calls.
   division, fractions, place value, sequences, word problems), a curated bank of 262 UK-spelling
   words with context sentences, per-skill adaptive difficulty and spaced repetition of missed
   words and number facts.
-- **Progression**: three-star ratings, crystals, pets, hats, stickers (achievements), a home
-  island to decorate, and multiple local player profiles.
+- **Progression**: three-star ratings, crystals, pets, hats, a home island to decorate, and
+  multiple local player profiles.
+- **Trophy cabinet**: 145 trophies to collect (two medals per level, island trophies, milestone
+  ladders, learning trophies, collections and secret ones). A level hands out at most two; any
+  more wait for the next level. New trophies are tapped into the cabinet at the end of a level,
+  and the cabinet shows the gaps still to fill, each with a way straight back to its level.
 - **Parent area** behind a gate: playtime, accuracy per subject and skill, items being revisited,
   difficulty, times tables, spelling topics, break reminders and accessibility.
 - **Accessibility**: calmer motion, high contrast, easy-read text, spoken questions, hints,
@@ -53,8 +57,8 @@ Bundle ID: `otter-and-mosey-and-the-lost-islands.dev.skynolimit`.
 cd Packages/LostIslandsCore && swift test
 ```
 
-45 tests cover question correctness, the word bank, adaptive difficulty, spaced repetition,
-sessions, progression and save files. They run on macOS in under a second.
+66 tests cover question correctness, the word bank, adaptive difficulty, spaced repetition,
+sessions, progression, trophies and save files. They run on macOS in under a second.
 
 ```bash
 xcodebuild -project OtterAndMosey.xcodeproj -scheme OtterAndMosey -destination 'platform=iOS Simulator,id=<UDID>' test
@@ -104,7 +108,7 @@ npm run build   # type-check, then build into web/dist
 ```
 
 Every screen of the iOS game now has a web counterpart: the dedication and title screens, players
-(nickname, picture and favourite), the opening story with its one-question tutorial, the map and
+(nickname and picture), the opening story with its one-question tutorial, the map and
 island screens, all six game modes (story dialogue with voices, HUD, hints, on-screen or real
 keyboard, touch and mouse, pause, results), treasures, the home island, settings, the grown-ups'
 area behind its gate (progress, learning settings, reset) and the ending. Progress, settings and
@@ -188,8 +192,8 @@ voice (or with a made-up rhythm when a line has no recording); see
 Otter, Mosey and the six guardians have their own designed voices and all 174 of their lines
 are recorded, and the four "Story" lines are read by the question narrator; see [docs/ELEVENLABS.md](docs/ELEVENLABS.md) for every prompt and setting sent
 to ElevenLabs and how to continue. Questions with no exact recording, such as word problems, get
-the topic instruction; a grown-up can also turn on "Device voice for other sums" in Settings to
-have the built-in iOS voice read those word for word.
+the topic instruction; a grown-up can also turn on "Read every sum word for word" in Settings to
+have the device's built-in voice read those in full.
 
 **Music** is seven loops, one for the menus and one per island, composed with ElevenLabs Music
 by `npm run music` in `tools/sfx` (prompts in `tools/sfx/music.json`) and turned into seamless
@@ -202,7 +206,8 @@ which overwrites the ElevenLabs files.
 | Argument | Effect |
 | --- | --- |
 | `-debugLevel bay-1` | Open a level directly. |
-| `-debugRoute map` | Open a screen: `map`, `collection`, `home`, `parent`, `ending`, `intro`, `island:woods`. |
+| `-debugRoute map` | Open a screen: `map`, `collection`, `home`, `parent` (skips the grown-ups' gate), `ending`, `intro`, `island:woods`. |
+| `-debugPlaytest bay-1` | Play-test a level as if started from the parent dashboard (nothing is saved). |
 | `-debugUnlock` | Treat every level as cleared for this launch. |
 | `-debugShort` | Limit levels to three questions. |
 

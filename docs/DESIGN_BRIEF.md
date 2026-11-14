@@ -274,9 +274,9 @@ IMPORTANT:
 
 Mosey is a mosasaur, not a land dinosaur.
 
-She must have anatomically recognisable flippers and an aquatic body shape.
+He must have anatomically recognisable flippers and an aquatic body shape.
 
-Her design should be cute, approachable and expressive.
+His design should be cute, approachable and expressive.
 
 Personality:
 

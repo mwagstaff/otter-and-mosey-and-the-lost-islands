@@ -2,8 +2,8 @@ import LostIslandsCore
 import SpriteKit
 import UIKit
 
-/// Game mode B. Mosey swims along with Otter on her back. Three tunnels carry answers;
-/// tapping the right one sends her through with a rainbow speed boost. Between questions
+/// Game mode B. Mosey swims along with Otter on his back. Three tunnels carry answers;
+/// tapping the right one sends him through with a rainbow speed boost. Between questions
 /// the player drags up and down to scoop pearls.
 final class MathsSplashScene: GameScene {
     private enum Phase { case cruising, arriving, choosing, dashing }
@@ -16,7 +16,6 @@ final class MathsSplashScene: GameScene {
     private var targetY: CGFloat = 0
     private var lastTime: TimeInterval = 0
     private let trail = Effects.trail()
-    private var pearlCount = 0
 
     override var scrollsBackdrop: Bool { true }
 
@@ -149,6 +148,7 @@ final class MathsSplashScene: GameScene {
     private func spawnPearls() {
         bridge.caption = "Drag up and down to scoop the pearls!"
         let lane = Int.random(in: 0...2)
+        pearlsOffered += 5
         for index in 0..<5 {
             let pearl = SKSpriteNode(texture: Art.texture("pearl"), size: CGSize(width: gateSize * 0.36, height: gateSize * 0.36))
             let wave = sin(CGFloat(index) * 0.9) * play.height * 0.12
@@ -175,7 +175,7 @@ final class MathsSplashScene: GameScene {
         for pearl in pearls {
             pearl.position.x -= 280 * delta
             if abs(pearl.position.x - swimmerX) < mosey.size * 0.45, abs(pearl.position.y - y) < mosey.size * 0.3 {
-                pearlCount += 1
+                pearlsScooped += 1
                 AudioManager.shared.play(.star, volume: 0.6)
                 Effects.burst(at: pearl.position, colour: UIColor(hex: "#FFD9F0"), count: 8, in: self)
                 pearl.removeFromParent()

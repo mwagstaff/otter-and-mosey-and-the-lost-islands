@@ -1,5 +1,5 @@
 import {
-  activeProfile, applyResult, catalog, newProfile, nextLevelFor, SaveStore, starsFor,
+  activeProfile, addPlaytime, applyResult, catalog, cloneProfile, newProfile, nextLevelFor, prepareTrophies, SaveStore, starsFor, trophyCount,
   type AppSettings, type GameMode, type Island, type KeyValueStorage, type LearnerModel, type LevelResult, type Profile,
   type RewardSummary, type SaveFile,
 } from "../core";
@@ -15,6 +15,7 @@ export type Route =
   | { name: "island"; id: string }
   | { name: "play"; level: string }
   | { name: "collection" }
+  | { name: "trophies" }
   | { name: "home" }
   | { name: "parent" }
   | { name: "ending" };
@@ -49,10 +50,28 @@ export class AppModel {
   saveFailed = false;
   /** Seconds played since the page was opened, for the optional break reminder. */
   sessionSeconds = 0;
+  /**
+   * Set while a grown-up is play-testing a level from the parent dashboard. It holds a copy of
+   * the chosen child's profile (or a fresh one), and nothing played with it is saved.
+   */
+  playtest: { profile: Profile } | undefined;
+  /** Stays true while a grown-up moves between the dashboard and play-testing, so the gate is not asked again. */
+  parentUnlocked = false;
+  /** The child last chosen in the parent dashboard. */
+  dashboardProfileID: string | undefined;
+  /** An island just unlocked by "Next adventure", which the map shows off on arrival. */
+  unlockedIsland: string | undefined;
+  /** Where the trophy cabinet's back button goes. */
+  trophiesReturn: Route = { name: "map" };
 
   constructor(storage: KeyValueStorage = browserStorage()) {
     this.store = new SaveStore(storage);
     this.save = this.store.load();
+    // Moves stickers from before the trophy cabinet into it, for every player.
+    if (this.save.profiles.some((profile) => !profile.trophiesReady)) {
+      for (const profile of this.save.profiles) prepareTrophies(profile);
+      this.persist();
+    }
     options.settings = this.save.settings;
     this.applySettings();
   }
@@ -84,6 +103,28 @@ export class AppModel {
     }
   }
 
+  // Trophies
+
+  openTrophies(): void {
+    if (this.current.name !== "trophies") this.trophiesReturn = this.current;
+    this.go({ name: "trophies" });
+  }
+
+  /** Trophies won since the player last opened the cabinet. */
+  get hasNewTrophies(): boolean {
+    const profile = this.profile;
+    return !!profile && trophyCount(profile).won > profile.trophiesSeen;
+  }
+
+  markTrophiesSeen(): void {
+    const profile = this.profile;
+    if (!profile) return;
+    const won = trophyCount(profile).won;
+    if (profile.trophiesSeen === won) return;
+    profile.trophiesSeen = won;
+    this.persist();
+  }
+
   // Settings
 
   get settings(): AppSettings {
@@ -111,8 +152,8 @@ export class AppModel {
     return activeProfile(this.save);
   }
 
-  createProfile(nickname: string, avatar: string, favourite: string): Profile {
-    const profile = newProfile([...nickname.trim()].slice(0, 12).join("") || "Explorer", avatar, favourite);
+  createProfile(nickname: string, avatar: string): Profile {
+    const profile = newProfile([...nickname.trim()].slice(0, 12).join("") || "Explorer", avatar);
     profile.rewards = ["deco-palm"];
     this.save.profiles.push(profile);
     this.save.activeProfileID = profile.id;
@@ -136,7 +177,7 @@ export class AppModel {
     const index = this.save.profiles.findIndex((profile) => profile.id === id);
     const old = this.save.profiles[index];
     if (!old) return;
-    const fresh = newProfile(old.nickname, old.avatar, old.favourite);
+    const fresh = newProfile(old.nickname, old.avatar);
     fresh.id = old.id;
     fresh.parent = old.parent;
     fresh.rewards = ["deco-palm"];
@@ -147,9 +188,37 @@ export class AppModel {
   /** Counts time spent playing. It is written with the next real save, or when the page is hidden. */
   addPlaytime(seconds: number): void {
     const profile = this.profile;
-    if (!profile || this.current.name === "title" || this.current.name === "parent" || this.current.name === "profiles") return;
+    if (!profile || this.playtest || this.current.name === "title" || this.current.name === "parent" || this.current.name === "profiles") return;
     this.sessionSeconds += seconds;
-    profile.playSeconds += seconds;
+    addPlaytime(profile, seconds);
+  }
+
+  // Play-testing
+
+  /** The profile a level is played with: the play-test copy, or the active player. */
+  get playingProfile(): Profile | undefined {
+    return this.playtest?.profile ?? this.profile;
+  }
+
+  /** Opens any level, locked or not, for a grown-up to try. Nothing it does is saved. */
+  startPlaytest(levelID: string, profileID: string | undefined): void {
+    if (!catalog.level(levelID)) return;
+    const chosen = this.save.profiles.find((profile) => profile.id === profileID);
+    const tester = chosen ? cloneProfile(chosen) : newProfile("Tester");
+    tester.seenIntro = true;
+    this.playtest = { profile: tester };
+    this.go({ name: "play", level: levelID });
+  }
+
+  endPlaytest(): void {
+    this.playtest = undefined;
+    this.go({ name: "parent" });
+  }
+
+  leaveParentArea(): void {
+    this.parentUnlocked = false;
+    this.dashboardProfileID = undefined;
+    this.go({ name: "title" });
   }
 
   /** True once the grown-ups' suggested play time has passed. */
@@ -187,7 +256,7 @@ export class AppModel {
 
   /** Opens a level directly for testing, making a player first if there is none. */
   openForTesting(level: string): void {
-    const profile = this.profile ?? this.createProfile("Tester", "🦦", "otter");
+    const profile = this.profile ?? this.createProfile("Tester", "🦦");
     profile.seenIntro = true;
     this.go({ name: "play", level });
   }
@@ -197,12 +266,14 @@ export class AppModel {
   /** Saves learning progress part-way through a level, so nothing is lost if the page is closed. */
   updateLearner(learner: LearnerModel): void {
     const profile = this.profile;
-    if (!profile) return;
+    if (!profile || this.playtest) return;
     profile.learner = learner.clone();
     this.persist();
   }
 
   complete(levelID: string, result: LevelResult, learner: LearnerModel, friendshipUses: number): RewardSummary | undefined {
+    // A play-test shows what the child would earn, but keeps none of it.
+    if (this.playtest) return applyResult(result, levelID, learner, cloneProfile(this.playtest.profile), { usedFriendshipPower: friendshipUses });
     const profile = this.profile;
     if (!profile) return undefined;
     const summary = applyResult(result, levelID, learner, profile, { usedFriendshipPower: friendshipUses });
@@ -212,7 +283,7 @@ export class AppModel {
 
   /** How much of an island's colour has returned: the share of its levels that are cleared. */
   restoration(island: Island): number {
-    const profile = this.profile;
+    const profile = this.playingProfile;
     if (!profile) return 0;
     if (profile.crystals.includes(island.id)) return 1;
     return island.levels.filter((level) => starsFor(profile, level.id) > 0).length / island.levels.length;

@@ -4,15 +4,14 @@ import SwiftUI
 /// The grown-ups' area. Kept behind a gate and styled plainly so it reads as separate from play.
 struct ParentAreaView: View {
     @Environment(AppModel.self) private var model
-    @State private var unlocked = false
 
     var body: some View {
         ZStack {
             Color(red: 0.95, green: 0.96, blue: 0.97).ignoresSafeArea()
-            if unlocked {
+            if model.parentUnlocked {
                 ParentDashboardView()
             } else {
-                ParentGateView(onPass: { unlocked = true }, onCancel: { model.route = .title })
+                ParentGateView(onPass: { model.parentUnlocked = true }, onCancel: { model.leaveParentArea() })
             }
         }
     }
@@ -67,10 +66,14 @@ struct ParentGateView: View {
 
 struct ParentDashboardView: View {
     @Environment(AppModel.self) private var model
-    @State private var profileID: UUID?
     @State private var confirmReset = false
+    @State private var confirmDelete = false
 
-    private var profile: Profile? { model.save.profiles.first { $0.id == (profileID ?? model.save.activeProfileID) } }
+    private var profile: Profile? {
+        model.save.profiles.first { $0.id == model.dashboardProfileID }
+            ?? model.save.profiles.first { $0.id == model.save.activeProfileID }
+            ?? model.save.profiles.first
+    }
 
     var body: some View {
         NavigationStack {
@@ -78,7 +81,7 @@ struct ParentDashboardView: View {
                 if let profile {
                     List {
                         if model.save.profiles.count > 1 {
-                            Picker("Child", selection: Binding(get: { profile.id }, set: { profileID = $0 })) {
+                            Picker("Child", selection: Binding(get: { profile.id }, set: { model.dashboardProfileID = $0 })) {
                                 ForEach(model.save.profiles) { Text("\($0.avatar) \($0.nickname)").tag($0.id) }
                             }
                         }
@@ -87,26 +90,45 @@ struct ParentDashboardView: View {
                         practice(profile)
                         achievements(profile)
                         learning(profile)
+                        playtest(profile)
                         Section("Sound and accessibility") {
                             SettingsControls(compact: true).listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                         }
                         Section {
                             Button("Reset \(profile.nickname)'s progress", role: .destructive) { confirmReset = true }
+                            Button("Delete \(profile.nickname)", role: .destructive) { confirmDelete = true }
+                        } header: {
+                            Text("Player")
                         } footer: {
-                            Text("Everything is stored on this device only. The game has no accounts, adverts or purchases and collects no personal information.")
+                            Text("Resetting keeps the player and these settings but clears their stars, treasures and learning history. Deleting removes the player completely. Everything is stored on this device only. The game has no accounts, adverts or purchases and collects no personal information.")
                         }
                     }
                 } else {
-                    ContentUnavailableView("No players yet", systemImage: "person.crop.circle.badge.plus", description: Text("Create a player from the title screen to see their progress here."))
+                    List {
+                        ContentUnavailableView("No players yet", systemImage: "person.crop.circle.badge.plus", description: Text("Create a player from the title screen to see their progress here."))
+                        playtest(nil)
+                    }
                 }
             }
             .navigationTitle("Parent dashboard")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { Button("Done") { model.route = .title } }
+                ToolbarItem(placement: .topBarLeading) { Button("Done") { model.leaveParentArea() } }
             }
-            .confirmationDialog("Reset all progress for this child?", isPresented: $confirmReset, titleVisibility: .visible) {
+            .confirmationDialog("Reset all of \(profile?.nickname ?? "this child")'s progress?", isPresented: $confirmReset, titleVisibility: .visible) {
                 Button("Reset progress", role: .destructive) { if let profile { model.resetProgress(profile.id) } }
+                Button("Keep progress", role: .cancel) {}
+            } message: {
+                Text("Stars, crystals, treasures, trophies and learning history are cleared. This can't be undone.")
+            }
+            .alert("Delete \(profile?.nickname ?? "this player")?", isPresented: $confirmDelete, presenting: profile) { doomed in
+                Button("Delete", role: .destructive) {
+                    model.deleteProfile(doomed.id)
+                    model.dashboardProfileID = nil
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { doomed in
+                Text("\(doomed.nickname) and all their progress will be removed from this device. This can't be undone.")
             }
         }
         .environment(\.colorScheme, .light)
@@ -114,16 +136,41 @@ struct ParentDashboardView: View {
 
     private func percent(_ value: Double?) -> String { value.map { "\(Int(($0 * 100).rounded()))%" } ?? "No data yet" }
 
+    /// "1 hour, 5 minutes", "12 minutes" or "0 minutes".
+    private func duration(_ seconds: Double) -> String {
+        let minutes = Int(seconds / 60)
+        let hours = minutes / 60
+        func plural(_ count: Int, _ unit: String) -> String { "\(count) \(unit)\(count == 1 ? "" : "s")" }
+        return hours > 0 ? "\(plural(hours, "hour")), \(plural(minutes % 60, "minute"))" : plural(minutes, "minute")
+    }
+
+    private func speed(average: Double, best: Double) -> String {
+        "\(Int(average.rounded())) wpm average, best \(Int(best.rounded()))"
+    }
+
     private func overview(_ profile: Profile) -> some View {
-        Section("Overview") {
-            LabeledContent("Total playtime", value: Duration.seconds(profile.playSeconds).formatted(.units(allowed: [.hours, .minutes], width: .wide)))
+        let typing = profile.learner.typing
+        return Section {
+            LabeledContent("Playtime today", value: duration(profile.playSeconds(overLast: 1)))
+            LabeledContent("Playtime, last 7 days", value: duration(profile.playSeconds(overLast: 7)))
+            LabeledContent("Total playtime", value: duration(profile.playSeconds))
             LabeledContent("Stars and crystals", value: "\(profile.totalStars) stars, \(profile.crystals.count) of 6 crystals")
             LabeledContent("Spelling accuracy", value: percent(profile.learner.accuracy(for: .spelling)))
             LabeledContent("Maths accuracy", value: percent(profile.learner.accuracy(for: .maths)))
             LabeledContent("Typing accuracy", value: profile.learner.typing.keystrokes == 0 ? "No data yet" : percent(profile.learner.typing.accuracy))
-            LabeledContent("Typing speed", value: profile.learner.typing.samples.isEmpty
-                ? "Measured with a hardware keyboard"
-                : "\(Int(profile.learner.typing.averageWordsPerMinute.rounded())) wpm average, best \(Int(profile.learner.typing.bestWordsPerMinute.rounded()))")
+            if typing.samples.isEmpty, typing.touchSamples.isEmpty {
+                LabeledContent("Typing speed", value: "No data yet")
+            }
+            if !typing.samples.isEmpty {
+                LabeledContent("Typing speed, keyboard", value: speed(average: typing.averageWordsPerMinute, best: typing.bestWordsPerMinute))
+            }
+            if !typing.touchSamples.isEmpty {
+                LabeledContent("Typing speed, on-screen keys", value: speed(average: typing.averageTouchWordsPerMinute, best: typing.bestTouchWordsPerMinute))
+            }
+        } header: {
+            Text("Overview")
+        } footer: {
+            Text("Typing speed is measured in Typing Turbo levels. Tapping on-screen keys is naturally slower than typing on a keyboard, so the two are shown separately.")
         }
     }
 
@@ -171,14 +218,52 @@ struct ParentDashboardView: View {
     }
 
     private func achievements(_ profile: Profile) -> some View {
-        Section("Recent achievements") {
-            let recent = profile.achievements.sorted { $0.value > $1.value }.prefix(5)
+        Section("Recent trophies") {
+            let count = Trophies.count(in: profile, catalog: model.catalog)
+            LabeledContent("Trophy cabinet", value: "\(count.won) of \(count.total)")
+            let recent = profile.achievements.sorted { $0.value > $1.value }.compactMap { entry in
+                Trophies.trophy(entry.key, catalog: model.catalog).map { ($0, entry.value) }
+            }.prefix(5)
             if recent.isEmpty { Text("None yet.").foregroundStyle(.secondary) }
-            ForEach(Array(recent), id: \.key) { entry in
-                if let achievement = Progression.achievements.first(where: { $0.id == entry.key }) {
-                    LabeledContent("\(achievement.emoji) \(achievement.title)", value: entry.value.formatted(date: .abbreviated, time: .omitted))
+            ForEach(Array(recent), id: \.0.id) { trophy, date in
+                LabeledContent(trophy.levelID.flatMap { model.catalog.level($0) }.map { "\(trophy.title): \($0.title)" } ?? trophy.title,
+                               value: date.formatted(date: .abbreviated, time: .omitted))
+            }
+        }
+    }
+
+    /// Any level, locked or not, for a grown-up to try. Nothing played here is saved.
+    private func playtest(_ profile: Profile?) -> some View {
+        Section {
+            ForEach(model.catalog.islands) { island in
+                DisclosureGroup(island.name) {
+                    ForEach(island.levels) { level in
+                        Button { model.startPlaytest(levelID: level.id, as: profile?.id) } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(level.title).foregroundStyle(.primary)
+                                    Text("\(level.mode.title) · \(level.count) questions · " + level.skills.map(\.title).joined(separator: ", "))
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                if let profile, profile.stars(for: level.id) > 0 {
+                                    Text(String(repeating: "★", count: profile.stars(for: level.id))).foregroundStyle(.orange)
+                                }
+                                Image(systemName: "play.circle.fill").font(.title2).foregroundStyle(.teal)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Play-test \(level.title)")
+                    }
                 }
             }
+        } header: {
+            Text("Play-test a level")
+        } footer: {
+            Text((profile.map { "Opens any level, even a locked one, with \($0.nickname)'s learning settings and current skill levels, so you see the questions they would get. " }
+                  ?? "Opens any level, even a locked one, as a new player would see it. ")
+                 + "Nothing is saved: no stars, treasures, playtime or learning progress.")
         }
     }
 

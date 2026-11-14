@@ -5,6 +5,7 @@ import { audio } from "../game/audio";
 import { islandTheme } from "../game/theme";
 import { art, button, h, picture, roundButton, symbol } from "./dom";
 import { openSettings } from "./settings";
+import { trophiesButton } from "./trophies";
 
 /** One of the game's screens: what to show, and how to tidy up when it is left. */
 export interface Screen {
@@ -46,7 +47,7 @@ export function titleScreen(model: AppModel): Screen {
     h("div.heroes", {}, art("otter_idle", "hero otter bob"), art("mosey_idle", "hero mosey bob slow")),
     h("div.title-actions", {},
       started && button("teal.big", ["Continue", symbol("play")], () => model.continueGame()),
-      started && button("gold", [picture("🗺️"), "World map"], () => model.play()),
+      started && h("div.title-row", {}, button("gold", [picture("🗺️"), "World map"], () => model.play()), trophiesButton(model)),
       !started && button("teal.big", ["Play", symbol("play")], () => model.play()),
     ),
     h("footer.title-footer", {},
@@ -73,7 +74,7 @@ export function profilesScreen(model: AppModel): Screen {
   );
 
   function list(): void {
-    heading.textContent = "Who is playing?";
+    heading.textContent = "Who's playing?";
     const cards = model.save.profiles.map((profile) => {
       const card = button(`player${profile.id === model.profile?.id ? ".current" : ""}`, [
         picture(profile.avatar, "avatar"),
@@ -111,7 +112,6 @@ export function profilesScreen(model: AppModel): Screen {
   function form(): void {
     heading.textContent = "New explorer";
     let avatar = avatars[0]!;
-    let favourite = "otter";
     const shown = h("span.avatar-shown", {}, picture(avatar, "avatar"));
     const name = h<"input">("input.nickname", {
       type: "text", placeholder: "Nickname", maxlength: 12, autocomplete: "off", autocapitalize: "words", spellcheck: "false", "aria-label": "Nickname",
@@ -124,22 +124,35 @@ export function profilesScreen(model: AppModel): Screen {
       }, { "aria-label": `Picture ${avatars.indexOf(choice) + 1}` });
       return option;
     });
-    const favourites = ["otter", "mosey"].map((who) => {
-      const option = button(`favourite${who === favourite ? ".chosen" : ""}`, [art(`${who}_idle`, "favourite-art"), who === "otter" ? "Otter" : "Mosey"], () => {
-        favourite = who;
-        favourites.forEach((each) => each.classList.toggle("chosen", each === option));
-      });
-      return option;
+    // Filled in only when "Let's go!" is pressed with no name, so screen readers hear it then.
+    const hint = h("p.name-hint", { "aria-live": "polite" });
+    const askForName = () => {
+      hint.replaceChildren(art("otter_idle", "name-hint-art"), h("span", {}, "What shall we call you? Type your name in the box!"));
+      hint.classList.add("shown");
+      name.setAttribute("aria-invalid", "true");
+      // Restart the wiggle even if it is already playing.
+      name.classList.remove("wobble");
+      void name.offsetWidth;
+      name.classList.add("wobble");
+      name.focus();
+    };
+    name.addEventListener("animationend", () => name.classList.remove("wobble"));
+    name.addEventListener("input", () => {
+      if (!name.value.trim() || !hint.classList.contains("shown")) return;
+      hint.classList.remove("shown");
+      hint.replaceChildren();
+      name.removeAttribute("aria-invalid");
     });
     const go = () => {
-      model.createProfile(name.value, avatar, favourite);
+      if (!name.value.trim()) return askForName();
+      model.createProfile(name.value, avatar);
       model.play();
     };
     name.addEventListener("keydown", (event) => { if (event.key === "Enter") go(); });
     body.replaceChildren(h("div.profile-form.panel", {},
       h("div.name-row", {}, shown, name),
+      hint,
       h("div.avatar-row", {}, ...choices),
-      h("div.favourite-row", {}, h("span", {}, "My favourite:"), ...favourites),
       h("div.actions", {},
         model.save.profiles.length > 0 && button("cream", ["Cancel"], list),
         button("teal.big", ["Let's go!", symbol("play")], go),
@@ -167,6 +180,11 @@ export function endingScreen(model: AppModel): Screen {
 
 export function mapScreen(model: AppModel): Screen {
   const profile = model.profile;
+  // An island just unlocked by "Next adventure" is shown off once, on arrival.
+  const newlyUnlocked = model.unlockedIsland;
+  model.unlockedIsland = undefined;
+  const unlockedName = newlyUnlocked ? catalog.island(newlyUnlocked)?.name : undefined;
+  if (unlockedName) window.setTimeout(() => audio.play("unlock"), 500);
   const cards = catalog.islands.map((island, index) => {
     const unlocked = profile !== undefined && isIslandUnlocked(island, profile);
     const stars = profile ? island.levels.reduce((sum, level) => sum + starsFor(profile, level.id), 0) : 0;
@@ -177,7 +195,8 @@ export function mapScreen(model: AppModel): Screen {
     const detail = unlocked
       ? h("span.island-detail", {}, `${island.focus} · `, picture("⭐️", "star small"), `${stars}/15`, found && " · ", found && picture("💎", "star small"), found && "found")
       : h("span.island-detail", {}, picture("🔒", "star small"), `Find the ${catalog.islands[Math.max(index - 1, 0)]!.name} crystal first`);
-    return button(`island-card${unlocked ? "" : ".locked"}`, [picked, h("span.island-name", {}, island.name), detail],
+    const fresh = island.id === newlyUnlocked;
+    return button(`island-card${unlocked ? "" : ".locked"}${fresh ? ".just-unlocked" : ""}`, [picked, h("span.island-name", {}, island.name), detail],
       () => model.go({ name: "island", id: island.id }), { disabled: !unlocked });
   });
   const chip = (key: string, text: string) => h("span.count-chip", {}, picture(key), text);
@@ -188,9 +207,11 @@ export function mapScreen(model: AppModel): Screen {
       h("span.grow"),
       chip("⭐️", String(profile ? totalStars(profile) : 0)),
       chip("💎", `${profile?.crystals.length ?? 0}/6`),
+      trophiesButton(model),
       button("gold", [picture("🎒"), "Treasures"], () => model.go({ name: "collection" })),
       button("cream", [picture("🏝️"), "Home"], () => model.go({ name: "home" })),
     ),
+    unlockedName && h("p.map-note.unlocked", {}, picture("✨"), `New island to explore: ${unlockedName}!`),
     h("div.islands", {}, ...cards),
     model.breakSuggested
       ? h("p.map-note.break", {}, picture("🌙"), "Great playing today! This is a good moment for a break.")

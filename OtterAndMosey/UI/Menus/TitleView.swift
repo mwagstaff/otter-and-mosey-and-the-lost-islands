@@ -49,8 +49,11 @@ struct TitleView: View {
                         if let profile = model.profile, profile.seenIntro {
                             Button(action: tapped { model.continueGame() }) { IconLabel("Continue", symbol: "play.fill", size: compact ? 26 : 36) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 26 : 36, minWidth: compact ? 250 : 320))
-                            Button(action: tapped { model.play() }) { IconLabel("World map", emoji: "🗺", size: compact ? 19 : 26) }
-                                .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 19 : 26, minWidth: compact ? 210 : 270))
+                            HStack(spacing: compact ? 10 : 14) {
+                                Button(action: tapped { model.play() }) { IconLabel("World map", emoji: "🗺", size: compact ? 19 : 26) }
+                                    .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 19 : 26))
+                                TrophiesButton(size: compact ? 19 : 26)
+                            }
                         } else {
                             Button(action: tapped { model.play() }) { IconLabel("Play", symbol: "play.fill", size: compact ? 30 : 40) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 30 : 40, minWidth: compact ? 250 : 320))
@@ -92,9 +95,13 @@ struct ProfilesView: View {
     @State private var adding = false
     @State private var nickname = ""
     @State private var avatar = "🦦"
-    @State private var favourite = "otter"
     @State private var deleting: Profile?
+    /// Shown when "Let's go!" is tapped with no name typed yet.
+    @State private var askingForName = false
+    /// Goes up by one per wobble; the field wiggles as it animates to the new value.
+    @State private var nameWobbles: CGFloat = 0
     @FocusState private var nameFocused: Bool
+    private static let nameHint = "What shall we call you? Type your name in the box!"
     private let avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"]
 
     var body: some View {
@@ -105,7 +112,7 @@ struct ProfilesView: View {
                     HStack {
                         RoundButton(symbol: "chevron.left", label: "Back") { model.route = .title }
                         Spacer()
-                        Text(adding ? "New explorer" : "Who is playing?").font(.game(compact ? 28 : 42)).foregroundStyle(.white).shadow(radius: 4)
+                        Text(adding ? "New explorer" : "Who's playing?").font(.game(compact ? 28 : 42)).foregroundStyle(.white).shadow(radius: 4)
                         Spacer()
                         Color.clear.frame(width: 54, height: 54)
                     }
@@ -175,9 +182,24 @@ struct ProfilesView: View {
                     .focused($nameFocused)
                     .padding(.horizontal, 14)
                     .padding(.vertical, compact ? 6 : 10)
-                    .background(RoundedRectangle(cornerRadius: 14).fill(.white).overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Palette.ink, lineWidth: 3)))
+                    .background(RoundedRectangle(cornerRadius: 14).fill(.white).overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(askingForName ? Palette.coral : Palette.ink, lineWidth: askingForName ? 4 : 3)))
                     .frame(maxWidth: 340)
-                    .onChange(of: nickname) { _, value in if value.count > 12 { nickname = String(value.prefix(12)) } }
+                    .modifier(Wobble(wobbles: nameWobbles))
+                    .onSubmit(letsGo)
+                    .onChange(of: nickname) { _, value in
+                        if value.count > 12 { nickname = String(value.prefix(12)) }
+                        if askingForName, !value.trimmingCharacters(in: .whitespaces).isEmpty { askingForName = false }
+                    }
+            }
+            if askingForName {
+                HStack(spacing: 8) {
+                    Image("otter_idle").resizable().scaledToFit().frame(height: compact ? 30 : 40).accessibilityHidden(true)
+                    Text(Self.nameHint).font(.game(compact ? 16 : 20)).foregroundStyle(Palette.ink)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(Palette.gold.opacity(0.35)))
+                .transition(.scale(scale: 0.8).combined(with: .opacity))
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -192,38 +214,56 @@ struct ProfilesView: View {
                 }
                 .padding(4)
             }
-            HStack(spacing: 14) {
-                Text("My favourite:").font(.game(compact ? 17 : 22)).foregroundStyle(Palette.ink)
-                ForEach(["otter", "mosey"], id: \.self) { who in
-                    Button(action: tapped { favourite = who }) {
-                        HStack(spacing: 6) {
-                            Image("\(who)_idle").resizable().scaledToFit().frame(height: compact ? 44 : 64)
-                            Text(who.capitalized).font(.game(compact ? 17 : 22)).foregroundStyle(Palette.ink)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Capsule().fill(favourite == who ? Palette.gold : .white).overlay(Capsule().strokeBorder(Palette.ink, lineWidth: 3)))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
             HStack(spacing: 12) {
                 if !model.save.profiles.isEmpty {
-                    Button("Cancel", action: tapped { adding = false }).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
+                    Button("Cancel", action: tapped { adding = false; askingForName = false }).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
                 }
-                Button(action: tapped {
-                    nameFocused = false
-                    model.createProfile(nickname: nickname, avatar: avatar, favourite: favourite)
-                    adding = false
-                    nickname = ""
-                    model.play()
-                }) { IconLabel("Let's go!", symbol: "play.fill", size: compact ? 22 : 28, trailing: true) }
+                Button(action: tapped(letsGo)) { IconLabel("Let's go!", symbol: "play.fill", size: compact ? 22 : 28, trailing: true) }
                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 200))
             }
         }
         .padding(compact ? 14 : 28)
         .panel()
         .frame(maxWidth: 760)
+    }
+
+    /// Creates the player, or, with no name typed yet, gives the box a friendly wiggle and asks for one.
+    private func letsGo() {
+        guard !nickname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            Haptics.shared.nudge()
+            withAnimation(model.settings.reducedMotion ? nil : .spring(duration: 0.3)) { askingForName = true }
+            if !model.settings.reducedMotion {
+                withAnimation(.easeInOut(duration: 0.6)) { nameWobbles += 1 }
+            }
+            nameFocused = true
+            AccessibilityNotification.Announcement(Self.nameHint).post()
+            return
+        }
+        nameFocused = false
+        askingForName = false
+        model.createProfile(nickname: nickname, avatar: avatar)
+        adding = false
+        nickname = ""
+        model.play()
+    }
+}
+
+/// A gentle side-to-side wiggle, played once each time `wobbles` goes up by one.
+private struct Wobble: GeometryEffect {
+    var wobbles: CGFloat
+    var animatableData: CGFloat {
+        get { wobbles }
+        set { wobbles = newValue }
+    }
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let progress = wobbles - wobbles.rounded(.down)
+        // Three swings that fade out, with a slight tilt so it feels playful rather than stern.
+        let swing = sin(progress * .pi * 6) * (1 - progress)
+        let transform = CGAffineTransform(translationX: size.width / 2, y: size.height / 2)
+            .rotated(by: swing * 0.04)
+            .translatedBy(x: -size.width / 2 + swing * 12, y: -size.height / 2)
+        return ProjectionTransform(transform)
     }
 }
 

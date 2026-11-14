@@ -33,7 +33,7 @@ final class WordSlotsNode: SKNode {
         for (index, character) in characters.enumerated() {
             let isGap = character == "_"
             let label = GameLabel(isGap ? "_" : String(character), size: letterWidth * 1.12, colour: isGap ? accent : ink, tracking: 0)
-            label.position = CGPoint(x: (CGFloat(index) - CGFloat(characters.count - 1) / 2) * letterWidth, y: 0)
+            label.position = CGPoint(x: (CGFloat(index) - CGFloat(characters.count - 1) / 2) * letterWidth, y: 0) // matches home(_:)
             addChild(label)
             labels.append(label)
             if isGap { gaps.append(index) }
@@ -60,6 +60,7 @@ final class WordSlotsNode: SKNode {
     func fillNext(with character: Character) {
         guard filled < gaps.count else { return }
         let label = labels[gaps[filled]]
+        settle(label, at: gaps[filled])
         label.string = String(character).lowercased()
         label.colour = UIColor(hex: "#1E9E52")
         label.run(.pop())
@@ -67,11 +68,23 @@ final class WordSlotsNode: SKNode {
         moveMarker(animated: true)
     }
 
+    /// Where the letter at `index` sits when nothing is moving it.
+    private func home(_ index: Int) -> CGPoint {
+        CGPoint(x: (CGFloat(index) - CGFloat(labels.count - 1) / 2) * letterWidth, y: 0)
+    }
+
+    /// Stops any wobble and puts the label back in place. Cutting a wobble short would otherwise
+    /// leave the letter nudged sideways, and quick wrong taps would push it further each time.
+    private func settle(_ label: GameLabel, at index: Int) {
+        label.removeAction(forKey: "wrong")
+        label.position = home(index)
+    }
+
     /// Briefly shows a wrong letter in the current gap, then clears it.
     func flashWrong(_ character: Character) {
         guard filled < gaps.count else { return }
         let label = labels[gaps[filled]]
-        label.removeAction(forKey: "wrong")
+        settle(label, at: gaps[filled])
         label.string = String(character).lowercased()
         label.colour = UIColor(hex: "#E8743B")
         let letter = answer.indices.contains(gaps[filled]) ? answer[gaps[filled]] : nil

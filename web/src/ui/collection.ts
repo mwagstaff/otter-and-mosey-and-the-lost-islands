@@ -1,6 +1,6 @@
 import { artURL } from "../assets";
 import type { AppModel } from "../app/model";
-import { achievements, catalog, hasReward, placeDecoration, type PlacedDecoration, type Reward, type RewardKind } from "../core";
+import { catalog, hasReward, placeDecoration, wear as putOn, type PlacedDecoration, type Reward, type RewardKind } from "../core";
 import { iconName } from "../engine/art";
 import { audio } from "../game/audio";
 import { button, h, picture, roundButton } from "./dom";
@@ -9,10 +9,10 @@ import type { Screen } from "./menus";
 const backdrop = (name: string) => `background-image: url("${artURL(name)}")`;
 const rewardArt = (reward: Reward) => iconName(`reward_${reward.id}`) ?? reward.emoji;
 
-/** Everything the player has collected: crystals, pets, hats and stickers. */
+/** Everything the player has collected: crystals, pets and hats. Trophies have their own cabinet. */
 export function collectionScreen(model: AppModel): Screen {
   const profile = model.profile!;
-  const tabs = [["💎", "Crystals"], ["🐾", "Pets"], ["🎩", "Hats"], ["🏅", "Stickers"]] as const;
+  const tabs = [["💎", "Crystals"], ["🐾", "Pets"], ["🎩", "Hats"]] as const;
   let tab = 0;
   const grid = h("div.tiles");
 
@@ -30,7 +30,7 @@ export function collectionScreen(model: AppModel): Screen {
     const made = tile(picture(rewardArt(reward), "glyph"), owned ? reward.name : "???", subtitle, owned, worn);
     if (!wearable) return made;
     const wear = button("tile-button", [made], () => {
-      profile.equippedAccessory = worn ? undefined : reward.id;
+      putOn(profile, worn ? undefined : reward.id);
       model.persist();
       render();
     }, { "aria-pressed": String(worn) });
@@ -49,13 +49,7 @@ export function collectionScreen(model: AppModel): Screen {
         return tile(shard, island.name, found ? "Fragment found!" : "Still lost…", found);
       }));
     } else if (tab === 1) grid.replaceChildren(...rewards("pet"));
-    else if (tab === 2) grid.replaceChildren(...rewards("accessory"));
-    else {
-      grid.replaceChildren(...achievements.map((achievement) => {
-        const earned = profile.achievements[achievement.id] !== undefined;
-        return tile(picture(iconName(`badge_${achievement.id}`) ?? achievement.emoji, "glyph"), achievement.title, achievement.detail, earned);
-      }));
-    }
+    else grid.replaceChildren(...rewards("accessory"));
   }
 
   const tabButtons = tabs.map(([emoji, title], index) => button("cream.tab", [picture(emoji), title], () => {
@@ -140,9 +134,13 @@ export function homeScreen(model: AppModel): Screen {
     if (item) field.append(item);
   }
 
+  // The trophy cabinet stands on the island too.
+  const cabinet = button("home-cabinet", [h("img", { src: artURL("trophy_cabinet"), alt: "", draggable: "false" }), h("span.panel", {}, "Trophies")],
+    () => model.openTrophies(), { "aria-label": "Trophy cabinet" });
   const element = h("section.screen.home", {},
     scenery,
     field,
+    cabinet,
     h("header.bar", {}, roundButton("back", "Back to map", () => model.go({ name: "map" })), h("h1.home-title.panel", {}, "Rainbow Island"), h("span.spacer")),
     h("div.home-tray.panel", {},
       h("span", {}, "Tap to add. Drag to move. Double-tap to put away."),

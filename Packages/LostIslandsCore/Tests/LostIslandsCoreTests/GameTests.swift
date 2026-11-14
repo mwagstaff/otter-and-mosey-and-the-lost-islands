@@ -29,7 +29,7 @@ import Testing
     @Test func dialogueClipKeysMatchTheBuiltScript() {
         let script = Catalog.voicedLines
         #expect(script.count > 100)
-        var lines: [(line: DialogueLine, guardian: String?)] = (catalog.intro + catalog.introAfter).map { ($0, nil) }
+        var lines: [(line: DialogueLine, guardian: String?)] = (catalog.intro + catalog.introAfter + catalog.askGrownUp).map { ($0, nil) }
         for island in catalog.islands {
             let kind = island.guardian.kind
             lines += (island.guardian.phases + island.guardian.befriended).map { ($0, kind) }
@@ -133,6 +133,47 @@ import Testing
         #expect(session.bestCombo == 0)
     }
 
+    @Test func grownUpHelpIsSuggestedAfterRepeatedSlipsOnOneQuestion() {
+        var session = ChallengeSession(level: catalog.level("woods-1")!, learner: LearnerModel(), seed: 1)
+        _ = session.next()
+        var answers: [Bool] = []
+        for _ in 0..<5 { answers.append(session.recordSlip()) }
+        #expect(answers == [false, false, false, true, false], "suggested on the fourth slip, and only once")
+    }
+
+    @Test func grownUpHelpComesSoonerAfterSeveralTrickyQuestions() {
+        var session = ChallengeSession(level: catalog.level("woods-1")!, learner: LearnerModel(), seed: 1)
+        for _ in 0..<ChallengeSession.trickyStreakBeforeHelp {
+            let question = session.next()!
+            session.recordSlip()
+            _ = session.complete(question, firstTry: false, seconds: 10, usedHint: false)
+        }
+        _ = session.next()
+        let first = session.recordSlip()
+        let second = session.recordSlip()
+        #expect(!first)
+        #expect(second)
+    }
+
+    @Test func grownUpHelpIsOfferedAgainOnLaterQuestions() {
+        var session = ChallengeSession(level: catalog.level("woods-1")!, learner: LearnerModel(), seed: 1)
+        var suggestions: [Bool] = []
+        for _ in 0..<4 {
+            let question = session.next()!
+            var suggested = false
+            for _ in 0..<ChallengeSession.slipsBeforeHelp where session.recordSlip() { suggested = true }
+            suggestions.append(suggested)
+            _ = session.complete(question, firstTry: false, seconds: 10, usedHint: true)
+        }
+        #expect(suggestions == [true, true, true, true])
+    }
+
+    @Test func grownUpHelpLinesComeFromOtterAndMosey() {
+        #expect(catalog.askGrownUp.count >= 2)
+        #expect(catalog.askGrownUp.allSatisfy { $0.speaker == .otter || $0.speaker == .mosey })
+        #expect(catalog.askGrownUp.allSatisfy { $0.text.contains("grown-up") })
+    }
+
     @Test func combosMultiplyPoints() {
         var session = ChallengeSession(level: catalog.level("bay-4")!, learner: LearnerModel(), seed: 1)
         var points: [Int] = []
@@ -213,10 +254,13 @@ import Testing
         let level = catalog.level("woods-1")!
         let first = Progression.apply(perfect(level), levelID: level.id, learner: profile.learner, to: &profile)
         #expect(first.isFirstClear && first.reward?.id == "pet-firefly")
-        #expect(first.achievements.map(\.id).contains("first-steps"))
+        #expect(first.trophies.map(\.id) == ["first-steps", "superstar-woods-1"])
+        #expect(profile.pendingTrophies == ["flawless-woods-1", "combo-5"], "the rest wait, this level's own first")
+        #expect(first.trophiesWaiting == 2)
         #expect(first.decorations.map(\.id) == ["deco-palm"])
         let second = Progression.apply(perfect(level), levelID: level.id, learner: profile.learner, to: &profile)
-        #expect(!second.isFirstClear && second.reward == nil && second.achievements.isEmpty && second.decorations.isEmpty)
+        #expect(!second.isFirstClear && second.reward == nil && second.decorations.isEmpty)
+        #expect(second.trophies.map(\.id) == ["flawless-woods-1", "combo-5"], "waiting trophies come out next time")
         #expect(profile.rewards.filter { $0 == "pet-firefly" }.count == 1)
         #expect(profile.levels[level.id]?.plays == 2)
     }
@@ -240,7 +284,8 @@ import Testing
             last = Progression.apply(perfect(level), levelID: level.id, learner: profile.learner, usedFriendshipPower: level.mode == .guardian ? 3 : 0, to: &profile)
         }
         #expect(last.gameComplete && profile.crystals.count == 6 && profile.totalStars == 90)
-        #expect(profile.achievements["crystal-6"] != nil && profile.achievements["friendship"] != nil && profile.achievements["pets-5"] != nil)
+        #expect(profile.achievements["friend-star"] != nil, "the guardian's own trophy is never held back")
+        #expect(profile.achievements.count + profile.pendingTrophies.count >= 60)
         #expect(Progression.nextLevel(for: profile) == nil)
     }
 }
@@ -252,7 +297,7 @@ import Testing
 
     func sampleFile() -> SaveFile {
         var file = SaveFile()
-        var profile = Profile(nickname: "Pip", avatar: "🐬", favourite: "mosey")
+        var profile = Profile(nickname: "Pip", avatar: "🐬")
         profile.learner.record(key: "mul:8x7", skill: .multiplication, correct: false, seconds: 4, usedHint: false)
         profile.levels["woods-1"] = LevelRecord()
         profile.levels["woods-1"]?.stars = 2
@@ -321,11 +366,160 @@ import Testing
         }
     }
 
+    @Test func playtimeIsTrackedPerDay() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/London")!
+        let day = { (offset: Int) in calendar.date(from: DateComponents(year: 2026, month: 3, day: 10 + offset, hour: 23, minute: 30))! }
+        var profile = Profile(nickname: "Pip")
+        profile.addPlaytime(600, at: day(0), calendar: calendar)
+        profile.addPlaytime(300, at: day(-3), calendar: calendar)
+        profile.addPlaytime(120, at: day(-7), calendar: calendar)
+        profile.addPlaytime(60, at: day(0), calendar: calendar)
+        #expect(profile.playSeconds == 1080)
+        #expect(Profile.dayKey(day(0), calendar: calendar) == "2026-03-10")
+        #expect(profile.playSeconds(overLast: 1, endingAt: day(0), calendar: calendar) == 660)
+        #expect(profile.playSeconds(overLast: 7, endingAt: day(0), calendar: calendar) == 960, "a week ago is outside the last 7 days")
+        #expect(profile.playSeconds(overLast: 1, endingAt: day(1), calendar: calendar) == 0)
+    }
+
+    @Test func oldDailyPlaytimeIsPruned() {
+        let calendar = Calendar(identifier: .gregorian)
+        let start = Date(timeIntervalSince1970: 1_700_000_000)
+        var profile = Profile(nickname: "Pip")
+        for offset in 0..<60 { profile.addPlaytime(10, at: calendar.date(byAdding: .day, value: offset, to: start)!, calendar: calendar) }
+        #expect(profile.dailyPlaySeconds.count <= Profile.playHistoryDays)
+        #expect(profile.playSeconds == 600, "the running total keeps everything")
+    }
+
     @Test func activeProfileSetterUpdatesInPlace() {
         var file = sampleFile()
         var profile = file.activeProfile!
         profile.seenIntro = true
         file.activeProfile = profile
         #expect(file.profiles[0].seenIntro && file.profiles.count == 2)
+    }
+}
+
+@Suite struct TrophyTests {
+    let catalog = Catalog.shared
+    let monday = Calendar(identifier: .gregorian).date(from: DateComponents(year: 2026, month: 11, day: 9, hour: 10))!
+
+    func result(_ level: LevelDef, firstTry: Int? = nil) -> LevelResult {
+        let right = firstTry ?? level.count
+        return LevelResult(stars: Progression.stars(forAccuracy: Double(right) / Double(level.count)), accuracy: Double(right) / Double(level.count),
+                           score: 100, bestCombo: right, correctFirstTry: right, total: level.count)
+    }
+
+    @Test func thereAre145TrophiesWithUniqueIDsAndArt() {
+        let all = Trophies.all(catalog)
+        #expect(all.count == 145)
+        #expect(Set(all.map(\.id)).count == all.count)
+        #expect(all.filter { $0.group == .islands }.count == 72)
+        #expect(all.filter { $0.group == .milestones }.count == 43)
+        #expect(all.filter { $0.group == .learning }.count == 14)
+        #expect(all.filter { $0.group == .collections }.count == 6)
+        #expect(all.filter { $0.group == .secret }.count == 10)
+        #expect(all.allSatisfy { !$0.art.isEmpty && !$0.detail.isEmpty })
+    }
+
+    @Test func noMoreThanTwoAreHandedOutAndTheRestWait() {
+        var profile = Profile(nickname: "Pip")
+        let level = catalog.level("woods-1")!
+        var awarded = 0
+        for _ in 0..<12 {
+            let summary = Progression.apply(result(level), levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+            #expect(summary.trophies.count <= Trophies.perLevel)
+            awarded += summary.trophies.count
+        }
+        #expect(awarded == profile.achievements.count)
+        #expect(profile.achievements["back-for-more"] != nil && profile.achievements["levels-10"] != nil)
+    }
+
+    @Test func thisLevelsMedalsComeBeforeWaitingOnes() {
+        var profile = Profile(nickname: "Pip")
+        profile.pendingTrophies = ["first-steps"]
+        profile.levels["woods-1"] = LevelRecord()
+        profile.trophiesReady = true
+        let level = catalog.level("woods-2")!
+        let summary = Progression.apply(result(level), levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+        #expect(summary.trophies.map(\.id) == ["superstar-woods-2", "flawless-woods-2"])
+        #expect(profile.pendingTrophies.first == "first-steps")
+    }
+
+    @Test func oneOffMomentsAreKeptIfThereIsNoRoom() {
+        var profile = Profile(nickname: "Pip")
+        let level = catalog.level("woods-1")!
+        var poor = result(level, firstTry: 1)
+        Progression.apply(poor, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+        #expect(profile.stars(for: level.id) == 1)
+        poor = result(level)
+        poor.comeback = true
+        let summary = Progression.apply(poor, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+        let won = Set(summary.trophies.map(\.id) + profile.pendingTrophies)
+        #expect(won.isSuperset(of: ["never-give-up", "comeback", "superstar-woods-1", "flawless-woods-1"]))
+    }
+
+    @Test func oldStickersMoveIntoTheCabinet() {
+        var profile = Profile(nickname: "Pip")
+        profile.achievements = ["wordsmith": monday, "first-steps": monday, "three-stars": monday]
+        profile.levels["woods-1"] = LevelRecord()
+        profile.levels["woods-1"]?.stars = 3
+        Trophies.prepare(&profile, catalog: catalog, now: monday)
+        #expect(profile.achievements["words-40"] != nil && profile.achievements["first-steps"] != nil)
+        #expect(profile.achievements["three-stars"] == nil && profile.achievements["wordsmith"] == nil)
+        #expect(profile.achievements["superstar-woods-1"] != nil, "already-won trophies go straight in")
+        #expect(profile.pendingTrophies.isEmpty && profile.trophiesReady)
+    }
+
+    @Test func lifetimeCountsAddUp() {
+        let calendar = Calendar(identifier: .gregorian)
+        var profile = Profile(nickname: "Pip")
+        let level = catalog.level("bay-1")!
+        var run = result(level)
+        run.pearls = 12
+        run.tableFirstTry = ["3": 2]
+        let saturday = calendar.date(from: DateComponents(year: 2026, month: 11, day: 14, hour: 9))!
+        let sunday = calendar.date(byAdding: .day, value: 1, to: saturday)!
+        Progression.apply(run, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: saturday, calendar: calendar)
+        Progression.apply(run, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: saturday, calendar: calendar)
+        Progression.apply(run, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: sunday, calendar: calendar)
+        #expect(profile.stats.pearls == 36 && profile.stats.tableFirstTry["3"] == 6)
+        #expect(profile.stats.playDays == 2 && Set(profile.stats.weekendDays) == [1, 7])
+        #expect(Trophies.progress(Trophies.trophy("pearls-100")!, in: profile)! == (36, 100))
+    }
+
+    @Test func pearlPerfectNeedsEveryPearl() {
+        var profile = Profile(nickname: "Pip")
+        profile.trophiesReady = true
+        let level = catalog.level("bay-1")!
+        var run = result(level, firstTry: 3)
+        run.pearls = 24
+        run.pearlsOffered = 25
+        Progression.apply(run, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+        #expect(!profile.pendingTrophies.contains("pearl-perfect") && profile.achievements["pearl-perfect"] == nil)
+        run.pearls = 25
+        let summary = Progression.apply(run, levelID: level.id, learner: profile.learner, to: &profile, catalog: catalog, now: monday)
+        #expect(summary.trophies.map(\.id).contains("pearl-perfect") || profile.pendingTrophies.contains("pearl-perfect"))
+    }
+
+    @Test func sessionsCountHintsComebacksAndTables() {
+        var session = ChallengeSession(level: catalog.level("dragon-1")!, learner: LearnerModel(), seed: 7)
+        let question = session.next()!
+        session.recordSlip()
+        session.recordSlip()
+        _ = session.complete(question, firstTry: false, seconds: 3, usedHint: true)
+        let second = session.next()!
+        _ = session.complete(second, firstTry: true, seconds: 2, usedHint: false)
+        let result = session.result
+        #expect(result.hintsUsed == 1 && result.comeback)
+        #expect(ChallengeSession.table(of: "mul:8x7") == 8 && ChallengeSession.table(of: "div:3x4") == 3 && ChallengeSession.table(of: "word:said") == nil)
+    }
+
+    @Test func hatsTriedAreRemembered() {
+        var profile = Profile(nickname: "Pip")
+        profile.wear("hat-leaf")
+        profile.wear(nil)
+        profile.wear("hat-crown")
+        #expect(profile.stats.hatsWorn == ["hat-leaf", "hat-crown"] && profile.equippedAccessory == "hat-crown")
     }
 }

@@ -73,12 +73,18 @@ export interface TypingStats {
   keystrokes: number;
   correctKeystrokes: number;
   bestWordsPerMinute: number;
-  /** Recent words-per-minute samples, newest last. */
+  /** Recent words-per-minute samples typed on a real keyboard, newest last. */
   samples: number[];
+  /**
+   * The same, typed on the game's on-screen keys. Kept apart because tapping is much
+   * slower than typing, so mixing the two would make either figure misleading.
+   */
+  touchSamples: number[];
+  bestTouchWordsPerMinute: number;
 }
 
 export function newTypingStats(): TypingStats {
-  return { keystrokes: 0, correctKeystrokes: 0, bestWordsPerMinute: 0, samples: [] };
+  return { keystrokes: 0, correctKeystrokes: 0, bestWordsPerMinute: 0, samples: [], touchSamples: [], bestTouchWordsPerMinute: 0 };
 }
 
 function readTypingStats(value: unknown): TypingStats {
@@ -88,6 +94,8 @@ function readTypingStats(value: unknown): TypingStats {
     correctKeystrokes: int(raw.correctKeystrokes, 0),
     bestWordsPerMinute: num(raw.bestWordsPerMinute, 0),
     samples: list(raw.samples, isNumber, []),
+    touchSamples: list(raw.touchSamples, isNumber, []),
+    bestTouchWordsPerMinute: num(raw.bestTouchWordsPerMinute, 0),
   };
 }
 
@@ -95,18 +103,26 @@ export function typingAccuracyOf(stats: TypingStats): number {
   return stats.keystrokes === 0 ? 0 : stats.correctKeystrokes / stats.keystrokes;
 }
 
+const average = (samples: number[]) => (samples.length === 0 ? 0 : samples.reduce((sum, sample) => sum + sample, 0) / samples.length);
+
 export function averageWordsPerMinuteOf(stats: TypingStats): number {
-  return stats.samples.length === 0 ? 0 : stats.samples.reduce((sum, sample) => sum + sample, 0) / stats.samples.length;
+  return average(stats.samples);
 }
 
-export function recordTypingStats(stats: TypingStats, keystrokes: number, correct: number, wordsPerMinute?: number): void {
+export function averageTouchWordsPerMinuteOf(stats: TypingStats): number {
+  return average(stats.touchSamples);
+}
+
+/** Adds one finished word or sentence. `onScreenKeys` says it was tapped rather than typed. */
+export function recordTypingStats(stats: TypingStats, keystrokes: number, correct: number, wordsPerMinute?: number, onScreenKeys = false): void {
   stats.keystrokes += keystrokes;
   stats.correctKeystrokes += correct;
-  if (wordsPerMinute !== undefined && wordsPerMinute > 0) {
-    stats.samples.push(wordsPerMinute);
-    if (stats.samples.length > 20) stats.samples.splice(0, stats.samples.length - 20);
-    stats.bestWordsPerMinute = Math.max(stats.bestWordsPerMinute, wordsPerMinute);
-  }
+  if (wordsPerMinute === undefined || wordsPerMinute <= 0) return;
+  const samples = onScreenKeys ? stats.touchSamples : stats.samples;
+  samples.push(wordsPerMinute);
+  if (samples.length > 20) samples.splice(0, samples.length - 20);
+  if (onScreenKeys) stats.bestTouchWordsPerMinute = Math.max(stats.bestTouchWordsPerMinute, wordsPerMinute);
+  else stats.bestWordsPerMinute = Math.max(stats.bestWordsPerMinute, wordsPerMinute);
 }
 
 /**

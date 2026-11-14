@@ -47,6 +47,14 @@ public struct LevelResult: Codable, Equatable, Sendable {
     public var total: Int
     public var wordsPerMinute: Double?
     public var typingAccuracy: Double?
+    /// Pearls scooped, and how many there were to scoop (Maths Splash only).
+    public var pearls = 0
+    public var pearlsOffered = 0
+    public var hintsUsed = 0
+    /// A question was answered right after at least two wrong tries.
+    public var comeback = false
+    /// Right-first-time answers per times table, keyed by the table ("3").
+    public var tableFirstTry: [String: Int] = [:]
 
     public init(stars: Int, accuracy: Double, score: Int, bestCombo: Int, correctFirstTry: Int, total: Int,
                 wordsPerMinute: Double? = nil, typingAccuracy: Double? = nil) {
@@ -58,6 +66,23 @@ public struct LevelResult: Codable, Equatable, Sendable {
         self.total = total
         self.wordsPerMinute = wordsPerMinute
         self.typingAccuracy = typingAccuracy
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        stars = c.value(.stars, default: 1)
+        accuracy = c.value(.accuracy, default: 0)
+        score = c.value(.score, default: 0)
+        bestCombo = c.value(.bestCombo, default: 0)
+        correctFirstTry = c.value(.correctFirstTry, default: 0)
+        total = c.value(.total, default: 0)
+        wordsPerMinute = c.value(.wordsPerMinute, default: nil)
+        typingAccuracy = c.value(.typingAccuracy, default: nil)
+        pearls = c.value(.pearls, default: 0)
+        pearlsOffered = c.value(.pearlsOffered, default: 0)
+        hintsUsed = c.value(.hintsUsed, default: 0)
+        comeback = c.value(.comeback, default: false)
+        tableFirstTry = c.value(.tableFirstTry, default: [:])
     }
 }
 
@@ -92,6 +117,21 @@ public struct ChallengeSession: Sendable {
     public private(set) var keystrokes = 0
     public private(set) var correctKeystrokes = 0
     public private(set) var wordsPerMinuteSamples: [Double] = []
+    public private(set) var hintsUsed = 0
+    public private(set) var comeback = false
+    public private(set) var tableFirstTry: [String: Int] = [:]
+
+    /// Wrong attempts on the current question.
+    public private(set) var slipsOnQuestion = 0
+    /// Questions in a row that needed more than one go.
+    public private(set) var trickyStreak = 0
+    /// At most one suggestion per question, so it never nags while a child is still trying.
+    private var suggestedHelpThisQuestion = false
+
+    /// Wrong attempts on one question before suggesting a grown-up (the hint arrives at two).
+    public static let slipsBeforeHelp = 4
+    /// Tricky questions in a row after which two slips on the next one are enough.
+    public static let trickyStreakBeforeHelp = 3
 
     private var rng: SeededGenerator
     private var usedKeys: Set<String> = []
@@ -130,6 +170,8 @@ public struct ChallengeSession: Sendable {
     public mutating func next() -> Question? {
         guard asked < total else { return nil }
         asked += 1
+        slipsOnQuestion = 0
+        suggestedHelpThisQuestion = false
         let skills = activeSkills
 
         // Spaced repetition: bring back something the child found tricky.
@@ -194,13 +236,27 @@ public struct ChallengeSession: Sendable {
     }
 
     /// A wrong attempt. The question stays open; only the combo is lost.
-    public mutating func recordSlip() {
+    /// Returns true when the child seems stuck and it's time to suggest asking a grown-up.
+    @discardableResult
+    public mutating func recordSlip() -> Bool {
         combo = 0
+        slipsOnQuestion += 1
+        guard !suggestedHelpThisQuestion else { return false }
+        let stuckHere = slipsOnQuestion >= Self.slipsBeforeHelp
+        let strugglingLately = trickyStreak >= Self.trickyStreakBeforeHelp && slipsOnQuestion >= 2
+        guard stuckHere || strugglingLately else { return false }
+        suggestedHelpThisQuestion = true
+        trickyStreak = 0
+        return true
     }
 
     /// The question has been answered correctly (possibly after slips or a hint).
     public mutating func complete(_ question: Question, firstTry: Bool, seconds: Double, usedHint: Bool) -> AnswerOutcome {
         completed += 1
+        trickyStreak = firstTry ? 0 : trickyStreak + 1
+        if usedHint { hintsUsed += 1 }
+        if !firstTry, slipsOnQuestion >= 2 { comeback = true }
+        if firstTry, let table = Self.table(of: question.key) { tableFirstTry[String(table), default: 0] += 1 }
         learner.record(key: question.key, skill: question.skill, correct: firstTry, seconds: seconds, usedHint: usedHint)
         let points: Int
         if firstTry {
@@ -219,14 +275,20 @@ public struct ChallengeSession: Sendable {
         return AnswerOutcome(points: points, combo: combo, multiplier: multiplier, praise: praise, isLevelComplete: isFinished)
     }
 
+    /// The times table a number fact belongs to: "mul:3x4" and "div:3x4" are both the 3 times table.
+    static func table(of key: String) -> Int? {
+        guard key.hasPrefix("mul:") || key.hasPrefix("div:") else { return nil }
+        return key.dropFirst(4).split(separator: "x").first.flatMap { Int($0) }
+    }
+
     public mutating func retryMessage() -> String { Encouragement.pick(Encouragement.retry, using: &rng) }
 
     /// Typing measurements for one finished word or sentence.
-    public mutating func recordTyping(keystrokes: Int, correct: Int, wordsPerMinute: Double?) {
+    public mutating func recordTyping(keystrokes: Int, correct: Int, wordsPerMinute: Double?, onScreenKeys: Bool = false) {
         self.keystrokes += keystrokes
         correctKeystrokes += correct
         if let wordsPerMinute { wordsPerMinuteSamples.append(wordsPerMinute) }
-        learner.typing.record(keystrokes: keystrokes, correct: correct, wordsPerMinute: wordsPerMinute)
+        learner.typing.record(keystrokes: keystrokes, correct: correct, wordsPerMinute: wordsPerMinute, onScreenKeys: onScreenKeys)
     }
 
     public var result: LevelResult {
@@ -234,12 +296,16 @@ public struct ChallengeSession: Sendable {
         let typingAccuracy = keystrokes == 0 ? nil : Double(correctKeystrokes) / Double(keystrokes)
         // Typing levels are judged on key accuracy, never on speed.
         let judged = level.mode == .typingTurbo ? (typingAccuracy ?? accuracy) : accuracy
-        return LevelResult(
+        var result = LevelResult(
             stars: Progression.stars(forAccuracy: judged), accuracy: judged, score: score, bestCombo: bestCombo,
             correctFirstTry: correctFirstTry, total: total,
             wordsPerMinute: wordsPerMinuteSamples.isEmpty ? nil : wordsPerMinuteSamples.reduce(0, +) / Double(wordsPerMinuteSamples.count),
             typingAccuracy: typingAccuracy
         )
+        result.hintsUsed = hintsUsed
+        result.comeback = comeback
+        result.tableFirstTry = tableFirstTry
+        return result
     }
 }
 

@@ -10,6 +10,7 @@ import { collectionScreen, homeScreen } from "./ui/collection";
 import { introView } from "./ui/introView";
 import { dedicationScreen, endingScreen, islandScreen, mapScreen, profilesScreen, titleScreen, type Screen } from "./ui/menus";
 import { parentScreen } from "./ui/parent";
+import { trophyCabinetScreen } from "./ui/trophies";
 import "./ui/style.css";
 
 const stage = document.querySelector<HTMLDivElement>("#stage")!;
@@ -53,9 +54,10 @@ async function boot(): Promise<void> {
     else if (route.name === "ending") show(endingScreen(model));
     else if (route.name === "parent") show(parentScreen(model));
     else if (route.name === "collection" && model.profile) show(collectionScreen(model));
+    else if (route.name === "trophies" && model.profile) show(trophyCabinetScreen(model));
     else if (route.name === "home" && model.profile) show(homeScreen(model));
     else if (island) show(islandScreen(model, island));
-    else if (level && home && model.profile && playableModes.has(level.mode)) show(gameView(model, app, level, home), true);
+    else if (level && home && model.playingProfile && playableModes.has(level.mode)) show(gameView(model, app, level, home), true);
     else show(mapScreen(model));
   });
 

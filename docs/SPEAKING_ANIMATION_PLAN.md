@@ -109,7 +109,7 @@ Avoid that by only ever using the mouth from the new image:
    - Otter: "Exactly the same image, unchanged in every detail, except that his mouth is open in a
      happy, mid-sentence talking shape, showing a little pink tongue. Do not move or redraw
      anything else."
-   - Mosey: "Exactly the same image, unchanged in every detail, except that her mouth is slightly
+   - Mosey: "Exactly the same image, unchanged in every detail, except that his mouth is slightly
      open in a gentle, mid-sentence talking shape, rounded, with no sharp teeth. Do not move or
      redraw anything else."
 2. In `tools/import_art.py`, find the area around the muzzle where the two images differ, and paste

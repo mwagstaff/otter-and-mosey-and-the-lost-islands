@@ -933,5 +933,11 @@
   "o:It bloomed! The colour came back!",
   "m:So our answers bring the world back to life.",
   "o:Six islands. Six fragments. One snack break. Let's go!"
+ ],
+ "askGrownUp": [
+  "o:Hey, don't worry! Why don't you ask a grown-up for some help?",
+  "m:This one's a bit tricky. How about asking a grown-up to help us?",
+  "o:You're trying really hard! Shall we get a grown-up to help with this one?",
+  "m:Even the best explorers ask for help. Why don't you find a grown-up?"
  ]
 }

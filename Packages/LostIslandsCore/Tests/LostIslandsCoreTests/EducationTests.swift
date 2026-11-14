@@ -297,6 +297,17 @@ import Testing
         #expect(abs((meter.wordsPerMinute ?? 0) - 9 / (29.4 / 60)) < 0.01)
         #expect(TypingMeter().wordsPerMinute == nil)
     }
+
+    @Test func onScreenTypingSpeedIsKeptApartFromKeyboardSpeed() {
+        var stats = TypingStats()
+        stats.record(keystrokes: 20, correct: 19, wordsPerMinute: 24)
+        stats.record(keystrokes: 20, correct: 18, wordsPerMinute: 8, onScreenKeys: true)
+        stats.record(keystrokes: 20, correct: 20, wordsPerMinute: 10, onScreenKeys: true)
+        #expect(stats.samples == [24] && stats.bestWordsPerMinute == 24)
+        #expect(stats.touchSamples == [8, 10] && stats.bestTouchWordsPerMinute == 10)
+        #expect(stats.averageTouchWordsPerMinute == 9)
+        #expect(stats.keystrokes == 60 && stats.correctKeystrokes == 57)
+    }
 }
 
 @Suite struct SpeechTests {

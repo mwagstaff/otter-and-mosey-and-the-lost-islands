@@ -16,7 +16,7 @@ import Testing
         names += ["otter_run", "mosey_swim", "otter_talk", "mosey_talk"]
         for island in Catalog.shared.islands {
             let theme = IslandTheme.island(island.id)
-            names += [theme.background, theme.foreground, theme.guardian, theme.guardianHappy, theme.islandArt, theme.container, theme.friend]
+            names += [theme.background, theme.foreground, theme.guardian, theme.guardianHappy, theme.islandArt, theme.container] + theme.friends
         }
         for name in names { #expect(Art.hasAsset(name), "missing art: \(name)") }
     }
@@ -85,7 +85,7 @@ import Testing
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("app-test-\(UUID().uuidString)")
         let store = SaveStore(directory: directory)
         let first = AppModel(store: store)
-        first.createProfile(nickname: "  Pip the Very Long Name ", avatar: "🐬", favourite: "mosey")
+        first.createProfile(nickname: "  Pip the Very Long Name ", avatar: "🐬")
         #expect(first.profile?.nickname.count == 12, "nicknames are trimmed and capped")
         first.finishIntro()
         let level = Catalog.shared.level("woods-1")!
@@ -115,7 +115,7 @@ import Testing
             let level = Catalog.shared.level(id)!
             let island = Catalog.shared.island(containing: id)!
             let bridge = GameBridge()
-            let options = SceneOptions(settings: AppSettings(), favourite: .otter, accessory: nil, island: island,
+            let options = SceneOptions(settings: AppSettings(), accessory: nil, island: island,
                                        inputProfile: .compactTouch, startRestoration: 0, endRestoration: 0.4)
             let session = ChallengeSession(level: level, learner: LearnerModel(), seed: 3)
             let scene: GameScene

@@ -1,8 +1,8 @@
 import type { Application } from "pixi.js";
 import { playableModes, type AppModel } from "../app/model";
 import {
-  catalog, ChallengeSession, isLevelUnlocked, subjectOf, type DialogueLine, type GameMode, type InputProfile, type Island,
-  type LevelDef, type LevelResult, type RewardSummary,
+  catalog, ChallengeSession, counterUnits, isLevelUnlocked, subjectOf, type DialogueLine, type GameMode, type InputProfile, type Island,
+  type LevelDef, type LevelResult, type RewardSummary, type Trophy,
 } from "../core";
 import { tick } from "../engine/actions";
 import { iconName, rainbow } from "../engine/art";
@@ -19,6 +19,8 @@ import { dialogueHeight, showDialogue as sharedDialogue } from "./dialogue";
 import { button, h, picture, roundButton, symbol } from "./dom";
 import { openSettings } from "./settings";
 import { starRow, type Screen } from "./menus";
+import { crystalShowcase, fragmentRow, miniCabinet, trophyBadge } from "./trophies";
+import { options } from "../game/options";
 
 type Stage = "loading" | "intro" | "playing" | "outro" | "results";
 
@@ -42,9 +44,13 @@ const scenes: Record<GameMode, new (session: ChallengeSession, bridge: GameBridg
   guardian: GuardianScene,
 };
 
+/** Reminds a grown-up play-testing a level that none of it is kept. */
+const playtestNote = () => h("p.playtest-note", {}, "Play-test: nothing is saved");
+
 /** Hosts one level: the scene with the HUD, keys, dialogue and results over it. */
 export function gameView(model: AppModel, app: Application, level: LevelDef, island: Island): Screen {
-  const profile = model.profile!;
+  const profile = model.playingProfile!;
+  const testing = model.playtest !== undefined;
   const compact = () => window.innerHeight < 520;
   const input = inputProfile(compact());
   const hardware = input === "hardware";
@@ -57,7 +63,6 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   const base = model.restoration(island);
   const hat = profile.equippedAccessory === undefined ? undefined : catalog.reward(profile.equippedAccessory);
   const sceneOptions: SceneOptions = {
-    favourite: profile.favourite === "mosey" ? "mosey" : "otter",
     accessory: hat && (iconName(`reward_${hat.id}`) ?? hat.emoji),
     island,
     inputProfile: input,
@@ -215,37 +220,132 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   function showResults(result: LevelResult): void {
     const earned = summary;
     const next = catalog.nextLevel(level.id);
-    const canGoOn = next && playableModes.has(next.mode) && isLevelUnlocked(next.id, model.profile!);
+    // Play-testing ignores locks.
+    const canGoOn = next && playableModes.has(next.mode) && (testing || isLevelUnlocked(next.id, model.profile!));
+    const islandIndex = catalog.islands.findIndex((each) => each.id === island.id);
+    const nextIsland = catalog.islands[islandIndex + 1];
     const headline = earned?.crystalIsland ? "Crystal fragment found!" : result.stars === 3 ? "Superstar!" : result.stars === 2 ? "Great work!" : "You did it!";
     const stat = (title: string, value: string) => h("div.stat", {}, h("strong", {}, value), h("span", {}, title));
     const stars = starRow(0, "stars big");
     const chip = (key: string, name: string) => h("span.chip", {}, picture(key), name);
     const chips = [
-      ...(earned?.crystalIsland ? [chip("💎", `${earned.crystalIsland.name} crystal`)] : []),
       ...(earned?.reward ? [chip(iconName(`reward_${earned.reward.id}`) ?? earned.reward.emoji, earned.reward.name)] : []),
       ...(earned?.decorations ?? []).map((item) => chip(iconName(`reward_${item.id}`) ?? item.emoji, item.name)),
-      ...(earned?.achievements ?? []).map((item) => chip(iconName(`badge_${item.id}`) ?? item.emoji, item.title)),
     ];
+    const stats = h("div.stats", {},
+      stat("Score", String(result.score)),
+      stat(level.mode === "typingTurbo" ? "Accuracy" : "First try", `${Math.round(result.accuracy * 100)}%`),
+      result.bestCombo >= 2 && stat("Best streak", String(result.bestCombo)),
+      result.wordsPerMinute !== undefined && stat("Speed", `${Math.round(result.wordsPerMinute)} wpm`),
+    );
+    const trophies = earned?.trophies ?? [];
+    const collected = new Set<string>();
+    const cabinet = earned && trophies.length > 0 ? miniCabinet(earned.trophyCount - trophies.length, earned.trophyTotal) : undefined;
+    const actions = h("div.actions", {},
+      testing
+        ? button("cream", ["Dashboard"], () => model.endPlaytest())
+        : button("cream", [picture("🏝️"), "Take a break"], () => model.go({ name: "island", id: island.id })),
+      button("cream", [symbol("again"), "Again"], replay),
+      !testing && earned?.gameComplete && button("teal.big", [picture("🌈"), "The ending!"], () => model.go({ name: "ending" })),
+      (testing || !earned?.gameComplete) && canGoOn && button("teal.big", ["Next", symbol("play")], () => model.go({ name: "play", level: next.id })),
+      !testing && !earned?.gameComplete && !canGoOn && earned?.crystalIsland && button("teal.big", ["Next adventure", symbol("play")], () => {
+        model.unlockedIsland = nextIsland?.id;
+        model.go({ name: "map" });
+      }),
+    );
+    const hint = h("p.collect-hint", {}, "Tap your trophies to carry on");
+    const trayTitle = h("p.tray-title");
+    const waitingNote = h("p.tray-waiting");
+
+    function titleTray(): void {
+      const left = trophies.length - collected.size;
+      if (left === 0) {
+        trayTitle.replaceChildren(h("b", {}, "All in your cabinet! "), `${earned!.trophyCount} of ${earned!.trophyTotal} trophies`);
+        if (earned!.trophiesWaiting > 0) {
+          waitingNote.textContent = earned!.trophiesWaiting === 1 ? "1 more trophy is waiting for your next level" : `${earned!.trophiesWaiting} more trophies are waiting for your next levels`;
+        }
+        return;
+      }
+      const lead = left === trophies.length ? (left === 1 ? "A new trophy! " : `${left} new trophies! `) : `${left} more to go! `;
+      trayTitle.replaceChildren(h("b", {}, lead), left === 1 ? "Tap it to put it in your cabinet" : "Tap them to put them in your cabinet");
+    }
+
+    function subtitle(item: Trophy): string {
+      if (item.tier > 0 && item.rule.kind === "count") return `${item.badge} ${counterUnits[item.rule.counter]}`;
+      if (item.levelID) return catalog.level(item.levelID)?.title ?? "";
+      if (item.islandID) return catalog.island(item.islandID)?.name ?? "";
+      return item.detail;
+    }
+
+    function collect(item: Trophy, token: HTMLButtonElement): void {
+      if (collected.has(item.id) || token.classList.contains("flying") || !cabinet) return;
+      token.classList.add("flying");
+      audio.play("whoosh");
+      const badge = token.querySelector<HTMLElement>(".trophy-badge")!;
+      const from = badge.getBoundingClientRect();
+      const to = cabinet.element.querySelector("img")!.getBoundingClientRect();
+      const flyer = trophyBadge(item, true, "flyer");
+      Object.assign(flyer.style, { left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px` });
+      document.body.append(flyer);
+      badge.style.visibility = "hidden";
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height * 0.35 - (from.top + from.height / 2);
+      const calm = options.reducedMotion;
+      const frames = calm
+        ? [{ opacity: 1 }, { opacity: 0 }]
+        : [
+            { transform: "translate(0, 0) scale(1.1) rotate(0deg)" },
+            { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 180}px) scale(0.85) rotate(-18deg)`, offset: 0.45 },
+            { transform: `translate(${dx}px, ${dy}px) scale(0.3) rotate(8deg)` },
+          ];
+      flyer.animate(frames, { duration: calm ? 300 : 800, easing: "cubic-bezier(.45,0,.55,1)", fill: "forwards" }).onfinish = () => {
+        flyer.remove();
+        if (destroyed) return;
+        collected.add(item.id);
+        token.classList.remove("flying");
+        token.classList.add("done");
+        badge.style.visibility = "";
+        token.setAttribute("aria-label", `${item.title}, in your cabinet`);
+        cabinet.set(earned!.trophyCount - trophies.length + collected.size);
+        cabinet.bump();
+        audio.play("unlock", 0.8);
+        titleTray();
+        if (collected.size === trophies.length) {
+          hint.replaceWith(actions);
+          actions.classList.add("rise");
+        }
+      };
+    }
+
+    const tray = trophies.length > 0 && h("div.trophy-tray", {},
+      trayTitle,
+      h("div.tokens", {}, ...trophies.map((item) => {
+        const token: HTMLButtonElement = h("button.token", { type: "button", "aria-label": `Collect the ${item.title} trophy`, onClick: () => collect(item, token) },
+          h("span.token-glow"), h("span.tap", { "aria-hidden": "true" }, "Tap!"), trophyBadge(item),
+          h("strong", {}, item.title), h("span.sub", {}, subtitle(item)), h("span.in-cabinet", {}, "In your cabinet"),
+        ) as HTMLButtonElement;
+        return token;
+      })),
+      waitingNote,
+    );
+    titleTray();
+
+    const top = earned?.crystalIsland
+      ? h("div.crystal-top", {}, crystalShowcase(earned.crystalIsland),
+        h("div.crystal-side", {}, h("h2", {}, headline), stars, fragmentRow(model.playingProfile?.crystals ?? [earned.crystalIsland.id]), stats))
+      : h("div.results-top", {}, h("h2", {}, headline), stars, stats);
     overlay.dataset.kind = "results";
-    overlay.replaceChildren(h("div.shade", {}, h("div.results.panel", { role: "dialog", "aria-label": "Level complete" },
-      h("h2", {}, headline),
-      stars,
-      h("div.stats", {},
-        stat("Score", String(result.score)),
-        stat(level.mode === "typingTurbo" ? "Accuracy" : "First try", `${Math.round(result.accuracy * 100)}%`),
-        result.bestCombo >= 2 && stat("Best streak", String(result.bestCombo)),
-        result.wordsPerMinute !== undefined && stat("Speed", `${Math.round(result.wordsPerMinute)} wpm`),
+    overlay.replaceChildren(h("div.shade", {},
+      h(`div.results.panel${earned?.crystalIsland ? ".crystal" : ""}`, { role: "dialog", "aria-label": "Level complete" },
+        top,
+        testing && playtestNote(),
+        chips.length > 0 && h("div.chips", {}, ...chips),
+        tray,
+        model.saveFailed && h("p.warning", {}, "This browser would not save your progress."),
+        trophies.length > 0 ? hint : actions,
       ),
-      chips.length > 0 && h("div.chips", {}, ...chips),
-      model.saveFailed && h("p.warning", {}, "This browser would not save your progress."),
-      h("div.actions", {},
-        button("cream", [picture("🏝️"), "Island"], () => model.go({ name: "island", id: island.id })),
-        button("cream", [symbol("again"), "Again"], replay),
-        earned?.gameComplete && button("teal.big", [picture("🌈"), "The ending!"], () => model.go({ name: "ending" })),
-        !earned?.gameComplete && canGoOn && button("teal.big", ["Next", symbol("play")], () => model.go({ name: "play", level: next.id })),
-        !earned?.gameComplete && !canGoOn && earned?.crystalIsland && button("teal.big", [picture("🗺️"), "Map"], () => model.go({ name: "map" })),
-      ),
-    )));
+      cabinet?.element,
+    ));
     for (let star = 1; star <= Math.max(result.stars, 1); star += 1) {
       window.setTimeout(() => {
         if (destroyed) return;
@@ -271,11 +371,14 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
     overlay.replaceChildren(h("div.shade", {}, h("div.pause.panel", { role: "dialog", "aria-label": "Paused" },
       h("h2", {}, "Paused"),
       h("p", {}, level.title),
+      testing && playtestNote(),
       button("teal.big", [symbol("play"), "Keep playing"], () => setPaused(false)),
       h("div.actions", {},
         button("cream", [symbol("again"), "Start again"], replay),
         button("cream", [symbol("gear"), "Sound"], () => openSettings(model)),
-        button("coral", [picture("🏝️"), "Leave"], () => model.go({ name: "island", id: island.id })),
+        testing
+          ? button("coral", ["Dashboard"], () => model.endPlaytest())
+          : button("coral", [picture("🏝️"), "Leave"], () => model.go({ name: "island", id: island.id })),
       ),
     )));
   }
@@ -350,6 +453,15 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
     app.renderer.on("resize", onResize);
     stage = "intro";
     applyInsets();
+    // `?results` (development only) jumps straight to the results screen with a perfect run.
+    if (import.meta.env.DEV && new URLSearchParams(location.search).has("results")) {
+      const perfect: LevelResult = { stars: 3, accuracy: 1, score: 900, bestCombo: level.count, correctFirstTry: level.count, total: level.count, pearls: 10 };
+      summary = model.complete(level.id, perfect, session.learner, 0);
+      stage = "results";
+      render();
+      showResults(perfect);
+      return;
+    }
     showDialogue(level.intro, false, () => {
       stage = "playing";
       // Make room for the keys before the first question is laid out.
@@ -360,7 +472,9 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
     console.error(error);
     overlay.replaceChildren(h("div.shade", {}, h("div.pause.panel", {},
       h("h2", {}, "Sorry, this level could not load"),
-      button("cream", [picture("🏝️"), "Back to the island"], () => model.go({ name: "island", id: island.id })),
+      testing
+        ? button("cream", ["Back to the dashboard"], () => model.endPlaytest())
+        : button("cream", [picture("🏝️"), "Back to the island"], () => model.go({ name: "island", id: island.id })),
     )));
   });
 

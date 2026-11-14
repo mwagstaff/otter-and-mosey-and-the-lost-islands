@@ -115,6 +115,7 @@ def collect(scene, lines, guardian=None, mood=None):
             entry["mood"] = mood
         dialogue.setdefault(line_key(line), entry)
 collect("intro", source.INTRO + source.INTRO_AFTER)
+collect("help", source.ASK_GROWN_UP)
 for island in source.ISLANDS:
     kind = island["guardian"]["kind"]
     for l in island["levels"]:
@@ -127,7 +128,7 @@ for island in source.ISLANDS:
 catalogue = {
     "islands": source.ISLANDS,
     "rewards": [{"id": r[0], "kind": r[1], "name": r[2], "emoji": r[3]} for r in source.REWARDS],
-    "intro": source.INTRO, "introAfter": source.INTRO_AFTER,
+    "intro": source.INTRO, "introAfter": source.INTRO_AFTER, "askGrownUp": source.ASK_GROWN_UP,
 }
 (out / "islands.json").write_text(json.dumps(catalogue, indent=1, ensure_ascii=False) + "\n")
 print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(dialogue)} voiced dialogue lines ({sum(len(d['text']) for d in dialogue.values())} characters), {len(lookalikes)} lookalikes, {len(narration)} narration lines ({sum(len(t) for t in narration.values())} characters)")

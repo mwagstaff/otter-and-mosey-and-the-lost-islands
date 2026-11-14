@@ -40,7 +40,10 @@ struct RootView: View {
         .onAppear { music(for: model.route) }
     }
 
-    private var routeKey: String { String(describing: model.route) }
+    private var routeKey: String {
+        if case .play = model.route { return "\(model.route)#\(model.playRun)" }
+        return String(describing: model.route)
+    }
 
     @ViewBuilder private var screen: some View {
         switch model.route {
@@ -57,6 +60,7 @@ struct RootView: View {
                 MapView()
             }
         case .collection: CollectionView()
+        case .trophies: TrophyCabinetView()
         case .home: HomeIslandView()
         case .parent: ParentAreaView()
         case .ending: EndingView()
@@ -67,7 +71,6 @@ struct RootView: View {
         switch route {
         case .island(let id): AudioManager.shared.playMusic(IslandTheme.island(id).music)
         case .play(let id): AudioManager.shared.playMusic(IslandTheme.island(model.catalog.island(containing: id)?.id ?? "woods").music)
-        case .parent: break
         default: AudioManager.shared.playMusic("music_title")
         }
     }

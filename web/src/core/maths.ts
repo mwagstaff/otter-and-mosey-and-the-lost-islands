@@ -351,7 +351,7 @@ function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft 
       const a = easy ? randomInt(rng, 10, 20) : randomInt(rng, 30, 90);
       const b = easy ? randomInt(rng, 2, 8) : randomInt(rng, 11, 25);
       return {
-        prompt: `Mosey has ${a} ${things}. She gives ${b} away. How many are left?`, answer: a - b,
+        prompt: `Mosey has ${a} ${things}. He gives ${b} away. How many are left?`, answer: a - b,
         near: [a - b + 1, a - b - 1, a + b, a - b + 10, a - b - 10].filter(positive),
         hint: `Giving away means subtract: ${a} − ${b}.`,
       };

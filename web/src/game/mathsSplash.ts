@@ -11,8 +11,8 @@ import { options } from "./options";
 type Phase = "cruising" | "arriving" | "choosing" | "dashing";
 
 /**
- * Game mode B. Mosey swims along with Otter on her back. Three tunnels carry answers;
- * tapping the right one sends her through with a rainbow speed boost. Between questions
+ * Game mode B. Mosey swims along with Otter on his back. Three tunnels carry answers;
+ * tapping the right one sends him through with a rainbow speed boost. Between questions
  * the player drags up and down to scoop pearls.
  */
 export class MathsSplashScene extends GameScene {
@@ -23,7 +23,6 @@ export class MathsSplashScene extends GameScene {
   private targetPace = 120;
   private targetY = 0;
   private stream!: Emitter;
-  pearlCount = 0;
 
   protected override get scrollsBackdrop(): boolean { return true; }
 
@@ -36,7 +35,7 @@ export class MathsSplashScene extends GameScene {
     this.mosey.restPose = "move";
     this.mosey.set("move", false);
     this.mosey.zIndex = 20;
-    // Otter rides on Mosey's back, tucked just behind her.
+    // Otter rides on Mosey's back, tucked just behind him.
     this.mosey.sortableChildren = true;
     this.otter.zIndex = -1;
     this.mosey.addChild(this.otter);
@@ -159,6 +158,7 @@ export class MathsSplashScene extends GameScene {
     this.bridge.set({ caption: "Drag up and down to scoop the pearls!" });
     const lane = this.lanes[Math.floor(Math.random() * 3)]!;
     const size = this.gateSize * 0.36;
+    this.pearlsOffered += 5;
     for (let index = 0; index < 5; index += 1) {
       const pearl = new Sprite(texture("pearl"));
       pearl.anchor.set(0.5);
@@ -188,7 +188,7 @@ export class MathsSplashScene extends GameScene {
       pearl.x -= 280 * delta;
       const scooped = Math.abs(pearl.x - this.swimmerX) < mosey.size * 0.45 && Math.abs(pearl.y - y) < mosey.size * 0.3;
       if (scooped) {
-        this.pearlCount += 1;
+        this.pearlsScooped += 1;
         audio.play("star", 0.6);
         burst(this.world, pearl.x, pearl.y, "#FFD9F0", 8);
       }

@@ -7,6 +7,8 @@ struct MapView: View {
     @Environment(AppModel.self) private var model
     @State private var scene = WorldMapScene()
     @State private var selected: String?
+    /// The name of an island that has just been unlocked, shown in a banner for a few seconds.
+    @State private var unlockBanner: String?
 
     private var states: [IslandState] {
         guard let profile = model.profile else { return [] }
@@ -31,6 +33,7 @@ struct MapView: View {
                         Spacer()
                         CountChip(emoji: "⭐️", text: "\(model.profile?.totalStars ?? 0)")
                         CountChip(emoji: "💎", text: "\(model.profile?.crystals.count ?? 0)/6")
+                        TrophiesButton(size: compact ? 16 : 20, showsTitle: !compact)
                         Button(action: tapped { model.route = .collection }) { IconLabel("Treasures", emoji: "🎒", size: compact ? 16 : 20) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 16 : 20))
                         Button(action: tapped { model.route = .home }) { IconLabel("Home", emoji: "🏝", size: compact ? 16 : 20) }
@@ -38,6 +41,13 @@ struct MapView: View {
                     }
                     .padding(.horizontal, compact ? 6 : 20)
                     .padding(.top, compact ? 6 : 14)
+                    if let unlockBanner {
+                        IconLabel("New island to explore: \(unlockBanner)!", emoji: "✨", size: compact ? 16 : 22)
+                            .font(.game(compact ? 16 : 22)).foregroundStyle(Palette.ink)
+                            .padding(.horizontal, 18).padding(.vertical, 8).panel(fill: Palette.gold, radius: 18)
+                            .padding(.top, compact ? 6 : 14)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                     Spacer()
                     if model.breakSuggested {
                         IconLabel("Great playing today! This is a good moment for a break.", emoji: "🌙", size: compact ? 14 : 18)
@@ -58,12 +68,24 @@ struct MapView: View {
                     }
                 }
                 .animation(.spring(duration: 0.3), value: selected)
+                .animation(.spring(duration: 0.4), value: unlockBanner)
             }
             .environment(\.compact, compact)
         }
         .onAppear {
             scene.configure(states)
             scene.onSelect = { selected = $0 }
+            if let id = model.unlockedIsland, let island = model.catalog.island(id) {
+                model.unlockedIsland = nil
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(0.7))
+                    scene.celebrateUnlock(id)
+                    selected = id
+                    unlockBanner = island.name
+                    try? await Task.sleep(for: .seconds(4))
+                    unlockBanner = nil
+                }
+            }
         }
     }
 

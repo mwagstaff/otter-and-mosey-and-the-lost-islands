@@ -345,7 +345,7 @@ public enum MathsGenerator {
         case 1:
             let a = Int.random(in: (level <= 2 ? 10...20 : 30...90), using: &rng)
             let b = Int.random(in: (level <= 2 ? 2...8 : 11...25), using: &rng)
-            return Draft(prompt: "Mosey has \(a) \(things). She gives \(b) away. How many are left?", answer: a - b,
+            return Draft(prompt: "Mosey has \(a) \(things). He gives \(b) away. How many are left?", answer: a - b,
                          near: [a - b + 1, a - b - 1, a + b, a - b + 10, a - b - 10].filter { $0 > 0 },
                          hint: "Giving away means subtract: \(a) − \(b).")
         case 2:

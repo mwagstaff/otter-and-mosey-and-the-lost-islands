@@ -124,9 +124,9 @@ final class TypingTurboScene: GameScene {
 
     private func completeText() {
         if meter.accuracy < 0.9 { markImperfect() }
-        // Speed is only meaningful with a real keyboard; touch typing records accuracy alone.
-        let speedSample = options.inputProfile == .hardware ? meter.wordsPerMinute : nil
-        session.recordTyping(keystrokes: meter.keystrokes, correct: meter.correct, wordsPerMinute: speedSample)
+        // Tapping on-screen keys is far slower than typing, so its speed is recorded separately.
+        session.recordTyping(keystrokes: meter.keystrokes, correct: meter.correct, wordsPerMinute: meter.wordsPerMinute,
+                             onScreenKeys: options.inputProfile != .hardware)
         let outcome = succeed(at: CGPoint(x: rider.position.x + rider.size.width * 0.3, y: rider.position.y + rider.size.height * 0.4))
         pace = min(pace + 160, 640)
         board?.run(.sequence([.wait(forDuration: 0.25), .fadeOut(withDuration: 0.2), .removeFromParent()]))

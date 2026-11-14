@@ -1,7 +1,8 @@
 import type { AppModel } from "../app/model";
 import {
-  accuracyOf, achievements, allDifficultyModes, averageSecondsOf, averageWordsPerMinuteOf, defaultTables, difficultyTitles, skillTitles,
-  spellingTopics, totalStars, typingAccuracyOf, type DifficultyMode, type Profile,
+  accuracyOf, allDifficultyModes, averageSecondsOf, averageTouchWordsPerMinuteOf, averageWordsPerMinuteOf, catalog,
+  defaultTables, difficultyTitles, gameModeTitles, playSecondsOver, skillTitles, spellingTopics, starsFor, totalStars, trophy, trophyCount,
+  typingAccuracyOf, type DifficultyMode, type Profile,
 } from "../core";
 import { h } from "./dom";
 import type { Screen } from "./menus";
@@ -63,6 +64,7 @@ export function parentScreen(model: AppModel): Screen {
       if (entry === "") return;
       if (Number(entry) === a * b) {
         cleanUp();
+        model.parentUnlocked = true;
         dashboard();
       } else {
         wrong.hidden = false;
@@ -84,7 +86,7 @@ export function parentScreen(model: AppModel): Screen {
       sum,
       wrong,
       h("div.digits", {}, ...[..."1234567890"].map(digit), h("button.plain.digit", { type: "button", "aria-label": "Delete", onClick: erase }, "⌫")),
-      h("div.gate-actions", {}, h("button.plain", { type: "button", onClick: () => model.go({ name: "title" }) }, "Back"), next),
+      h("div.gate-actions", {}, h("button.plain", { type: "button", onClick: () => model.leaveParentArea() }, "Back"), next),
     ));
     fresh();
   }
@@ -92,22 +94,29 @@ export function parentScreen(model: AppModel): Screen {
   const row = (title: string, value: Child) => h("div.row", {}, h("span", {}, title), h("span.value", {}, value));
   const section = (title: string, ...children: Child[]) => h("section.card", {}, h("h2", {}, title), ...children);
 
-  function dashboard(chosen?: string): void {
+  function dashboard(): void {
     const profiles = model.save.profiles;
-    const profile = profiles.find((each) => each.id === (chosen ?? model.save.activeProfileID));
-    const done = h("button.plain", { type: "button", onClick: () => model.go({ name: "title" }) }, "Done");
+    const profile = profiles.find((each) => each.id === model.dashboardProfileID)
+      ?? profiles.find((each) => each.id === model.save.activeProfileID)
+      ?? profiles[0];
+    const done = h("button.plain", { type: "button", onClick: () => model.leaveParentArea() }, "Done");
     const header = h("header.parent-bar", {}, done, h("h1", {}, "Parent dashboard"), h("span.parent-spacer"));
     if (!profile) {
-      element.replaceChildren(header, h("div.parent-body", {}, h("div.card", {},
-        h("h2", {}, "No players yet"),
-        h("p.muted", {}, "Create a player from the title screen to see their progress here."))));
+      element.replaceChildren(header, h("div.parent-body", {},
+        h("div.card", {},
+          h("h2", {}, "No players yet"),
+          h("p.muted", {}, "Create a player from the title screen to see their progress here.")),
+        playtest(undefined)));
       return;
     }
-    const refresh = () => dashboard(profile.id);
+    const refresh = () => dashboard();
     const picker = profiles.length > 1 && (() => {
       const select = h<"select">("select", { "aria-label": "Child" }, ...profiles.map((each) =>
         h("option", { value: each.id, selected: each.id === profile.id }, `${each.avatar} ${each.nickname}`)));
-      select.addEventListener("change", () => dashboard(select.value));
+      select.addEventListener("change", () => {
+        model.dashboardProfileID = select.value;
+        dashboard();
+      });
       return h("section.card", {}, row("Child", select));
     })();
     element.replaceChildren(header, h("div.parent-body", {},
@@ -117,23 +126,30 @@ export function parentScreen(model: AppModel): Screen {
       practice(profile),
       recent(profile),
       learning(profile, refresh),
+      playtest(profile),
       section("Sound and accessibility", settingsControls(model)),
-      reset(profile, refresh),
+      player(profile, refresh),
     ));
   }
 
   function overview(profile: Profile): HTMLElement {
     const learner = profile.learner;
     const typing = learner.typing;
+    const speed = (average: number, best: number) => `${Math.round(average)} wpm average, best ${Math.round(best)}`;
     return section("Overview",
+      row("Playtime today", playtime(playSecondsOver(profile, 1))),
+      row("Playtime, last 7 days", playtime(playSecondsOver(profile, 7))),
       row("Total playtime", playtime(profile.playSeconds)),
       row("Stars and crystals", `${totalStars(profile)} stars, ${profile.crystals.length} of 6 crystals`),
       row("Spelling accuracy", percent(learner.accuracy("spelling"))),
       row("Maths accuracy", percent(learner.accuracy("maths"))),
       row("Typing accuracy", typing.keystrokes === 0 ? "No data yet" : percent(typingAccuracyOf(typing))),
-      row("Typing speed", typing.samples.length === 0
-        ? "Measured with a real keyboard"
-        : `${Math.round(averageWordsPerMinuteOf(typing))} wpm average, best ${Math.round(typing.bestWordsPerMinute)}`),
+      typing.samples.length === 0 && typing.touchSamples.length === 0 && row("Typing speed", "No data yet"),
+      typing.samples.length > 0 && row("Typing speed, keyboard", speed(averageWordsPerMinuteOf(typing), typing.bestWordsPerMinute)),
+      typing.touchSamples.length > 0
+        && row("Typing speed, on-screen keys", speed(averageTouchWordsPerMinuteOf(typing), typing.bestTouchWordsPerMinute)),
+      h("p.muted.small", {}, "Typing speed is measured in Typing Turbo levels. Tapping on-screen keys is naturally slower than " +
+        "typing on a keyboard, so the two are shown separately."),
     );
   }
 
@@ -167,13 +183,16 @@ export function parentScreen(model: AppModel): Screen {
   }
 
   function recent(profile: Profile): HTMLElement {
-    const earned = Object.entries(profile.achievements).sort((a, b) => (a[1] < b[1] ? 1 : -1)).slice(0, 5);
-    return section("Recent achievements",
+    const earned = Object.entries(profile.achievements).sort((a, b) => (a[1] < b[1] ? 1 : -1))
+      .flatMap(([id, when]) => { const item = trophy(id); return item ? [[item, when] as const] : []; }).slice(0, 5);
+    const count = trophyCount(profile);
+    return section("Recent trophies",
+      row("Trophy cabinet", `${count.won} of ${count.total}`),
       earned.length === 0 && h("p.muted", {}, "None yet."),
-      ...earned.map(([id, when]) => {
-        const achievement = achievements.find((each) => each.id === id);
+      ...earned.map(([item, when]) => {
         const date = new Date(when).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-        return achievement && row(achievement.title, date);
+        const level = item.levelID ? catalog.level(item.levelID) : undefined;
+        return row(level ? `${item.title}: ${level.title}` : item.title, date);
       }),
     );
   }
@@ -226,21 +245,60 @@ export function parentScreen(model: AppModel): Screen {
     );
   }
 
-  function reset(profile: Profile, refresh: () => void): HTMLElement {
-    const ask = h("button.plain.danger", { type: "button" }, `Reset ${profile.nickname}'s progress`);
-    const sure = h("div.confirm", { hidden: true },
-      h("p", {}, "Reset all progress for this child? This cannot be undone."),
-      h("button.plain", { type: "button", onClick: () => { sure.hidden = true; ask.hidden = false; } }, "Keep progress"),
-      h("button.plain.danger.filled", { type: "button", onClick: () => { model.resetProgress(profile.id); refresh(); } }, "Reset progress"),
+  /** Any level, locked or not, for a grown-up to try. Nothing played here is saved. */
+  function playtest(profile: Profile | undefined): HTMLElement {
+    const islands = catalog.islands.map((island) => h("details.playtest-island", {},
+      h("summary", {}, island.name),
+      ...island.levels.map((level) => {
+        const stars = profile ? starsFor(profile, level.id) : 0;
+        return h("button.plain.playtest-level", {
+          type: "button", "aria-label": `Play-test ${level.title}`,
+          onClick: () => { cleanUp(); model.startPlaytest(level.id, profile?.id); },
+        },
+        h("span.playtest-text", {},
+          h("strong", {}, level.title),
+          h("span.muted.small", {}, `${gameModeTitles[level.mode]} · ${level.count} questions · ${level.skills.map((skill) => skillTitles[skill]).join(", ")}`)),
+        stars > 0 && h("span.playtest-stars", { "aria-label": `${stars} stars` }, "★".repeat(stars)),
+        h("span.playtest-play", { "aria-hidden": "true" }, "▶"));
+      })));
+    return section("Play-test a level",
+      ...islands,
+      h("p.muted.small", {}, (profile
+        ? `Opens any level, even a locked one, with ${profile.nickname}'s learning settings and current skill levels, so you see the questions they would get. `
+        : "Opens any level, even a locked one, as a new player would see it. ")
+        + "Nothing is saved: no stars, treasures, playtime or learning progress."),
     );
-    ask.addEventListener("click", () => {
-      sure.hidden = false;
-      ask.hidden = true;
-    });
-    return h("section.card", {}, ask, sure,
-      h("p.muted.small", {}, "Everything is stored in this browser only. The game has no accounts, adverts or purchases and collects no personal information."));
   }
 
-  gate();
+  /** Reset or delete a player, each behind its own confirmation. */
+  function player(profile: Profile, refresh: () => void): HTMLElement {
+    const askReset = h("button.plain.danger", { type: "button" }, `Reset ${profile.nickname}'s progress`);
+    const askDelete = h("button.plain.danger", { type: "button" }, `Delete ${profile.nickname}`);
+    const asks = h("div.confirm", {}, askReset, askDelete);
+    const cancel = () => { sureReset.hidden = true; sureDelete.hidden = true; asks.hidden = false; };
+    const sureReset = h("div.confirm", { hidden: true, role: "alertdialog", "aria-label": "Reset progress" },
+      h("p", {}, `Reset all of ${profile.nickname}'s progress? Stars, crystals, treasures, trophies and learning history are cleared. This can't be undone.`),
+      h("button.plain", { type: "button", onClick: cancel }, "Keep progress"),
+      h("button.plain.danger.filled", { type: "button", onClick: () => { model.resetProgress(profile.id); refresh(); } }, "Reset progress"),
+    );
+    const sureDelete = h("div.confirm", { hidden: true, role: "alertdialog", "aria-label": "Delete player" },
+      h("p", {}, `Delete ${profile.nickname}? They and all their progress will be removed from this browser. This can't be undone.`),
+      h("button.plain", { type: "button", onClick: cancel }, "Cancel"),
+      h("button.plain.danger.filled", { type: "button", onClick: () => {
+        model.deleteProfile(profile.id);
+        model.dashboardProfileID = undefined;
+        refresh();
+      } }, "Delete"),
+    );
+    askReset.addEventListener("click", () => { asks.hidden = true; sureReset.hidden = false; });
+    askDelete.addEventListener("click", () => { asks.hidden = true; sureDelete.hidden = false; });
+    return section("Player", asks, sureReset, sureDelete,
+      h("p.muted.small", {}, "Resetting keeps the player and these settings but clears their stars, treasures and learning history. " +
+        "Deleting removes the player completely. Everything is stored in this browser only. The game has no accounts, adverts or " +
+        "purchases and collects no personal information."));
+  }
+
+  if (model.parentUnlocked) dashboard();
+  else gate();
   return { element, destroy: () => cleanUp() };
 }

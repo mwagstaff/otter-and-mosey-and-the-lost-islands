@@ -14,7 +14,7 @@ CATALOG = ROOT / "OtterAndMosey/Assets.xcassets"
 # Longest edge in pixels for each family of sprite.
 LIMITS = {"otter": 760, "mosey": 900, "duo": 1000, "guardian": 900, "island": 560, "fg": 1536, "logo": 1200,
           "crystal": 420, "pearl": 200, "egg": 420, "babydragon": 420, "chest": 420, "ring": 520, "cliff": 700,
-          "jar": 420, "friend": 380, "icon": 256, "reward": 320, "badge": 256}
+          "jar": 420, "friend": 380, "icon": 256, "reward": 320, "badge": 256, "trophy": 420}
 
 
 # Talking frames. Each is the idle picture with only the mouth taken from a generated edit

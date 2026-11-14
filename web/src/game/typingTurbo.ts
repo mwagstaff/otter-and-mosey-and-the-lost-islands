@@ -194,9 +194,8 @@ export class TypingTurboScene extends GameScene {
 
   private completeText(): void {
     if (this.meter.accuracy < 0.9) this.markImperfect();
-    // Speed is only meaningful with a real keyboard; touch typing records accuracy alone.
-    const speed = this.options.inputProfile === "hardware" ? this.meter.wordsPerMinute : undefined;
-    this.session.recordTyping(this.meter.keystrokes, this.meter.correct, speed);
+    // Tapping on-screen keys is far slower than typing, so its speed is recorded separately.
+    this.session.recordTyping(this.meter.keystrokes, this.meter.correct, this.meter.wordsPerMinute, this.options.inputProfile !== "hardware");
     const outcome = this.succeed(this.rider.x + this.rider.width * 0.3, this.rider.y - this.rider.height * 0.4);
     this.pace = Math.min(this.pace + 160, 640);
     if (this.board) run(this.board, sequence(wait(0.25), fadeOut(0.2), remove()), "leave");
