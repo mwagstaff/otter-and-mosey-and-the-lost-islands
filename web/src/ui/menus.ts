@@ -50,6 +50,7 @@ export function titleScreen(model: AppModel): Screen {
       !started && button("teal.big", ["Play", symbol("play")], () => model.play()),
     ),
     h("footer.title-footer", {},
+      ...(import.meta.env.VITE_GAMES_HOME ? [h("a.button.cream.small", { href: import.meta.env.VITE_GAMES_HOME }, "All adventures")] : []),
       button("cream", [picture(profile?.avatar ?? "🙂"), profile?.nickname ?? "Players"], () => model.go({ name: "profiles" }), { "aria-label": "Choose a player" }),
       h("span.grow"),
       button("cream.small", ["Grown-ups"], () => model.go({ name: "parent" })),

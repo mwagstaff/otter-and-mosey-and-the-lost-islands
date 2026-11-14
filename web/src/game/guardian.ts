@@ -195,11 +195,13 @@ export class GuardianScene extends GameScene {
   protected override applyHint(): void {
     const question = this.current;
     if (!question || question.format !== "typed" || !this.slots || !this.acceptingAnswers) return;
-    if (question.flashThenHide) {
+    // Never type the final letter for the child: that would answer the question for them.
+    const target = [...question.typingTarget];
+    const next = target[this.typedIndex];
+    if (question.flashThenHide || next === undefined || this.typedIndex >= target.length - 1) {
       this.slots.flashWord(2.2);
     } else {
-      const next = [...question.typingTarget][this.typedIndex];
-      if (next !== undefined) this.typeNext(next, question, this.slots);
+      this.typeNext(next, question, this.slots);
     }
   }
 

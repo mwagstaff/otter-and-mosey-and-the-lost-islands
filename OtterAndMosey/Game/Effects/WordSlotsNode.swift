@@ -74,9 +74,17 @@ final class WordSlotsNode: SKNode {
         label.removeAction(forKey: "wrong")
         label.string = String(character).lowercased()
         label.colour = UIColor(hex: "#E8743B")
-        label.run(.sequence([.wobble(distance: 5), .wait(forDuration: 0.15), .run { [weak label, accent] in
-            label?.string = "_"
-            label?.colour = accent
+        let letter = answer.indices.contains(gaps[filled]) ? answer[gaps[filled]] : nil
+        label.run(.sequence([.wobble(distance: 5), .wait(forDuration: 0.15), .run { [weak self, weak label] in
+            guard let self, let label else { return }
+            // A hint may have flashed the word up meanwhile: leave the right letter showing, not a gap.
+            if self.action(forKey: "flash") != nil, let letter {
+                label.string = String(letter)
+                label.colour = self.ink
+            } else {
+                label.string = "_"
+                label.colour = self.accent
+            }
         }]), withKey: "wrong")
     }
 

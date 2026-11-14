@@ -1,4 +1,6 @@
 import "@fontsource-variable/nunito";
+// Pixi's CSP-compatible implementations avoid runtime Function/eval generation.
+import "pixi.js/unsafe-eval";
 import { Application } from "pixi.js";
 import { AppModel, playableModes } from "./app/model";
 import { catalog } from "./core";

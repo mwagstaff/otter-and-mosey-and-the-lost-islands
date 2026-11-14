@@ -14,6 +14,8 @@ export class WordSlots extends Container {
   private readonly marker: Sprite;
   private readonly answer: string[];
   private filled = 0;
+  /** True while `flashWord` is showing the hidden letters. */
+  private flashing = false;
 
   /**
    * @param masked the word with `_` for each missing letter.
@@ -84,8 +86,10 @@ export class WordSlots extends Container {
     label.string = character.toLowerCase();
     label.colour = palette.coral;
     run(label, sequence(wobble(5), wait(0.15), call(() => {
-      label.string = "_";
-      label.colour = this.accent;
+      // A hint may have flashed the word up meanwhile: leave the right letter showing, not a gap.
+      const letter = this.flashing ? this.answer[this.labels.indexOf(label)] : undefined;
+      label.string = letter ?? "_";
+      label.colour = letter === undefined ? this.accent : this.ink;
     })), "wrong");
   }
 
@@ -99,7 +103,9 @@ export class WordSlots extends Container {
       this.labels[index]!.colour = this.ink;
     }
     this.marker.visible = false;
+    this.flashing = true;
     run(this, sequence(wait(duration), call(() => {
+      this.flashing = false;
       for (const index of this.gaps.slice(this.filled)) {
         this.labels[index]!.string = "_";
         this.labels[index]!.colour = this.accent;

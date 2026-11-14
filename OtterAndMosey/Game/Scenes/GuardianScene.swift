@@ -165,11 +165,12 @@ final class GuardianScene: GameScene {
 
     override func applyHint() {
         guard let question = current, question.format == .typed, let slots else { return }
-        if question.flashThenHide {
+        // Never type the final letter for the child: that would answer the question for them.
+        let target = Array(question.typingTarget)
+        if question.flashThenHide || typedIndex >= target.count - 1 {
             slots.flashWord(for: 2.2)
         } else {
-            let target = Array(question.typingTarget)
-            if typedIndex < target.count { typeNext(target[typedIndex], question: question, slots: slots) }
+            typeNext(target[typedIndex], question: question, slots: slots)
         }
     }
 

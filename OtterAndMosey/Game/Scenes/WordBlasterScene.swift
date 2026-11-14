@@ -114,13 +114,15 @@ final class WordBlasterScene: GameScene {
     }
 
     /// A hint fills in the next letter, or shows the whole word again for look-cover-write.
+    /// It never types the final letter: that would finish the word for the child and count as a pop,
+    /// so the last letter is flashed up for them to type themselves.
     override func applyHint() {
         guard let question = current, let slots else { return }
-        if question.flashThenHide {
+        let target = Array(question.typingTarget)
+        if question.flashThenHide || typedIndex >= target.count - 1 {
             slots.flashWord(for: 2.2)
         } else {
-            let target = Array(question.typingTarget)
-            if typedIndex < target.count { accept(target[typedIndex], question: question, slots: slots) }
+            accept(target[typedIndex], question: question, slots: slots)
         }
     }
 

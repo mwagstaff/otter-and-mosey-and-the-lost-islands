@@ -118,15 +118,20 @@ export class WordBlasterScene extends GameScene {
     if (this.typedIndex >= [...question.typingTarget].length) this.pop();
   }
 
-  /** A hint fills in the next letter, or shows the whole word again for look-cover-write. */
+  /**
+   * A hint fills in the next letter, or shows the whole word again for look-cover-write.
+   * It never types the final letter: that would finish the word for the child and count as a pop,
+   * so the last letter is flashed up for them to type themselves.
+   */
   protected override applyHint(): void {
     const question = this.current;
     if (!question || !this.slots) return;
-    if (question.flashThenHide) {
+    const target = [...question.typingTarget];
+    const next = target[this.typedIndex];
+    if (question.flashThenHide || next === undefined || this.typedIndex >= target.length - 1) {
       this.slots.flashWord(2.2);
     } else {
-      const next = [...question.typingTarget][this.typedIndex];
-      if (next !== undefined) this.accept(next, question, this.slots);
+      this.accept(next, question, this.slots);
     }
   }
 
