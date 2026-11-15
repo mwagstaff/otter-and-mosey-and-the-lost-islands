@@ -61,7 +61,7 @@ struct MapView: View {
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                             .padding(.bottom, compact ? 6 : 24)
                     } else {
-                        Text("Tap an island to explore")
+                        Text(states.first(where: { $0.isCurrent && $0.unlocked }).map { "Tap \($0.name) to play!" } ?? "Tap an island to explore")
                             .font(.game(compact ? 15 : 22, weight: .bold)).foregroundStyle(Palette.ink)
                             .padding(.horizontal, 16).padding(.vertical, compact ? 5 : 8).panel(radius: 18)
                             .padding(.bottom, compact ? 6 : 24)

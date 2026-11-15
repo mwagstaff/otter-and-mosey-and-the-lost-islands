@@ -176,10 +176,12 @@ final class WorldMapScene: CoverScene {
             let spriteSize = CGSize(width: islandSize, height: islandSize * texture.height / texture.width)
             let colour = SKSpriteNode(texture: Art.texture(art), size: spriteSize)
             let grey = SKSpriteNode(texture: Art.greyTexture(art), size: spriteSize)
-            grey.alpha = state.unlocked ? 1 - state.restoration : 1
+            // Unlocked islands always keep a hint of colour, so they never look like the locked ones.
+            grey.alpha = state.unlocked ? 0.7 * (1 - state.restoration) : 1
             grey.zPosition = 1
             node.addChild(colour)
             node.addChild(grey)
+            let isNext = state.isCurrent && state.unlocked
             if state.hasCrystal {
                 let glow = SKSpriteNode(texture: Art.glow, size: CGSize(width: islandSize * 1.5, height: islandSize * 1.5))
                 glow.color = UIColor(hex: Catalog.shared.island(state.id)?.colour ?? "#FFFFFF")
@@ -202,12 +204,15 @@ final class WorldMapScene: CoverScene {
             // The plate is cut to the measured name, so every typeface gets the same margin.
             let label = GameLabel(state.name, size: fontSize, colour: UIColor(hex: "#0E3B43"))
             let plateSize = CGSize(width: label.frame.width + fontSize * 2.2, height: fontSize * 2.1)
-            let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
+            let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: isNext ? "#FFC83D" : "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
             plate.position = CGPoint(x: 0, y: -spriteSize.height * 0.58)
             plate.zPosition = 4
             label.zPosition = 1
             plate.addChild(label)
             node.addChild(plate)
+            if isNext {
+                addPlayHereMarker(to: node, at: point(index), spriteSize: spriteSize, plateBottom: plate.position.y - plateSize.height / 2)
+            }
             node.position = point(index)
             node.zPosition = 10
             addChild(node)
@@ -236,6 +241,56 @@ final class WorldMapScene: CoverScene {
 
     override func layout() {
         if !states.isEmpty { rebuild() }
+    }
+
+    /// Picks out the island to play next: a pulsing gold glow and a bouncing "Play here!" sign.
+    /// The sign sits above the island, or under its name when an island near the top has no room.
+    private func addPlayHereMarker(to node: SKNode, at position: CGPoint, spriteSize: CGSize, plateBottom: CGFloat) {
+        let glow = SKSpriteNode(texture: Art.glow, size: CGSize(width: islandSize * 1.7, height: islandSize * 1.7))
+        glow.color = UIColor(hex: "#FFC83D")
+        glow.colorBlendFactor = 1
+        glow.blendMode = .add
+        glow.alpha = 0.75
+        glow.zPosition = -2
+        node.addChild(glow)
+
+        let ink = UIColor(hex: "#0E3B43")
+        let fontSize = max(13, islandSize * 0.12)
+        let label = GameLabel("Play here!", size: fontSize, colour: ink)
+        label.zPosition = 1
+        let signSize = CGSize(width: label.frame.width + fontSize * 1.8, height: fontSize * 2.1)
+        let sign = SKSpriteNode(texture: Art.panel(size: signSize, fill: UIColor(hex: "#FFC83D"), stroke: ink, radius: 12, lineWidth: 3), size: signSize)
+        sign.addChild(label)
+        // A little pointer under the sign, aimed at the island.
+        let tip = fontSize * 0.7
+        let path = CGMutablePath()
+        let above = position.y + spriteSize.height * 0.5 + signSize.height + tip * 2 < play.maxY
+        let direction: CGFloat = above ? -1 : 1
+        path.move(to: CGPoint(x: -tip, y: 0))
+        path.addLine(to: CGPoint(x: tip, y: 0))
+        path.addLine(to: CGPoint(x: 0, y: tip * direction))
+        path.closeSubpath()
+        let pointer = SKShapeNode(path: path)
+        pointer.fillColor = UIColor(hex: "#FFC83D")
+        pointer.strokeColor = ink
+        pointer.lineWidth = 3
+        pointer.position = CGPoint(x: 0, y: (signSize.height / 2 - 1.5) * direction)
+        pointer.zPosition = -1
+        sign.addChild(pointer)
+
+        let marker = SKNode()
+        let offset = signSize.height * 0.5 + tip
+        marker.position = CGPoint(x: 0, y: above ? spriteSize.height * 0.5 + offset : plateBottom - offset)
+        marker.zPosition = 6
+        marker.addChild(sign)
+        node.addChild(marker)
+
+        guard !Effects.reducedMotion else { return }
+        glow.run(.repeatForever(.sequence([
+            .group([.scale(to: 1.12, duration: 0.8), .fadeAlpha(to: 0.95, duration: 0.8)]),
+            .group([.scale(to: 0.94, duration: 0.8), .fadeAlpha(to: 0.6, duration: 0.8)]),
+        ]).eased()))
+        marker.run(.repeatForever(.sequence([.moveBy(x: 0, y: 10, duration: 0.45), .moveBy(x: 0, y: -10, duration: 0.45)]).eased()))
     }
 
     private func layoutBoat(animated: Bool) {

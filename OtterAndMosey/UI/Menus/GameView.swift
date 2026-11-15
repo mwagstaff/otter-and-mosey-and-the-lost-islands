@@ -530,6 +530,10 @@ struct LevelCompleteView: View {
                         model.route = .map
                     }) { IconLabel("Next adventure", symbol: "play.fill", size: compact ? 20 : 26, trailing: true) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))
+                } else if model.playtest == nil {
+                    // Replaying the end of an island already finished: nothing new to unlock, so head back to the map.
+                    Button(action: tapped { model.route = .map }) { IconLabel("Continue to map", symbol: "arrow.right", size: compact ? 20 : 26, trailing: true) }
+                        .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))
                 }
             }
             .transition(.move(edge: .bottom).combined(with: .opacity))

@@ -1,6 +1,6 @@
 import { artURL } from "../assets";
 import { playableModes, type AppModel } from "../app/model";
-import { catalog, gameModeTitles, isIslandUnlocked, isLevelUnlocked, starsFor, totalStars, type Island, type LevelDef, type Profile } from "../core";
+import { catalog, gameModeTitles, isIslandUnlocked, isLevelUnlocked, nextLevelFor, starsFor, totalStars, type Island, type LevelDef, type Profile } from "../core";
 import { audio } from "../game/audio";
 import { islandTheme } from "../game/theme";
 import { art, button, h, picture, roundButton, symbol } from "./dom";
@@ -30,13 +30,25 @@ export function dedicationScreen(done: () => void): Screen {
   const element = h("section.screen.dedication", { style: backdrop("bg_title"), onClick: done },
     h("div.veil"),
     h("div.dedication-body", {},
-      h("div.heroes", {}, art("otter_cheer", "hero otter"), art("mosey_cheer", "hero mosey")),
-      h("h1", {}, "Chief playtesters: Skyla and Nova"),
+      h("h1.visually-hidden", {}, "Chief playtesters: Skyla and Nova"),
+      h("div.dedication-row", { "aria-hidden": "true" },
+        rosette("Skyla", "teal"),
+        h("div.heroes", {}, art("otter_cheer", "hero otter"), art("mosey_cheer", "hero mosey")),
+        rosette("Nova", "coral"),
+      ),
       h("p", {}, "Developed by SkyNoLimit.dev"),
       button("cream", ["Tap to continue", symbol("play")], () => {}),
     ),
   );
   return { element, destroy: () => window.clearTimeout(timer) };
+}
+
+/** A prize rosette with a playtester's name in the middle. */
+function rosette(name: string, ribbon: "teal" | "coral"): HTMLElement {
+  return h(`div.rosette.${ribbon}`, {},
+    h("div.rosette-disc", {}, h("div.rosette-face", {}, h("small", {}, "Chief", h("br"), "playtester"), h("strong", {}, name))),
+    h("div.rosette-tails", {}, h("i"), h("i")),
+  );
 }
 
 export function titleScreen(model: AppModel): Screen {
@@ -192,6 +204,9 @@ export function mapScreen(model: AppModel): Screen {
   model.unlockedIsland = undefined;
   const unlockedName = newlyUnlocked ? catalog.island(newlyUnlocked)?.name : undefined;
   if (unlockedName) window.setTimeout(() => audio.play("unlock"), 500);
+  // The island to play next is picked out, so it is obvious where to tap.
+  const nextLevelID = profile ? (nextLevelFor(profile)?.id ?? profile.lastLevelID) : undefined;
+  const current = nextLevelID ? catalog.islandContaining(nextLevelID) : undefined;
   const cards = catalog.islands.map((island, index) => {
     const unlocked = profile !== undefined && isIslandUnlocked(island, profile);
     const stars = profile ? island.levels.reduce((sum, level) => sum + starsFor(profile, level.id), 0) : 0;
@@ -203,7 +218,9 @@ export function mapScreen(model: AppModel): Screen {
       ? h("span.island-detail", {}, `${island.focus} · `, picture("⭐️", "star small"), `${stars}/15`, found && " · ", found && picture("💎", "star small"), found && "found")
       : h("span.island-detail", {}, picture("🔒", "star small"), `Find the ${catalog.islands[Math.max(index - 1, 0)]!.name} crystal first`);
     const fresh = island.id === newlyUnlocked;
-    return button(`island-card${unlocked ? "" : ".locked"}${fresh ? ".just-unlocked" : ""}`, [picked, h("span.island-name", {}, island.name), detail],
+    const isNext = unlocked && island.id === current?.id;
+    return button(`island-card${unlocked ? "" : ".locked"}${fresh ? ".just-unlocked" : ""}${isNext ? ".current" : ""}`,
+      [isNext && h("span.play-here", { "aria-hidden": "true" }, "Play here!"), picked, h("span.island-name", {}, island.name), detail],
       () => model.go({ name: "island", id: island.id }), { disabled: !unlocked });
   });
   const chip = (key: string, text: string) => h("span.count-chip", {}, picture(key), text);
@@ -222,7 +239,7 @@ export function mapScreen(model: AppModel): Screen {
     h("div.islands", {}, ...cards),
     model.breakSuggested
       ? h("p.map-note.break", {}, picture("🌙"), "Great playing today! This is a good moment for a break.")
-      : h("p.map-note", {}, "Tap an island to explore"),
+      : h("p.map-note", {}, current && profile && isIslandUnlocked(current, profile) ? `Tap ${current.name} to play!` : "Tap an island to explore"),
   );
   return { element };
 }

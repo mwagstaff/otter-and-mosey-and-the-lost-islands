@@ -84,7 +84,27 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
 
 .dedication { justify-content: center; cursor: pointer; }
 .dedication-body { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px; text-align: center; color: #fff; }
-.dedication h1 { font-size: clamp(32px, 9vh, 64px); text-shadow: 0 4px 0 var(--ink), 0 6px 14px rgba(0, 0, 0, 0.4); }
+.dedication-row { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 3vw, 36px); }
+.rosette { display: flex; flex-direction: column; align-items: center; width: clamp(116px, 19vh, 150px); flex: none; container-type: inline-size; animation: rosette-in 0.7s 0.25s cubic-bezier(0.3, 1.6, 0.5, 1) backwards; }
+.rosette.coral { animation-delay: 0.4s; }
+.rosette-disc {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 50%;
+  background: repeating-conic-gradient(#ffd45c 0 10deg, var(--gold) 10deg 20deg); border: 4px solid var(--ink); box-shadow: 0 5px 0 var(--ink);
+}
+.rosette-face {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; width: 74%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--cream); border: 3px solid var(--ink); color: var(--ink);
+}
+.rosette small { font-size: 7.4cqw; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.1; }
+.rosette strong { font-size: 17cqw; line-height: 1.15; }
+.rosette-tails { display: flex; gap: 6px; margin-top: -14px; }
+.rosette-tails i { width: clamp(18px, 3.2vh, 24px); height: clamp(30px, 5.4vh, 40px); border: 3px solid var(--ink); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%); }
+.rosette.teal .rosette-tails i { background: var(--teal); }
+.rosette.coral .rosette-tails i { background: var(--coral); }
+.rosette-tails i:first-child { transform: rotate(10deg); }
+.rosette-tails i:last-child { transform: rotate(-10deg); }
+@keyframes rosette-in { from { transform: scale(0) rotate(-30deg); } }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .dedication p { font-size: clamp(15px, 3vh, 22px); font-weight: 700; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); margin-bottom: 4vh; }
 .heroes { display: flex; align-items: flex-end; justify-content: center; gap: 2vw; }
 .dedication .hero.otter { height: 36vh; }
@@ -279,6 +299,19 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
   background: rgba(255, 246, 224, 0.92); font-size: clamp(16px, 3vh, 24px);
 }
 .island-card.locked { background: rgba(255, 246, 224, 0.7); }
+.island-card.current { position: relative; background: #fff3c4; box-shadow: 0 0 0 6px var(--gold), 0 0 28px 10px rgba(255, 200, 61, 0.75), 0 5px 0 var(--ink); animation: current-glow 1.6s ease-in-out infinite; }
+.island-card.current .island-name { background: var(--gold); padding: 0 12px; border-radius: 12px; border: 3px solid var(--ink); }
+.play-here {
+  position: absolute; top: -18px; left: 50%; z-index: 2; padding: 3px 14px; font-size: 0.75em; white-space: nowrap;
+  background: var(--gold); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 3px 0 var(--ink);
+  transform: translateX(-50%); animation: play-here-bounce 0.9s ease-in-out infinite;
+}
+.play-here::after {
+  content: ""; position: absolute; left: 50%; bottom: -11px; width: 14px; height: 14px; transform: translateX(-50%) rotate(45deg);
+  background: var(--gold); border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink);
+}
+@keyframes current-glow { 50% { box-shadow: 0 0 0 8px var(--gold), 0 0 40px 16px rgba(255, 200, 61, 0.95), 0 5px 0 var(--ink); } }
+@keyframes play-here-bounce { 50% { transform: translateX(-50%) translateY(-8px); } }
 .island-art { height: clamp(64px, 17vh, 160px); max-width: 100%; object-fit: contain; }
 .island-detail { font-size: 0.65em; font-weight: 700; opacity: 0.75; }
 
@@ -568,9 +601,9 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .token .trophy-badge, .token .tap, .crystal-showcase .rays, .shard.big, .island-card.just-unlocked, .actions.rise .button { animation: none; }
+  .token .trophy-badge, .token .tap, .crystal-showcase .rays, .shard.big, .island-card.just-unlocked, .island-card.current, .play-here, .actions.rise .button { animation: none; }
 }
-body.calm .token .trophy-badge, body.calm .token .tap, body.calm .crystal-showcase .rays, body.calm .shard.big, body.calm .island-card.just-unlocked, body.calm .actions.rise .button { animation: none; }
+body.calm .token .trophy-badge, body.calm .token .tap, body.calm .crystal-showcase .rays, body.calm .shard.big, body.calm .island-card.just-unlocked, body.calm .island-card.current, body.calm .play-here, body.calm .actions.rise .button { animation: none; }
 
 /* High contrast */
 

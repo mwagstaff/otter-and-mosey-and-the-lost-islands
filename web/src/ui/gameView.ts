@@ -240,6 +240,9 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
         model.unlockedIsland = nextIsland?.id;
         model.go({ name: "map" });
       }),
+      // Replaying the end of an island already finished: nothing new to unlock, so head back to the map.
+      !testing && !earned?.gameComplete && !canGoOn && !earned?.crystalIsland
+        && button("teal.big", ["Continue to map", symbol("arrow")], () => model.go({ name: "map" })),
     );
     const hint = h("p.collect-hint", {}, "Tap your trophies to carry on");
     const trayTitle = h("p.tray-title");
