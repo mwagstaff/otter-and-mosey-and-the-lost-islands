@@ -4,7 +4,7 @@ import { isCorrectTyped, type Question } from "../core";
 import {
   call, easeIn, easeInOut, fadeOut, group, moveBy, moveTo, pop, remove, repeat, rotateTo, run, scaleTo, scaleToXY, sequence, wait, wobble,
 } from "../engine/actions";
-import { texture, tintByTurn } from "../engine/art";
+import { fishBiscuits, texture, tintByTurn } from "../engine/art";
 import { audio } from "./audio";
 import { rainbowBurst } from "./effects";
 import { GameScene, type Sign } from "./gameScene";
@@ -201,11 +201,12 @@ export class EggRescueScene extends GameScene {
 
     // Every rescue is a small surprise: a different friend, colour and size each time.
     const look = this.nextLook();
-    const picture = new Sprite(texture(look.art));
+    const bonusSnack = this.theme.container === "chest" && outcome?.isLevelComplete;
+    const picture = new Sprite(bonusSnack ? fishBiscuits() : texture(look.art));
     picture.anchor.set(0.5);
-    tintByTurn(picture, look.turn);
+    if (!bonusSnack) tintByTurn(picture, look.turn);
     const big = (this.containerSize * 0.8) / Math.max(picture.texture.width, picture.texture.height);
-    picture.scale.set(Math.random() < 0.5 ? -big : big, big);
+    picture.scale.set(!bonusSnack && Math.random() < 0.5 ? -big : big, big);
     const friend = new Container();
     friend.addChild(picture);
     friend.position.set(x, y);

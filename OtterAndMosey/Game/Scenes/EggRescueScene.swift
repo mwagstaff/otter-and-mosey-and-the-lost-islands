@@ -175,8 +175,9 @@ final class EggRescueScene: GameScene {
 
         // Every rescue is a small surprise: a different friend, colour and size each time.
         let look = nextLook()
-        let friend = SKSpriteNode(texture: Art.tintedTexture(look.art, turn: look.turn))
-        if Bool.random() { friend.xScale = -1 }
+        let bonusSnack = theme.container == "chest" && outcome?.isLevelComplete == true
+        let friend = SKSpriteNode(texture: bonusSnack ? Art.fishBiscuits : Art.tintedTexture(look.art, turn: look.turn))
+        if !bonusSnack, Bool.random() { friend.xScale = -1 }
         let texture = friend.texture!.size()
         let big = containerSize * 0.8 / max(texture.width, texture.height)
         friend.size = CGSize(width: texture.width * big, height: texture.height * big)

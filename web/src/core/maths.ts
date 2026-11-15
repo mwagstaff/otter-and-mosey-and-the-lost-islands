@@ -108,6 +108,25 @@ function roundStep(rng: Rng): number {
   return pick(rng, [randomInt(rng, 2, 9), randomInt(rng, 1, 9) * 10, randomInt(rng, 1, 2) * 100]);
 }
 
+/** Partition by place value, including hundreds and regrouping across a ten. */
+export function additionHint(a: number, b: number): string {
+  const parts = [100, 10, 1].filter((place) => Math.floor(a / place) % 10 || Math.floor(b / place) % 10);
+  return parts.map((place) => {
+    const x = Math.floor(a / place) % 10 * place, y = Math.floor(b / place) % 10 * place;
+    return `${place === 100 ? "Hundreds" : place === 10 ? "Tens" : "Ones"}: ${x} + ${y} = ${x + y}.`;
+  }).join(" ") + " Add these totals together.";
+}
+
+export function subtractionHint(a: number, b: number): string {
+  let remaining = a;
+  const steps = [100, 10, 1].map((place) => Math.floor(b / place) % 10 * place).filter((part) => part > 0);
+  return `Start at ${a}. ` + steps.map((part, index) => {
+    const start = remaining;
+    remaining -= part;
+    return index === steps.length - 1 ? `Then take away ${part}.` : `${start} − ${part} = ${remaining}.`;
+  }).join(" ");
+}
+
 function addition(level: number, rng: Rng): Draft {
   let a: number, b: number;
   switch (level) {
@@ -120,7 +139,7 @@ function addition(level: number, rng: Rng): Draft {
   const answer = a + b;
   return {
     prompt: `${a} + ${b} = ?`, answer, near: slips(answer),
-    hint: level <= 2 ? `Start at ${Math.max(a, b)} and count on ${Math.min(a, b)}.` : "Add the tens first, then the ones.",
+    hint: level <= 2 ? `Start at ${Math.max(a, b)} and count on ${Math.min(a, b)}.` : additionHint(a, b),
   };
 }
 
@@ -136,18 +155,18 @@ function subtraction(level: number, rng: Rng): Draft {
   const answer = a - b;
   return {
     prompt: `${a} − ${b} = ?`, answer, near: [...slips(answer), a + b],
-    hint: level <= 2 ? `Start at ${a} and count back ${b}.` : "Take away the tens first, then the ones.",
+    hint: level <= 2 ? `Start at ${a} and count back ${b}.` : subtractionHint(a, b),
   };
 }
 
 function timesFact(table: number, other: number): Draft {
   const answer = table * other;
-  const steps = [1, 2, 3].map((step) => table * step).join(", ");
+  const steps = Array.from({ length: Math.min(3, other) }, (_, index) => index + 1).map((step) => table * step).join(", ");
   return {
     key: `mul:${table}x${other}`,
     prompt: `${other} × ${table} = ?`, answer,
     near: [answer + table, answer - table, answer + other, answer - other, answer + 1, answer - 1, answer + 10].filter(positive),
-    hint: `Count in ${table}s, ${other} times: ${steps}, …`,
+    hint: `Start at 0. Make ${other} ${other === 1 ? "jump" : "jumps"} of ${table}: ${steps}${other > 3 ? ", …" : "."} Count one jump on each finger.`,
     audio: recordedFact("mul", table, other),
   };
 }
@@ -158,7 +177,7 @@ function divisionFact(table: number, quotient: number): Draft {
     key: `div:${table}x${quotient}`,
     prompt: `${dividend} ÷ ${table} = ?`, answer: quotient,
     near: [quotient + 1, quotient - 1, quotient + 2, quotient - 2, table, quotient * 2].filter(positive),
-    hint: `How many ${table}s make ${dividend}? Count in ${table}s.`,
+    hint: `Start at 0 and add ${table} each time until ${dividend}. Count your jumps: that is how many groups.`,
     audio: recordedFact("div", table, quotient),
   };
 }
@@ -237,7 +256,7 @@ function fractions(level: number, rng: Rng): Draft {
     return {
       prompt: `${numerator}/${denominator} of ${whole} = ?`, answer,
       near: [part, whole - part, answer + part, answer - 1, answer + 1].filter(positive),
-      hint: `Find 1/${denominator} of ${whole} first, then multiply by ${numerator}.`,
+      hint: `First share ${whole} into ${denominator} groups: ${whole} ÷ ${denominator} = ${part}. Then add ${numerator} lots of ${part}.`,
       spoken: `What is ${numerator} ${ordinal(denominator)}s of ${whole}?`,
     };
   }
@@ -344,7 +363,7 @@ function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft 
       return {
         prompt: `Otter has ${a} ${things}. Mosey gives him ${b} more. How many now?`, answer: a + b,
         near: [a + b + 1, a + b - 1, a - b, a + b + 10, a + b - 10].filter(positive),
-        hint: `More means add: ${a} + ${b}.`,
+        hint: `More means add. ${additionHint(a, b)}`,
       };
     }
     case 1: {
@@ -353,7 +372,7 @@ function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft 
       return {
         prompt: `Mosey has ${a} ${things}. He gives ${b} away. How many are left?`, answer: a - b,
         near: [a - b + 1, a - b - 1, a + b, a - b + 10, a - b - 10].filter(positive),
-        hint: `Giving away means subtract: ${a} − ${b}.`,
+        hint: `Giving away means subtract. ${subtractionHint(a, b)}`,
       };
     }
     case 2: {

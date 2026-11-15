@@ -258,7 +258,7 @@ Otter should be animated and highly expressive.
 
 MOSEY
 
-A beautiful bright-blue female mosasaur.
+A friendly bright-blue boy mosasaur.
 
 Appearance:
 
@@ -268,7 +268,7 @@ Appearance:
 * Large expressive eyes
 * Four swimming flippers
 * Long aquatic tail
-* Small golden star accessory
+* No eyelashes and nothing round his neck (he is a boy; see docs/art-proposals/mosey-boy)
 
 IMPORTANT:
 

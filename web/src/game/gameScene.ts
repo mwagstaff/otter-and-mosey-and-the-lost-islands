@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import { catalog, type AnswerOutcome, type ChallengeSession, type InputProfile, type Island, type Question } from "../core";
-import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, run, scaleTo, sequence, wait } from "../engine/actions";
-import { loadArt, iconName, mix, palette, panel } from "../engine/art";
+import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, rotateTo, run, scaleTo, sequence, wait } from "../engine/actions";
+import { fishBiscuit, fishBiscuits, iconSprite, loadArt, iconName, mix, palette, panel } from "../engine/art";
 import { GameLabel } from "../engine/label";
 import { audio, narrator } from "./audio";
 import { Backdrop } from "./backdrop";
@@ -72,7 +72,7 @@ export abstract class GameScene {
   protected current?: Question;
   protected firstTry = true;
   protected usedHint = false;
-  /** Pearls scooped and pearls there were to scoop, for the trophy cabinet (Maths Splash). */
+  /** Collected/offered items; legacy pearl keys preserve saved trophy progress. */
   pearlsScooped = 0;
   pearlsOffered = 0;
   protected slips = 0;
@@ -94,7 +94,7 @@ export abstract class GameScene {
 
   /** The pictures to load before the scene is built. */
   art(): string[] {
-    const blooms = this.theme.blooms.map(iconName).filter((name) => name !== undefined);
+    const blooms = [...this.theme.blooms, this.theme.snack].map(iconName).filter((name) => name !== undefined);
     const hat = this.options.accessory === undefined ? undefined : iconName(this.options.accessory);
     return [this.theme.background, this.theme.foreground, ...characterArt("otter"), ...characterArt("mosey"), ...blooms, ...(hat ? [hat] : [])];
   }
@@ -331,7 +331,51 @@ export abstract class GameScene {
       this.bloom(6);
       this.otter.celebrate();
       this.mosey.celebrate();
-      this.after(2.4, () => this.bridge.set({ result: { ...this.session.result, pearls: this.pearlsScooped, pearlsOffered: this.pearlsOffered } }));
+      this.shareSnack();
+      this.after(4, () => this.bridge.set({ result: { ...this.session.result, pearls: this.pearlsScooped, pearlsOffered: this.pearlsOffered } }));
+    });
+  }
+
+  private shareSnack(): void {
+    const bonus = this.session.level.mode === "eggRescue" && this.theme.container === "chest";
+    const packet = bonus || this.theme.snack === "fish_biscuits";
+    this.bridge.set({ hintText: undefined, caption: `${bonus ? "All chests opened! Bonus snack: " : "Snack time! "}Otter and Mosey share ${packet ? "fish biscuits" : this.theme.snackName}.` });
+    if (packet) {
+      const bag = new Sprite(fishBiscuits());
+      bag.anchor.set(0.5);
+      bag.setSize(72, 90);
+      bag.position.set(this.play.midX, this.play.y + this.play.height * 0.45);
+      bag.zIndex = 60;
+      this.world.addChild(bag);
+      run(bag, sequence(wait(6), fadeOut(0.3), remove()));
+    }
+    // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
+    // (or flippers) until the level closes, so the snack is still there during the chat
+    // that follows and nobody misses it.
+    [this.otter, this.mosey].forEach((hero, index) => {
+      const snack = packet ? new Sprite(fishBiscuit()) : iconSprite(this.theme.snack, 64);
+      snack.anchor.set(0.5);
+      const side = Math.max(this.compact ? 40 : 52, hero.size * 0.34);
+      const ratio = side / Math.max(snack.texture.width, snack.texture.height);
+      const facing = hero.facingLeft ? -1 : 1;
+      if (hero === this.otter) snack.position.set(facing * hero.size * 0.14, -hero.size * 0.62);
+      else snack.position.set(facing * hero.size * 0.36, -hero.size * 0.08);
+      snack.zIndex = 50;
+      snack.scale.set(0);
+      hero.addChild(snack);
+      const bite = call(() => {
+        if (!snack.parent) return;
+        audio.play("pop", 0.35);
+        const point = this.world.toLocal(snack.getGlobalPosition());
+        burst(this.world, point.x, point.y, "#E8B46A", 8, 70);
+      });
+      const nibble = (to: number) => sequence(
+        bite,
+        group(scaleTo(ratio * to * 0.88, 0.08), rotateTo(0.12 * facing, 0.08)),
+        group(scaleTo(ratio * to, 0.12), rotateTo(0, 0.12)),
+        wait(0.9),
+      );
+      run(snack, sequence(wait(0.15 * index), scaleTo(ratio, 0.25, easeInOut), wait(0.9), nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48)));
     });
   }
 

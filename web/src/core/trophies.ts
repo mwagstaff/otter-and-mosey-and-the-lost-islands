@@ -18,7 +18,7 @@ export type TrophyCounter =
   | "stars" | "pearls" | "answers" | "firstTry" | "words" | "maths" | "streak" | "typing" | "levels" | "friendship" | "days" | "crystals";
 
 export const counterUnits: Record<TrophyCounter, string> = {
-  stars: "stars", pearls: "pearls", answers: "right answers", firstTry: "right first time", words: "words spelt",
+  stars: "stars", pearls: "items collected", answers: "right answers", firstTry: "right first time", words: "words spelt",
   maths: "maths answers", streak: "in a row", typing: "words a minute", levels: "levels played",
   friendship: "Friendship Power uses", days: "days played", crystals: "fragments",
 };
@@ -76,7 +76,7 @@ export const trophyTables = [2, 3, 4, 5, 8, 10];
 
 export const trophyLadders: readonly TrophyLadder[] = [
   { id: "stars", title: "Star Collector", counter: "stars", rungs: [10, 30, 60, 90], art: () => "badge_stars-30" },
-  { id: "pearls", title: "Pearl Diver", counter: "pearls", rungs: [25, 100, 250, 500], art: () => "badge_pearls" },
+  { id: "pearls", title: "Island Collector", counter: "pearls", rungs: [25, 100, 250, 500], art: () => "badge_pearls" },
   { id: "answers", title: "Busy Brain", counter: "answers", rungs: [50, 100, 250, 500, 1000], art: (rung) => (rung < 250 ? "badge_answers-50" : "badge_answers-250") },
   { id: "first-try", title: "Sharp Shooter", counter: "firstTry", rungs: [25, 100, 250, 500], art: () => "badge_sharp-shooter" },
   { id: "words", title: "Wordsmith", counter: "words", rungs: [40, 150, 400], art: () => "badge_wordsmith" },
@@ -152,7 +152,7 @@ function build(catalog: Catalog): Trophy[] {
   const secrets: [string, string, string, string, TrophyRule["kind"]][] = [
     ["comeback", "Comeback Kid", "Get a question right after two wrong tries.", "Try, try and try again…", "comeback"],
     ["never-give-up", "Never Give Up", "Turn a one-star level into three stars.", "One becomes three…", "neverGiveUp"],
-    ["pearl-perfect", "Pearl Perfect", "Scoop every pearl in a Maths Splash level.", "Every pearl, every time…", "pearlPerfect"],
+    ["pearl-perfect", "Perfect Collector", "Collect every item in a Maths Splash level by tapping or steering.", "Every item, every time…", "pearlPerfect"],
     ["turbo-ace", "Turbo Ace", "Type with no slips at all in Typing Turbo.", "Faster than a comet, with no slips…", "turboAce"],
     ["hat-trick", "Hat Trick", "Finish three levels in a row wearing a hat.", "Wear it, wear it, wear it!", "hatTrick"],
     ["old-friends", "Old Friends", "Visit a guardian you’ve already befriended.", "Pop in on a friend…", "oldFriends"],

@@ -3,6 +3,11 @@ export type Ambient = "fireflies" | "bubbles" | "embers" | "sparkles" | "sprinkl
 /** The look of one island: which art to use and how its ambient effects behave. */
 export interface IslandTheme {
   id: string;
+  collectible: string;
+  collectInstruction: string;
+  gateDecoration: string;
+  snack: string;
+  snackName: string;
   tint: string;
   ambient: Ambient;
   /** Little things that pop up as the island recovers. */
@@ -36,6 +41,7 @@ export function islandTheme(island: string): IslandTheme {
   const look = looks[id]!;
   return {
     ...look,
+    ...activities[id]!,
     id,
     music: `music_${id}`,
     background: `bg_${id}`,
@@ -45,3 +51,12 @@ export function islandTheme(island: string): IslandTheme {
     islandArt: `island_${id}`,
   };
 }
+
+const activities: Record<string, Pick<IslandTheme, "collectible" | "collectInstruction" | "gateDecoration" | "snack" | "snackName">> = {
+  woods: { collectible: "🍓", collectInstruction: "Tap berries to eat them, or drag to collect!", gateDecoration: "🌸", snack: "🍓", snackName: "berries" },
+  bay: { collectible: "pearl", collectInstruction: "Tap pearls to pop them, or drag to collect!", gateDecoration: "🐚", snack: "fish_biscuits", snackName: "fish biscuits" },
+  dragon: { collectible: "💎", collectInstruction: "Tap gems to pop them, or drag to collect!", gateDecoration: "💎", snack: "🍪", snackName: "warm cookies" },
+  cloud: { collectible: "☁️", collectInstruction: "Tap clouds to pop them, or drag to collect!", gateDecoration: "🌈", snack: "🧁", snackName: "cloud cakes" },
+  candy: { collectible: "🍬", collectInstruction: "Tap candies to eat them, or drag to collect!", gateDecoration: "🍬", snack: "🍬", snackName: "candies" },
+  star: { collectible: "⭐️", collectInstruction: "Tap stars to pop them, or drag to collect!", gateDecoration: "⭐️", snack: "🍪", snackName: "star cookies" },
+};

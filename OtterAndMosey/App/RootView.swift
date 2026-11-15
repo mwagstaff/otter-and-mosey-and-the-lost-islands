@@ -21,7 +21,7 @@ struct RootView: View {
                     .transition(.opacity)
                     .zIndex(20)
             }
-            if model.showSettings {
+            if model.showSettings && model.parentUnlocked {
                 SettingsOverlay()
                     .transition(.opacity)
                     .zIndex(10)
@@ -95,7 +95,7 @@ struct DedicationView: View {
                     }
                     .scaleEffect(shown ? 1 : 0.8, anchor: .bottom)
                     .accessibilityHidden(true)
-                    Text("For Skyla and Nova")
+                    Text("Chief playtesters: Skyla and Nova")
                         .font(.game(compact ? 40 : 64 * scale))
                         .gameTracking()
                         .foregroundStyle(.white)

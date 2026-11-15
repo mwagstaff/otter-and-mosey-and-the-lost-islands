@@ -21,6 +21,17 @@ import Testing
         for name in names { #expect(Art.hasAsset(name), "missing art: \(name)") }
     }
 
+    @Test func everyIslandHasThemedCollectiblesAndNumberFrames() {
+        let themes = ["woods", "bay", "dragon", "cloud", "candy", "star"].map(IslandTheme.island)
+        #expect(themes.map(\.collectible) == ["🍓", "pearl", "💎", "☁️", "🍬", "⭐️"])
+        #expect(themes.map(\.gateDecoration) == ["🌸", "🐚", "💎", "🌈", "🍬", "⭐️"])
+        for theme in themes {
+            #expect(!theme.snackName.isEmpty && !theme.snack.isEmpty)
+            #expect(theme.collectInstruction.contains("Tap") && theme.collectInstruction.contains("drag"))
+        }
+        #expect(Art.fishBiscuits.size() == CGSize(width: 160, height: 200))
+    }
+
     @Test func everySoundEffectAndMusicTrackIsBundled() {
         for effect in SFX.allCases {
             #expect(Bundle.main.url(forResource: effect.rawValue, withExtension: "m4a") != nil, "missing sound: \(effect.rawValue)")

@@ -77,6 +77,7 @@ struct GameHUD: View {
 /// The hint bubble, praise toasts and the Friendship Power meter that sit just under the HUD.
 struct HUDExtras: View {
     var bridge: GameBridge
+    var onHintHeight: (CGFloat) -> Void = { _ in }
     @State private var toastVisible = false
     @Environment(\.compact) private var compact
 
@@ -91,7 +92,8 @@ struct HUDExtras: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .panel(fill: Palette.gold.opacity(0.95), radius: 16)
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { onHintHeight($0) }
+                .transition(.opacity)
             }
             HStack {
                 if let charge = bridge.friendship {

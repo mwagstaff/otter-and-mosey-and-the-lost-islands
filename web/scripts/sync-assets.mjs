@@ -2,6 +2,7 @@
 // of what exists. The iOS project stays the single source: nothing here is edited by hand,
 // and the copies are git-ignored. Runs before `npm run dev` and `npm run build`.
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,6 +34,12 @@ function prune(folder, keep) {
   }
 }
 
+// A short hash of a file's contents. It goes on each asset's URL (`?v=`), so a changed picture,
+// sound or voice clip gets a new URL and is never served from a browser or CDN cache.
+function version(path) {
+  return createHash("sha1").update(readFileSync(path)).digest("hex").slice(0, 8);
+}
+
 function folder(name) {
   const path = join(out, name);
   mkdirSync(path, { recursive: true });
@@ -50,9 +57,9 @@ for (const set of readdirSync(catalogue).filter((name) => name.endsWith(".images
   const name = set.replace(/\.imageset$/, "");
   const target = name + extname(file).toLowerCase();
   copy(join(catalogue, set, file), join(artOut, target));
-  art[name] = `art/${target}`;
+  art[name] = `art/${target}?v=${version(join(catalogue, set, file))}`;
 }
-prune(artOut, new Set(Object.values(art).map((path) => path.slice(4))));
+prune(artOut, new Set(Object.values(art).map((path) => path.slice(4).split("?")[0])));
 
 // Sound effects and music, keyed by file name without the extension.
 const audio = {};
@@ -60,18 +67,18 @@ const audioOut = folder("audio");
 const audioIn = join(ios, "Resources", "Audio");
 for (const file of readdirSync(audioIn).filter((name) => /\.(m4a|mp3)$/.test(name)).sort()) {
   copy(join(audioIn, file), join(audioOut, file));
-  audio[file.replace(/\.[^.]+$/, "")] = `audio/${file}`;
+  audio[file.replace(/\.[^.]+$/, "")] = `audio/${file}?v=${version(join(audioIn, file))}`;
 }
-prune(audioOut, new Set(Object.values(audio).map((path) => path.slice(6))));
+prune(audioOut, new Set(Object.values(audio).map((path) => path.slice(6).split("?")[0])));
 
-// Narration and dialogue: `say_<key>.mp3`. Only the keys go in the manifest.
-const speech = [];
+// Narration and dialogue: `say_<key>.mp3`. The manifest maps each key to its version hash.
+const speech = {};
 const speechOut = folder("speech");
 const speechIn = join(ios, "Resources", "Speech");
 const speechFiles = readdirSync(speechIn).filter((name) => /^say_.+\.mp3$/.test(name)).sort();
 for (const file of speechFiles) {
   copy(join(speechIn, file), join(speechOut, file));
-  speech.push(file.slice(4, -4));
+  speech[file.slice(4, -4)] = version(join(speechIn, file));
 }
 prune(speechOut, new Set(speechFiles));
 
@@ -82,6 +89,6 @@ const manifestPath = join(generated, "assets.json");
 if (!existsSync(manifestPath) || readFileSync(manifestPath, "utf8") !== manifest) writeFileSync(manifestPath, manifest);
 
 console.log(
-  `assets: ${Object.keys(art).length} pictures, ${Object.keys(audio).length} sounds, ${speech.length} voice clips` +
+  `assets: ${Object.keys(art).length} pictures, ${Object.keys(audio).length} sounds, ${Object.keys(speech).length} voice clips` +
     ` (${copied} copied, ${removed} removed)`,
 );

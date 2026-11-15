@@ -3,9 +3,9 @@
 
 Sprites are trimmed to their painted area, scaled down and palette-compressed; scenery
 becomes JPEG. Requires ImageMagick (`magick`) and `pngquant` (both from Homebrew).
-Usage: python3 tools/import_art.py
+Usage: python3 tools/import_art.py [name ...]   (names limit the import to those sprites)
 """
-import json, pathlib, shutil, subprocess
+import json, pathlib, shutil, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RAW = ROOT / "tools/raw"
@@ -20,7 +20,7 @@ LIMITS = {"otter": 760, "mosey": 900, "duo": 1000, "guardian": 900, "island": 56
 # Talking frames. Each is the idle picture with only the mouth taken from a generated edit
 # (tools/raw/<name>_talk_gen.png), so the rest of the character cannot shift between frames.
 # Values are the mouth area in the 1024-pixel raw image: centre x, centre y, radius x, radius y.
-MOUTHS = {"otter": (640, 300, 110, 75), "mosey": (890, 465, 115, 70)}
+MOUTHS = {"otter": (640, 300, 110, 75), "mosey": (900, 465, 125, 70)}
 
 
 def build_talk_frames():
@@ -31,14 +31,14 @@ def build_talk_frames():
         mask = RAW / ".mouth_mask.png"
         subprocess.run(["magick", "-size", "1024x1024", "xc:black", "-fill", "white", "-draw",
                         f"ellipse {cx},{cy} {rx},{ry} 0,360", "-blur", "0x7", str(mask)], check=True)
-        # Cut the mouth out of the edit (its own transparency times the soft mask), then lay that
-        # patch over the untouched idle picture.
-        patch = RAW / ".mouth_patch.png"
-        subprocess.run(["magick", str(edit), "(", "+clone", "-alpha", "extract", str(mask), "-compose", "Multiply", "-composite", ")",
-                        "-alpha", "off", "-compose", "CopyOpacity", "-composite", str(patch)], check=True)
-        subprocess.run(["magick", str(idle), str(patch), "-compose", "Over", "-composite", str(talk)], check=True)
+        # Blend from the idle picture to the edit through the soft mask, transparency included, so
+        # anything the edit removed (such as the tip of a jaw that has dropped open) goes too.
+        # Colours are weighted by their opacity so transparent pixels add no dark fringe.
+        blend = "mk=u[2].r; al=u.a*(1-mk)+v.a*mk; al>0 ? (u*u.a*(1-mk)+v*v.a*mk)/al : 0"
+        subprocess.run(["magick", str(idle), str(edit), str(mask),
+                        "(", "-clone", "0-2", "-fx", blend, ")", "(", "-clone", "0-2", "-fx", "mk=u[2].r; u.a*(1-mk)+v.a*mk", ")",
+                        "-delete", "0-2", "-alpha", "off", "-compose", "CopyOpacity", "-composite", str(talk)], check=True)
         mask.unlink()
-        patch.unlink()
         # Prove it: with the mouth area painted over in both, the two frames must be identical.
         cover = ["-fill", "black", "-draw", f"rectangle {cx - rx - 30},{cy - ry - 30} {cx + rx + 30},{cy + ry + 30}"]
         covered = [RAW / ".covered_idle.png", RAW / ".covered_talk.png"]
@@ -76,8 +76,11 @@ def main():
     tmp.mkdir(exist_ok=True)
     build_talk_frames()
     count = 0
+    only = set(sys.argv[1:])
     for path in sorted(RAW.glob("*.png")):
         name = path.stem
+        if only and name not in only:
+            continue
         if name.endswith("_ref") or name.endswith("_gen"):
             continue
         if name == "app_icon":

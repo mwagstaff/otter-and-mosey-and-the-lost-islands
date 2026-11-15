@@ -248,3 +248,36 @@ export function speechBubble(): Texture {
     context.fill();
   });
 }
+
+/** A sealed snack packet, clearly distinct from the rescued fish. */
+export function fishBiscuits(): Texture {
+  return drawn("fish-biscuits", 160, 200, (context) => {
+    context.fillStyle = "#FFE4A3";
+    context.strokeStyle = palette.ink;
+    context.lineWidth = 5;
+    context.beginPath(); context.roundRect(6, 5, 148, 190, 16); context.fill(); context.stroke();
+    context.fillStyle = "#29B6E8";
+    context.fillRect(9, 12, 142, 16); context.fillRect(9, 174, 142, 14);
+    context.fillStyle = palette.ink;
+    context.textAlign = "center";
+    context.font = "bold 23px sans-serif";
+    context.fillText("FISH", 80, 58); context.fillText("BISCUITS", 80, 85);
+    context.fillStyle = "#D59643";
+    context.beginPath(); context.ellipse(75, 128, 34, 21, 0, 0, Math.PI * 2); context.fill();
+    context.beginPath(); context.moveTo(100, 128); context.lineTo(130, 107); context.lineTo(130, 149); context.closePath(); context.fill();
+    context.fillStyle = palette.ink;
+    context.beginPath(); context.arc(57, 123, 3, 0, Math.PI * 2); context.fill();
+  });
+}
+
+export function fishBiscuit(): Texture {
+  return drawn("fish-biscuit", 100, 64, (context) => {
+    context.fillStyle = "#D59643";
+    context.strokeStyle = "#855522";
+    context.lineWidth = 3;
+    context.beginPath(); context.ellipse(39, 32, 32, 22, 0, 0, Math.PI * 2); context.fill(); context.stroke();
+    context.beginPath(); context.moveTo(65, 32); context.lineTo(94, 10); context.lineTo(94, 54); context.closePath(); context.fill(); context.stroke();
+    context.fillStyle = "#855522";
+    context.beginPath(); context.arc(23, 27, 3, 0, Math.PI * 2); context.fill();
+  });
+}

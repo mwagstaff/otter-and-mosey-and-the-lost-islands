@@ -106,7 +106,7 @@ export function parentScreen(model: AppModel): Screen {
         h("div.card", {},
           h("h2", {}, "No players yet"),
           h("p.muted", {}, "Create a player from the title screen to see their progress here.")),
-        playtest(undefined)));
+        playtest(undefined), section("Sound and accessibility", settingsControls(model))));
       return;
     }
     const refresh = () => dashboard();

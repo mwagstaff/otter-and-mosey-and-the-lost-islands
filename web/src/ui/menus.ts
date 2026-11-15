@@ -4,7 +4,7 @@ import { catalog, gameModeTitles, isIslandUnlocked, isLevelUnlocked, starsFor, t
 import { audio } from "../game/audio";
 import { islandTheme } from "../game/theme";
 import { art, button, h, picture, roundButton, symbol } from "./dom";
-import { openSettings } from "./settings";
+import { editName, keyboardRows } from "./keyboard";
 import { trophiesButton } from "./trophies";
 
 /** One of the game's screens: what to show, and how to tidy up when it is left. */
@@ -31,7 +31,7 @@ export function dedicationScreen(done: () => void): Screen {
     h("div.veil"),
     h("div.dedication-body", {},
       h("div.heroes", {}, art("otter_cheer", "hero otter"), art("mosey_cheer", "hero mosey")),
-      h("h1", {}, "For Skyla and Nova"),
+      h("h1", {}, "Chief playtesters: Skyla and Nova"),
       h("p", {}, "Developed by SkyNoLimit.dev"),
       button("cream", ["Tap to continue", symbol("play")], () => {}),
     ),
@@ -47,15 +47,17 @@ export function titleScreen(model: AppModel): Screen {
     h("div.heroes", {}, art("otter_idle", "hero otter bob"), art("mosey_idle", "hero mosey bob slow")),
     h("div.title-actions", {},
       started && button("teal.big", ["Continue", symbol("play")], () => model.continueGame()),
-      started && h("div.title-row", {}, button("gold", [picture("🗺️"), "World map"], () => model.play()), trophiesButton(model)),
+      started && trophiesButton(model),
       !started && button("teal.big", ["Play", symbol("play")], () => model.play()),
     ),
-    h("footer.title-footer", {},
-      ...(import.meta.env.VITE_GAMES_HOME ? [h("a.button.cream.small", { href: import.meta.env.VITE_GAMES_HOME }, "All adventures")] : []),
-      button("cream", [picture(profile?.avatar ?? "🙂"), profile?.nickname ?? "Players"], () => model.go({ name: "profiles" }), { "aria-label": "Choose a player" }),
+    h("header.title-header", {},
+      ...(import.meta.env.VITE_GAMES_HOME ? [h("a.button.cream.small", { href: import.meta.env.VITE_GAMES_HOME }, symbol("back"), "All adventures")] : []),
       h("span.grow"),
-      button("cream.small", ["Grown-ups"], () => model.go({ name: "parent" })),
-      roundButton("gear", "Settings", () => openSettings(model)),
+      button("cream", [picture(profile?.avatar ?? "🙂"), profile?.nickname ?? "Players"], () => model.go({ name: "profiles" }), { "aria-label": "Choose a player" }),
+    ),
+    h("footer.title-footer", {},
+      h("span.grow"),
+      button("cream.small", [symbol("gear"), "Grown-ups"], () => model.go({ name: "parent" })),
     ),
   );
   return { element };
@@ -114,7 +116,7 @@ export function profilesScreen(model: AppModel): Screen {
     let avatar = avatars[0]!;
     const shown = h("span.avatar-shown", {}, picture(avatar, "avatar"));
     const name = h<"input">("input.nickname", {
-      type: "text", placeholder: "Nickname", maxlength: 12, autocomplete: "off", autocapitalize: "words", spellcheck: "false", "aria-label": "Nickname",
+      type: "text", required: true, inputmode: "none", "aria-describedby": "name-help name-hint", placeholder: "Nickname", maxlength: 12, autocomplete: "off", autocapitalize: "words", spellcheck: "false", "aria-label": "Nickname",
     });
     const choices = avatars.map((choice) => {
       const option = button(`avatar-choice${choice === avatar ? ".chosen" : ""}`, [picture(choice, "avatar")], () => {
@@ -125,7 +127,7 @@ export function profilesScreen(model: AppModel): Screen {
       return option;
     });
     // Filled in only when "Let's go!" is pressed with no name, so screen readers hear it then.
-    const hint = h("p.name-hint", { "aria-live": "polite" });
+    const hint = h("p.name-hint", { id: "name-hint", "aria-live": "polite" });
     const askForName = () => {
       hint.replaceChildren(art("otter_idle", "name-hint-art"), h("span", {}, "What shall we call you? Type your name in the box!"));
       hint.classList.add("shown");
@@ -150,9 +152,14 @@ export function profilesScreen(model: AppModel): Screen {
     };
     name.addEventListener("keydown", (event) => { if (event.key === "Enter") go(); });
     body.replaceChildren(h("div.profile-form.panel", {},
+      h("p.name-help", { id: "name-help" }, "What shall we call you? Pick a nickname to start!"),
       h("div.name-row", {}, shown, name),
       hint,
       h("div.avatar-row", {}, ...choices),
+      h("div.name-keyboard", { role: "group", "aria-label": "Nickname keyboard" },
+        ...keyboardRows({ kind: "qwerty", space: true }, (key) => editName(name, key), () => editName(name, "Backspace")),
+        h("div.key-row", {}, ...["-", "’"].map((key) => button("cream.name-punctuation", [key], () => editName(name, key)))),
+      ),
       h("div.actions", {},
         model.save.profiles.length > 0 && button("cream", ["Cancel"], list),
         button("teal.big", ["Let's go!", symbol("play")], go),

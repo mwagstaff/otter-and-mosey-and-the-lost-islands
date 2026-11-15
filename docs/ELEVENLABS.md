@@ -40,8 +40,8 @@ guidelines"): it does not generate children's voices. These were the rejected de
   humour. Clean studio recording."
 
 The voices in use are therefore adult voice actors performing youthful cartoon characters,
-which is how most animation is voiced. Otter is a girl, voiced by a woman; Mosey is a boy, voiced
-by a young man. Do not try to reword the request to obtain a child's voice.
+which is how most animation is voiced (boy characters are often voiced by women). Otter is
+voiced by a woman; Mosey is now voiced by a man (see below). Do not try to reword the request to obtain a child's voice.
 
 ### Voice Design requests that were accepted
 
@@ -66,9 +66,16 @@ parameters). Script: `tools/sfx/design-voices.mjs`.
   steady, kind and reassuring, unhurried, with quiet wonder and a little playful humour. Clear
   southern English accent. Clean studio recording."
 
-Mosey's first voice was "an adult British voice actress in her twenties performing a gentle cartoon
-sea creature", which made him sound like a girl. It was replaced with the voice above and all of
-his lines were re-recorded.
+**Mosey now uses Daniel, a premade ElevenLabs voice** (British, male, "Steady Broadcaster", voice
+ID `onwK4e9ZLuTAKqWW03F9`), not a designed one. His lines measure about 127 Hz.
+
+How he got there: his first voice was "an adult British voice actress in her twenties performing a
+gentle cartoon sea creature" (about 250 Hz), which made him sound like a girl. The designed "boy"
+voice above replaced it, but measured only about 205 Hz and sounded much the same in the game.
+Asking Voice Design for "a British man with a deep voice" (two more rounds, previews in
+`docs/voice-poc/mosey-deeper/`) kept giving two high voices (about 280 Hz) and one very deep,
+growly one (about 80 Hz) per round. Daniel and George (both premade) were tried reading Mosey's
+lines, and Daniel was chosen by ear.
 - `text`: "Welcome to my favourite place. Maths, under the sea. Stay close, Otter, and follow me.
   Each right answer builds a rainbow plank, so there is no need to rush. Look, the flowers are
   waking up. We did it together, and that is the real magic."
@@ -90,10 +97,10 @@ before the rest were recorded.
 | Mosey 3 (first voice) | 235 Hz | 113 Hz | |
 | Mosey boy 1 | 286 Hz | 168 Hz | |
 | Mosey boy 2 | 302 Hz | 167 Hz | |
-| Mosey boy 3 | 200 Hz | 91 Hz | **Yes**, chosen by ear |
+| Mosey boy 3 | 200 Hz | 91 Hz | Kept briefly, then replaced by Daniel |
 
-The boy previews are in `docs/voice-poc/mosey-boy/`. The pitch measurement only looks between
-120 Hz and 600 Hz, so it can read a man's voice an octave high; judge deeper voices by ear.
+The boy previews are in `docs/voice-poc/mosey-boy/`. The pitch measurement in `design-voices.mjs` now
+looks between 70 Hz and 600 Hz, but it is rough; judge voices by ear.
 
 Kept previews were saved to the account with `client.textToVoice.create({ voiceName,
 voiceDescription, generatedVoiceId })`:
@@ -101,7 +108,7 @@ voiceDescription, generatedVoiceId })`:
 | Character | Voice name in the account | Voice ID |
 | --- | --- | --- |
 | Otter | Otter (Lost Islands) | `sYN0fMdsZGmW5GjQDfRo` |
-| Mosey | Mosey (Lost Islands) | `pdpnPCm7zMxCzdfHpCyH` |
+| Mosey | Daniel (premade; not designed) | `onwK4e9ZLuTAKqWW03F9` |
 
 Preview IDs expire, so previews 2 and 3 can no longer be saved as they are. To get a different
 voice, run the design step again (new previews each time), listen, then keep one:

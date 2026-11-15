@@ -5,7 +5,7 @@ import manifest from "./generated/assets.json";
 
 const art: Record<string, string> = manifest.art;
 const audio: Record<string, string> = manifest.audio;
-const speech = new Set(manifest.speech);
+const speech: Record<string, string> = manifest.speech;
 const base = `${import.meta.env.BASE_URL}assets/`;
 
 export function hasArt(name: string): boolean {
@@ -27,5 +27,6 @@ export function audioURL(name: string): string {
 
 /** The recording for a narrator or dialogue clip key, if there is one. */
 export function speechURL(key: string | undefined): string | undefined {
-  return key !== undefined && speech.has(key) ? `${base}speech/say_${key}.mp3` : undefined;
+  const version = key === undefined ? undefined : speech[key];
+  return version === undefined ? undefined : `${base}speech/say_${key}.mp3?v=${version}`;
 }

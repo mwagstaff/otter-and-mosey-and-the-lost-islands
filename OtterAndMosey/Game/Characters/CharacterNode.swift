@@ -145,6 +145,12 @@ final class CharacterNode: SKNode {
         return "\(kind.rawValue)_\(suffix)"
     }
 
+    /// The resting sprite's width and height on screen, for laying characters out side by side.
+    var footprint: CGSize {
+        let idle = Art.texture(textureName(.idle)).size()
+        return CGSize(width: idle.width * unitScale, height: idle.height * unitScale)
+    }
+
     func resize(_ newSize: CGFloat) {
         size = newSize
         let idle = Art.texture(textureName(.idle)).size()

@@ -283,8 +283,9 @@ class GameScene: SKScene {
                 self.bloom(count: 6)
                 self.otter.celebrate()
                 self.mosey.celebrate()
+                self.shareSnack()
             },
-            .wait(forDuration: 2.4),
+            .wait(forDuration: 4),
             .run { [weak self] in
                 guard let self else { return }
                 var result = self.session.result
@@ -293,6 +294,52 @@ class GameScene: SKScene {
                 self.bridge.result = result
             },
         ]))
+    }
+
+    private func shareSnack() {
+        let bonus = session.level.mode == .eggRescue && theme.container == "chest"
+        let packet = bonus || theme.snack == "fish_biscuits"
+        bridge.hintText = nil
+        bridge.caption = "\(bonus ? "All chests opened! Bonus snack: " : "Snack time! ")Otter and Mosey share \(packet ? "fish biscuits" : theme.snackName)."
+        if packet {
+            let bag = SKSpriteNode(texture: Art.fishBiscuits, size: CGSize(width: 72, height: 90))
+            bag.position = CGPoint(x: play.midX, y: play.minY + play.height * 0.55)
+            bag.zPosition = 60
+            addChild(bag)
+            bag.run(.sequence([.wait(forDuration: 6), .fadeOut(withDuration: 0.3), .removeFromParent()]))
+        }
+        // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
+        // (or flippers) until the level closes, so the snack is still there during the chat
+        // that follows and nobody misses it.
+        for (index, hero) in [otter, mosey].compactMap({ $0 }).enumerated() {
+            let snack = SKSpriteNode(texture: packet ? Art.fishBiscuit : Art.emoji(theme.snack))
+            let side = max(compact ? 40 : 52, hero.size * 0.34)
+            let textureSize = snack.texture!.size()
+            let ratio = side / max(textureSize.width, textureSize.height)
+            snack.size = CGSize(width: textureSize.width * ratio, height: textureSize.height * ratio)
+            let facing: CGFloat = hero.facingLeft ? -1 : 1
+            snack.position = hero === otter
+                ? CGPoint(x: facing * hero.size * 0.14, y: hero.size * 0.62)
+                : CGPoint(x: facing * hero.size * 0.36, y: hero.size * 0.08)
+            snack.zPosition = 50
+            snack.setScale(0)
+            hero.addChild(snack)
+            let bite = SKAction.run { [weak self, weak snack] in
+                guard let self, let snack, snack.parent != nil else { return }
+                AudioManager.shared.play(.pop, volume: 0.35)
+                Effects.burst(at: self.convert(.zero, from: snack), colour: UIColor(hex: "#E8B46A"), count: 8, in: self, z: 70)
+            }
+            let nibble = { (to: CGFloat) -> SKAction in
+                .sequence([bite, .group([.scale(to: to * 0.88, duration: 0.08), .rotate(toAngle: 0.12 * facing, duration: 0.08)]),
+                           .group([.scale(to: to, duration: 0.12), .rotate(toAngle: 0, duration: 0.12)]), .wait(forDuration: 0.9)])
+            }
+            snack.run(.sequence([
+                .wait(forDuration: 0.15 * Double(index)),
+                SKAction.scale(to: 1, duration: 0.25).eased(),
+                .wait(forDuration: 0.9),
+                nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48),
+            ]))
+        }
     }
 
     // MARK: - Helpers

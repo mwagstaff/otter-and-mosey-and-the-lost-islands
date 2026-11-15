@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Mosey Boy Proposal</title>
+<style>
+  :root { --ink: #3b2a1e; --card: rgba(255, 251, 240, 0.9); }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1600px; height: 1000px; font-family: "Avenir Next", "Trebuchet MS", sans-serif; color: var(--ink);
+         background: #8fd3e8 url(bg_bay.jpg) center / cover no-repeat; position: relative; overflow: hidden; }
+  h1 { position: absolute; top: 22px; left: 0; right: 0; margin: 0; text-align: center; font-size: 40px; font-weight: 800;
+       color: #fff; text-shadow: 0 3px 0 #3b2a1e, 0 0 18px rgba(0,0,0,.35); }
+  .row { position: absolute; top: 96px; left: 30px; right: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .card { background: var(--card); border: 4px solid var(--ink); border-radius: 28px; padding: 12px 14px 16px; text-align: center;
+          box-shadow: 0 8px 0 rgba(59,42,30,.35); }
+  .card.now { opacity: .82; }
+  .card img { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; }
+  .card h2 { margin: 2px 0 4px; font-size: 26px; }
+  .card p { margin: 0; font-size: 18px; line-height: 1.3; }
+  .tag { display: inline-block; font-size: 15px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #3b2a1e; color: #fff; margin-bottom: 6px; }
+  .scene { position: absolute; left: 0; right: 0; bottom: 0; height: 410px; }
+  .scene .otter { position: absolute; left: 250px; bottom: 40px; height: 270px; transform: scaleX(1); }
+  .scene .mosey { position: absolute; left: 470px; bottom: -10px; height: 380px; }
+  .bubble { position: absolute; left: 860px; bottom: 210px; width: 560px; background: #fffaf0; border: 4px solid var(--ink);
+            border-radius: 26px; padding: 18px 24px; font-size: 26px; font-weight: 600; box-shadow: 0 8px 0 rgba(59,42,30,.35); }
+  .bubble b { display: block; font-size: 20px; color: #1f6fa8; margin-bottom: 4px; }
+  .bubble::before { content: ""; position: absolute; left: -26px; bottom: 34px; border: 14px solid transparent; border-right: 22px solid var(--ink); }
+</style>
+</head>
+<body>
+  <h1>Mosey as a boy: three options</h1>
+  <div class="row">
+    <div class="card now"><img src="current.png" alt="Current Mosey"><span class="tag">Now</span><h2>Current</h2><p>Eyelashes and a star necklace read as a girl.</p></div>
+    <div class="card"><img src="option_a.png" alt="Option A"><span class="tag">Option A</span><h2>Plain</h2><p>No lashes, bolder brow, cheeky grin. Nothing round his neck.</p></div>
+    <div class="card"><img src="option_b.png" alt="Option B"><span class="tag">Option B</span><h2>Neckerchief</h2><p>Orange adventurer's neckerchief with a stitched gold star.</p></div>
+    <div class="card"><img src="option_c.png" alt="Option C"><span class="tag">Option C</span><h2>Explorer strap</h2><p>Leather strap across his chest with a gold star badge.</p></div>
+  </div>
+  <div class="scene">
+    <img class="otter" src="otter_idle.png" alt="">
+    <img class="mosey" src="option_b.png" alt="">
+    <div class="bubble"><b>Mosey</b>Look, a word bubble by that flower. Try the missing letter!</div>
+  </div>
+</body>
+</html>

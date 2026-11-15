@@ -49,11 +49,7 @@ struct TitleView: View {
                         if let profile = model.profile, profile.seenIntro {
                             Button(action: tapped { model.continueGame() }) { IconLabel("Continue", symbol: "play.fill", size: compact ? 26 : 36) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 26 : 36, minWidth: compact ? 250 : 320))
-                            HStack(spacing: compact ? 10 : 14) {
-                                Button(action: tapped { model.play() }) { IconLabel("World map", emoji: "🗺", size: compact ? 19 : 26) }
-                                    .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 19 : 26))
-                                TrophiesButton(size: compact ? 19 : 26)
-                            }
+                            TrophiesButton(size: compact ? 19 : 26)
                         } else {
                             Button(action: tapped { model.play() }) { IconLabel("Play", symbol: "play.fill", size: compact ? 30 : 40) }
                                 .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 30 : 40, minWidth: compact ? 250 : 320))
@@ -61,10 +57,10 @@ struct TitleView: View {
                     }
                     .padding(.bottom, compact ? 12 : 44)
                 }
-                .padding(.top, compact ? 0 : 20)
+                .padding(.top, compact ? 48 : 64)
                 VStack {
-                    Spacer()
-                    HStack(alignment: .bottom) {
+                    HStack {
+                        Spacer()
                         Button(action: tapped { model.route = .profiles }) {
                             HStack(spacing: 6) {
                                 Glyph(model.profile?.avatar ?? "🙂", size: compact ? 26 : 34).padding(.vertical, -6)
@@ -72,10 +68,16 @@ struct TitleView: View {
                             }
                         }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
+                    }
+                    .padding(.horizontal, compact ? 8 : 28)
+                    .padding(.top, compact ? 8 : 20)
+                    Spacer()
+                    HStack {
                         Spacer()
-                        Button("Grown-ups", action: tapped { model.route = .parent })
-                            .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 14 : 18))
-                        RoundButton(symbol: "gearshape.fill", size: compact ? 54 : 64, label: "Settings") { model.showSettings = true }
+                        Button(action: tapped { model.route = .parent }) {
+                            IconLabel("Grown-ups", symbol: "gearshape.fill", size: compact ? 14 : 18)
+                        }
+                        .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 14 : 18))
                     }
                     .padding(.horizontal, compact ? 8 : 28)
                     .padding(.bottom, compact ? 10 : 28)
@@ -100,7 +102,6 @@ struct ProfilesView: View {
     @State private var askingForName = false
     /// Goes up by one per wobble; the field wiggles as it animates to the new value.
     @State private var nameWobbles: CGFloat = 0
-    @FocusState private var nameFocused: Bool
     private static let nameHint = "What shall we call you? Type your name in the box!"
     private let avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"]
 
@@ -116,7 +117,15 @@ struct ProfilesView: View {
                         Spacer()
                         Color.clear.frame(width: 54, height: 54)
                     }
-                    if adding || model.save.profiles.isEmpty { form(compact: compact) } else { list(compact: compact) }
+                    if adding || model.save.profiles.isEmpty {
+                        ScrollView {
+                            form(compact: compact)
+                                .frame(maxWidth: .infinity)
+                        }
+                        GameKeyboard(kind: .qwerty(space: true), width: geometry.size.width - (compact ? 20 : 56),
+                                     onKey: typeName, onBackspace: deleteName)
+                            .background(HardwareKeys(onKey: typeName, onBackspace: deleteName).frame(width: 0, height: 0))
+                    } else { list(compact: compact) }
                     Spacer(minLength: 0)
                 }
                 .padding(compact ? 10 : 28)
@@ -174,22 +183,22 @@ struct ProfilesView: View {
         VStack(spacing: compact ? 8 : 16) {
             HStack(spacing: 12) {
                 Glyph(avatar, size: compact ? 52 : 72)
-                TextField("Nickname", text: $nickname)
+                Text(nickname.isEmpty ? "Nickname" : nickname)
                     .font(.game(compact ? 24 : 32))
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .focused($nameFocused)
+                    .foregroundStyle(nickname.isEmpty ? Palette.ink.opacity(0.5) : Palette.ink)
+                    .frame(maxWidth: 340, alignment: .leading)
+                    .accessibilityLabel("Nickname")
+                    .accessibilityValue(nickname.isEmpty ? "Not entered" : nickname)
                     .padding(.horizontal, 14)
                     .padding(.vertical, compact ? 6 : 10)
                     .background(RoundedRectangle(cornerRadius: 14).fill(.white).overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(askingForName ? Palette.coral : Palette.ink, lineWidth: askingForName ? 4 : 3)))
                     .frame(maxWidth: 340)
                     .modifier(Wobble(wobbles: nameWobbles))
-                    .onSubmit(letsGo)
                     .onChange(of: nickname) { _, value in
                         if value.count > 12 { nickname = String(value.prefix(12)) }
                         if askingForName, !value.trimmingCharacters(in: .whitespaces).isEmpty { askingForName = false }
                     }
+                RoundButton(symbol: "delete.left", size: compact ? 44 : 54, label: "Delete letter", action: deleteName)
             }
             if askingForName {
                 HStack(spacing: 8) {
@@ -227,6 +236,16 @@ struct ProfilesView: View {
         .frame(maxWidth: 760)
     }
 
+    private func typeName(_ character: Character) {
+        guard nickname.count < 12, character.isLetter || character == " " || character == "-" || character == "’" else { return }
+        let startsWord = nickname.isEmpty || nickname.last == " " || nickname.last == "-"
+        nickname += startsWord ? String(character).uppercased() : String(character)
+    }
+
+    private func deleteName() {
+        if !nickname.isEmpty { nickname.removeLast() }
+    }
+
     /// Creates the player, or, with no name typed yet, gives the box a friendly wiggle and asks for one.
     private func letsGo() {
         guard !nickname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -235,11 +254,9 @@ struct ProfilesView: View {
             if !model.settings.reducedMotion {
                 withAnimation(.easeInOut(duration: 0.6)) { nameWobbles += 1 }
             }
-            nameFocused = true
             AccessibilityNotification.Announcement(Self.nameHint).post()
             return
         }
-        nameFocused = false
         askingForName = false
         model.createProfile(nickname: nickname, avatar: avatar)
         adding = false

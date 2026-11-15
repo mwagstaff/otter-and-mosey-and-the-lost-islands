@@ -23,6 +23,7 @@ export class GameBridge {
   hintText?: string;
   toast = "";
   toastID = 0;
+  usedOnScreenKeyboard = false;
   keyboard: KeyboardKind = { kind: "none" };
   /** Friendship Power charge from 0 to 1, or undefined when the meter is hidden. */
   friendship?: number;

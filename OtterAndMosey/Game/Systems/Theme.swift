@@ -19,6 +19,29 @@ struct IslandTheme {
     /// True when the heroes swim or float through this island's travel levels.
     let underwater: Bool
 
+    var collectible: String {
+        switch id { case "woods": "🍓"; case "bay": "pearl"; case "dragon": "💎"; case "cloud": "☁️"; case "candy": "🍬"; default: "⭐️" }
+    }
+    var gateDecoration: String {
+        switch id { case "woods": "🌸"; case "bay": "🐚"; case "dragon": "💎"; case "cloud": "🌈"; case "candy": "🍬"; default: "⭐️" }
+    }
+    var collectInstruction: String {
+        switch id {
+        case "woods": "Tap berries to eat them, or drag to collect!"
+        case "bay": "Tap pearls to pop them, or drag to collect!"
+        case "dragon": "Tap gems to pop them, or drag to collect!"
+        case "cloud": "Tap clouds to pop them, or drag to collect!"
+        case "candy": "Tap candies to eat them, or drag to collect!"
+        default: "Tap stars to pop them, or drag to collect!"
+        }
+    }
+    var snack: String {
+        switch id { case "woods": "🍓"; case "bay": "fish_biscuits"; case "cloud": "🧁"; case "candy": "🍬"; default: "🍪" }
+    }
+    var snackName: String {
+        switch id { case "woods": "berries"; case "bay": "fish biscuits"; case "dragon": "warm cookies"; case "cloud": "cloud cakes"; case "candy": "candies"; default: "star cookies" }
+    }
+
     var background: String { "bg_\(id)" }
     var foreground: String { "fg_\(id)" }
     var guardian: String { "guardian_\(guardianKind)" }

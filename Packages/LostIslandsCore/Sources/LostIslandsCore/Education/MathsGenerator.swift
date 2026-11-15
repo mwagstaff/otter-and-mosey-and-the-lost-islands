@@ -105,6 +105,25 @@ public enum MathsGenerator {
 
     // MARK: - Number operations
 
+    static func additionHint(_ a: Int, _ b: Int) -> String {
+        let places = [100, 10, 1].filter { a / $0 % 10 != 0 || b / $0 % 10 != 0 }
+        return places.map { place in
+            let x = a / place % 10 * place, y = b / place % 10 * place
+            let name = place == 100 ? "Hundreds" : place == 10 ? "Tens" : "Ones"
+            return "\(name): \(x) + \(y) = \(x + y)."
+        }.joined(separator: " ") + " Add these totals together."
+    }
+
+    static func subtractionHint(_ a: Int, _ b: Int) -> String {
+        var remaining = a
+        let steps = [100, 10, 1].map { b / $0 % 10 * $0 }.filter { $0 > 0 }
+        return "Start at \(a). " + steps.enumerated().map { index, part in
+            let start = remaining
+            remaining -= part
+            return index == steps.count - 1 ? "Then take away \(part)." : "\(start) − \(part) = \(remaining)."
+        }.joined(separator: " ")
+    }
+
     static func addition<R: RandomNumberGenerator>(_ level: Int, _ rng: inout R) -> Draft {
         let a: Int, b: Int
         switch level {
@@ -121,7 +140,7 @@ public enum MathsGenerator {
         return Draft(
             prompt: "\(a) + \(b) = ?", answer: answer,
             near: slips(around: answer),
-            hint: level <= 2 ? "Start at \(max(a, b)) and count on \(min(a, b))." : "Add the tens first, then the ones."
+            hint: level <= 2 ? "Start at \(max(a, b)) and count on \(min(a, b))." : additionHint(a, b)
         )
     }
 
@@ -141,18 +160,18 @@ public enum MathsGenerator {
         return Draft(
             prompt: "\(a) − \(b) = ?", answer: answer,
             near: slips(around: answer) + [a + b],
-            hint: level <= 2 ? "Start at \(a) and count back \(b)." : "Take away the tens first, then the ones."
+            hint: level <= 2 ? "Start at \(a) and count back \(b)." : subtractionHint(a, b)
         )
     }
 
     static func timesFact(_ table: Int, _ other: Int) -> Draft {
         let answer = table * other
-        let steps = (1...3).map { String(table * $0) }.joined(separator: ", ")
+        let steps = (1...min(3, other)).map { String(table * $0) }.joined(separator: ", ")
         return Draft(
             key: "mul:\(table)x\(other)",
             prompt: "\(other) × \(table) = ?", answer: answer,
             near: [answer + table, answer - table, answer + other, answer - other, answer + 1, answer - 1, answer + 10].filter { $0 > 0 },
-            hint: "Count in \(table)s, \(other) times: \(steps), …",
+            hint: "Start at 0. Make \(other) \(other == 1 ? "jump" : "jumps") of \(table): \(steps)\(other > 3 ? ", …" : ".") Count one jump on each finger.",
             audio: recordedFact("mul", table, other)
         )
     }
@@ -163,7 +182,7 @@ public enum MathsGenerator {
             key: "div:\(table)x\(quotient)",
             prompt: "\(dividend) ÷ \(table) = ?", answer: quotient,
             near: [quotient + 1, quotient - 1, quotient + 2, quotient - 2, table, quotient * 2].filter { $0 > 0 },
-            hint: "How many \(table)s make \(dividend)? Count in \(table)s.",
+            hint: "Start at 0 and add \(table) each time until \(dividend). Count your jumps: that is how many groups.",
             audio: recordedFact("div", table, quotient)
         )
     }
@@ -241,7 +260,7 @@ public enum MathsGenerator {
             let whole = denominator * part
             return Draft(prompt: "\(numerator)/\(denominator) of \(whole) = ?", answer: numerator * part,
                          near: [part, whole - part, numerator * part + part, numerator * part - 1, numerator * part + 1].filter { $0 > 0 },
-                         hint: "Find 1/\(denominator) of \(whole) first, then multiply by \(numerator).",
+                         hint: "First share \(whole) into \(denominator) groups: \(whole) ÷ \(denominator) = \(part). Then add \(numerator) lots of \(part).",
                          spoken: "What is \(numerator) \(ordinal(denominator))s of \(whole)?")
         default:
             let denominator = [5, 6, 7, 8, 9, 10].randomElement(using: &rng)!
@@ -341,13 +360,13 @@ public enum MathsGenerator {
             let b = Int.random(in: (level <= 2 ? 3...9 : 11...28), using: &rng)
             return Draft(prompt: "Otter has \(a) \(things). Mosey gives him \(b) more. How many now?", answer: a + b,
                          near: [a + b + 1, a + b - 1, a - b, a + b + 10, a + b - 10].filter { $0 > 0 },
-                         hint: "More means add: \(a) + \(b).")
+                         hint: "More means add. \(additionHint(a, b))")
         case 1:
             let a = Int.random(in: (level <= 2 ? 10...20 : 30...90), using: &rng)
             let b = Int.random(in: (level <= 2 ? 2...8 : 11...25), using: &rng)
             return Draft(prompt: "Mosey has \(a) \(things). He gives \(b) away. How many are left?", answer: a - b,
                          near: [a - b + 1, a - b - 1, a + b, a - b + 10, a - b - 10].filter { $0 > 0 },
-                         hint: "Giving away means subtract: \(a) − \(b).")
+                         hint: "Giving away means subtract. \(subtractionHint(a, b))")
         case 2:
             let table = MathsGenerator.tables(for: max(level, 2), from: tables).randomElement(using: &rng)!
             let groups = Int.random(in: 2...(level <= 2 ? 5 : 9), using: &rng)

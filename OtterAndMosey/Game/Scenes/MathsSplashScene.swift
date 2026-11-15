@@ -11,6 +11,7 @@ final class MathsSplashScene: GameScene {
     private var phase = Phase.cruising
     private var gates: [SKNode] = []
     private var pearls: [SKSpriteNode] = []
+    private var originalGateSize: CGFloat = 1
     private var pace: CGFloat = 120
     private var targetPace: CGFloat = 120
     private var targetY: CGFloat = 0
@@ -44,21 +45,25 @@ final class MathsSplashScene: GameScene {
         // The play area shrinks when the speech panel appears; keep Mosey in view above it.
         targetY = min(max(targetY, lanes[2]), lanes[0])
         mosey.position = CGPoint(x: swimmerX, y: targetY)
-        for (index, gate) in gates.enumerated() where phase == .choosing { gate.position = CGPoint(x: gateX, y: lanes[index]) }
+        for (index, gate) in gates.enumerated() where phase == .choosing { gate.position = CGPoint(x: gateX, y: lanes[index]); gate.setScale(gateSize / originalGateSize) }
     }
 
     override func caption(for question: Question) -> String { question.prompt }
 
     override func present(_ question: Question) {
         phase = .arriving
+        originalGateSize = gateSize
         gates.forEach { $0.removeFromParent() }
         gates = []
         for (index, choice) in question.choices.enumerated() {
             let gate = SKNode()
             gate.name = choice
-            let ring = SKSpriteNode(texture: Art.texture("ring"), size: CGSize(width: gateSize, height: gateSize))
-            ring.name = "ring"
-            gate.addChild(ring)
+            for petal in 0..<8 {
+                let decoration = SKSpriteNode(texture: Art.emoji(theme.gateDecoration), size: CGSize(width: gateSize * 0.28, height: gateSize * 0.28))
+                let angle = CGFloat(petal) * .pi / 4
+                decoration.position = CGPoint(x: cos(angle) * gateSize * 0.36, y: sin(angle) * gateSize * 0.36)
+                gate.addChild(decoration)
+            }
             let plateSize = CGSize(width: gateSize * 0.7, height: gateSize * 0.46)
             let plate = makeSign(text: choice, size: plateSize, fontSize: plateSize.height * 0.66)
             plate.zPosition = 1
@@ -72,7 +77,7 @@ final class MathsSplashScene: GameScene {
             gate.run(arrive)
         }
         targetPace = 40
-        run(.sequence([.wait(forDuration: 1.0), .run { [weak self] in self?.phase = .choosing }]))
+        run(.sequence([.wait(forDuration: 1.0), .run { [weak self] in self?.phase = .choosing; self?.layout() }]))
     }
 
     // MARK: - Touch
@@ -83,6 +88,11 @@ final class MathsSplashScene: GameScene {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
+        if let item = pearls.first(where: { hypot($0.position.x - point.x, $0.position.y - point.y) <= max(24, $0.size.width * 0.6) }) {
+            collect(item)
+            pearls.removeAll { $0 === item }
+            return
+        }
         if phase == .choosing, point.x > swimmerX + mosey.size * 0.5 {
             choose(lane(at: point.y))
         } else {
@@ -146,17 +156,25 @@ final class MathsSplashScene: GameScene {
     }
 
     private func spawnPearls() {
-        bridge.caption = "Drag up and down to scoop the pearls!"
+        bridge.caption = theme.collectInstruction
         let lane = Int.random(in: 0...2)
         pearlsOffered += 5
         for index in 0..<5 {
-            let pearl = SKSpriteNode(texture: Art.texture("pearl"), size: CGSize(width: gateSize * 0.36, height: gateSize * 0.36))
+            let pearl = SKSpriteNode(texture: Art.emoji(theme.collectible), size: CGSize(width: gateSize * 0.36, height: gateSize * 0.36))
             let wave = sin(CGFloat(index) * 0.9) * play.height * 0.12
             pearl.position = CGPoint(x: size.width + 30 + CGFloat(index) * gateSize * 0.6, y: clampY(lanes[lane] + wave))
             pearl.zPosition = 14
             addChild(pearl)
             pearls.append(pearl)
         }
+    }
+
+    private func collect(_ item: SKSpriteNode) {
+        guard item.parent != nil else { return }
+        pearlsScooped += 1
+        AudioManager.shared.play(.pop, volume: 0.6)
+        Effects.burst(at: item.position, colour: theme.tint, count: 8, in: self)
+        item.removeFromParent()
     }
 
     // MARK: - Frame loop
@@ -175,10 +193,7 @@ final class MathsSplashScene: GameScene {
         for pearl in pearls {
             pearl.position.x -= 280 * delta
             if abs(pearl.position.x - swimmerX) < mosey.size * 0.45, abs(pearl.position.y - y) < mosey.size * 0.3 {
-                pearlsScooped += 1
-                AudioManager.shared.play(.star, volume: 0.6)
-                Effects.burst(at: pearl.position, colour: UIColor(hex: "#FFD9F0"), count: 8, in: self)
-                pearl.removeFromParent()
+                collect(pearl)
             } else if pearl.position.x < -40 {
                 pearl.removeFromParent()
             }

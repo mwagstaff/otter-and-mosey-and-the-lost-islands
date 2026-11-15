@@ -23,7 +23,7 @@ public enum TrophyCounter: String, CaseIterable, Sendable {
     public var unit: String {
         switch self {
         case .stars: "stars"
-        case .pearls: "pearls"
+        case .pearls: "items collected"
         case .answers: "right answers"
         case .firstTry: "right first time"
         case .words: "words spelt"
@@ -124,7 +124,7 @@ public enum Trophies {
 
     public static let ladders: [TrophyLadder] = [
         TrophyLadder(id: "stars", title: "Star Collector", counter: .stars, rungs: [10, 30, 60, 90]) { _ in "badge_stars-30" },
-        TrophyLadder(id: "pearls", title: "Pearl Diver", counter: .pearls, rungs: [25, 100, 250, 500]) { _ in "badge_pearls" },
+        TrophyLadder(id: "pearls", title: "Island Collector", counter: .pearls, rungs: [25, 100, 250, 500]) { _ in "badge_pearls" },
         TrophyLadder(id: "answers", title: "Busy Brain", counter: .answers, rungs: [50, 100, 250, 500, 1000]) { $0 < 250 ? "badge_answers-50" : "badge_answers-250" },
         TrophyLadder(id: "first-try", title: "Sharp Shooter", counter: .firstTry, rungs: [25, 100, 250, 500]) { _ in "badge_sharp-shooter" },
         TrophyLadder(id: "words", title: "Wordsmith", counter: .words, rungs: [40, 150, 400]) { _ in "badge_wordsmith" },
@@ -210,7 +210,7 @@ public enum Trophies {
         let secrets: [(String, String, String, String, TrophyRule)] = [
             ("comeback", "Comeback Kid", "Get a question right after two wrong tries.", "Try, try and try again…", .comeback),
             ("never-give-up", "Never Give Up", "Turn a one-star level into three stars.", "One becomes three…", .neverGiveUp),
-            ("pearl-perfect", "Pearl Perfect", "Scoop every pearl in a Maths Splash level.", "Every pearl, every time…", .pearlPerfect),
+            ("pearl-perfect", "Perfect Collector", "Collect every item in a Maths Splash level by tapping or steering.", "Every item, every time…", .pearlPerfect),
             ("turbo-ace", "Turbo Ace", "Type with no slips at all in Typing Turbo.", "Faster than a comet, with no slips…", .turboAce),
             ("hat-trick", "Hat Trick", "Finish three levels in a row wearing a hat.", "Wear it, wear it, wear it!", .hatTrick),
             ("old-friends", "Old Friends", "Visit a guardian you’ve already befriended.", "Pop in on a friend…", .oldFriends),

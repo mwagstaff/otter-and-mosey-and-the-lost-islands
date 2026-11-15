@@ -17,6 +17,7 @@ struct GameView: View {
     @State private var paused = false
     @State private var summary: RewardSummary?
     @State private var result: LevelResult?
+    @State private var hintHeight: CGFloat = 0
     @State private var hardware = InputDetector.hasHardwareKeyboard
 
     var body: some View {
@@ -30,7 +31,10 @@ struct GameView: View {
                 if stage == .playing || stage == .outro {
                     VStack(spacing: 4) {
                         GameHUD(bridge: bridge) { paused = true }
-                        HUDExtras(bridge: bridge)
+                        HUDExtras(bridge: bridge) { height in
+                            hintHeight = height
+                            applyInsets(geometry: geometry, compact: compact)
+                        }
                         Spacer(minLength: 0)
                         if !hardware, stage == .playing, bridge.dialogue.isEmpty {
                             GameKeyboard(kind: bridge.keyboard, width: geometry.size.width - 16,
@@ -68,6 +72,10 @@ struct GameView: View {
                 #endif
             }
             .onChange(of: geometry.size) { _, _ in applyInsets(geometry: geometry, compact: compact) }
+            .onChange(of: bridge.hintText) { _, hint in
+                if hint == nil { hintHeight = 0 }
+                applyInsets(geometry: geometry, compact: compact)
+            }
             .onChange(of: hardware) { _, _ in applyInsets(geometry: geometry, compact: compact) }
             .onChange(of: stage) { _, _ in applyInsets(geometry: geometry, compact: compact) }
             .onChange(of: bridge.dialogue.isEmpty) { _, _ in applyInsets(geometry: geometry, compact: compact) }
@@ -127,7 +135,7 @@ struct GameView: View {
         // just above the speech panel instead, so the panel never covers the characters and the
         // scenery is not left floating over an empty gap.
         let bottom = playing ? reservedKeys(compact: compact) : DialogueView.reservedHeight(compact: compact)
-        return UIEdgeInsets(top: safe.top + GameHUD.height(compact: compact, scale: ScreenMetrics.scale(geometry)) + 6, left: safe.leading + 8,
+        return UIEdgeInsets(top: safe.top + GameHUD.height(compact: compact, scale: ScreenMetrics.scale(geometry)) + 6 + (bridge.hintText == nil ? 0 : hintHeight + 12), left: safe.leading + 8,
                             bottom: safe.bottom + bottom, right: safe.trailing + 8)
     }
 
@@ -203,7 +211,6 @@ struct PauseView: View {
                 Button(action: tapped(resume)) { IconLabel("Keep playing", symbol: "play.fill", size: compact ? 22 : 28) }.buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 260))
                 HStack(spacing: 12) {
                     Button(action: tapped(restart)) { IconLabel("Start again", symbol: "arrow.counterclockwise", size: compact ? 17 : 22) }.buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
-                    Button(action: tapped { model.showSettings = true }) { IconLabel("Sound", symbol: "gearshape.fill", size: compact ? 17 : 22) }.buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 17 : 22))
                     Button(action: tapped(quit)) {
                         if model.playtest != nil {
                             IconLabel("Dashboard", symbol: "chart.bar.fill", size: compact ? 17 : 22)

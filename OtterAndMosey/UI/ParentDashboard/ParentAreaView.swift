@@ -107,6 +107,9 @@ struct ParentDashboardView: View {
                     List {
                         ContentUnavailableView("No players yet", systemImage: "person.crop.circle.badge.plus", description: Text("Create a player from the title screen to see their progress here."))
                         playtest(nil)
+                        Section("Sound and accessibility") {
+                            SettingsControls(compact: true)
+                        }
                     }
                 }
             }

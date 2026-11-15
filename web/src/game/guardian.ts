@@ -74,10 +74,33 @@ export class GuardianScene extends GameScene {
     this.badge.position.set(this.guardian.x - this.guardianWidth * 0.42, this.guardian.y - height * 0.78);
     this.otter.resize(Math.min(play.height * 0.36, 250));
     this.mosey.resize(Math.min(play.height * 0.46, 330));
-    this.otter.position.set(play.x + play.width * 0.1, this.groundY);
-    this.mosey.position.set(play.x + play.width * 0.2, this.groundY - play.height * 0.27);
+    this.placeHeroes();
     this.sign?.position.set(this.signX, this.signY);
     this.layoutOrbs();
+  }
+
+  /**
+   * Otter stands on the left with Mosey beside him. Where the screen is too narrow for that
+   * (4:3 iPads, and phones once the answer orbs are out), Mosey hovers just above Otter's head
+   * instead, so the two of them never cover each other.
+   */
+  private placeHeroes(): void {
+    const play = this.play;
+    // Keep clear of the leftmost answer orb (three orbs, centred under the sign).
+    const laneRight = this.signX - this.orbSize * 1.75 - 8;
+    // On squarer screens Mosey can be wider than the space left of the orbs, so she shrinks to fit.
+    if (this.mosey.size > laneRight - play.x) this.mosey.resize(Math.max(laneRight - play.x, 80));
+    const otter = this.otter.footprint;
+    const mosey = this.mosey.footprint;
+    const otterX = play.x + Math.max(play.width * 0.08, otter.width * 0.5);
+    this.otter.position.set(otterX, this.groundY);
+    const besideX = otterX + otter.width * 0.5 + mosey.width * 0.52;
+    if (besideX + mosey.width * 0.45 <= laneRight) {
+      this.mosey.position.set(besideX, this.groundY - mosey.height * 0.62);
+    } else {
+      const x = Math.min(otterX + otter.width * 0.2, laneRight - mosey.width * 0.45);
+      this.mosey.position.set(Math.max(x, play.x + mosey.width * 0.45), this.groundY - otter.height * 1.02 - mosey.height * 0.5);
+    }
   }
 
   protected override start(): void {

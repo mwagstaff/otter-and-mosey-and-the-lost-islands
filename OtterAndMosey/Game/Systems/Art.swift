@@ -139,6 +139,39 @@ enum Art {
         return texture
     }
 
+    /// A sealed snack packet, distinct from the rescued fish.
+    static var fishBiscuits: SKTexture {
+        drawn("fish-biscuits", size: CGSize(width: 160, height: 200)) { context, _ in
+            let packet = UIBezierPath(roundedRect: CGRect(x: 6, y: 5, width: 148, height: 190), cornerRadius: 16)
+            UIColor(hex: "#FFE4A3").setFill(); packet.fill()
+            UIColor(hex: "#0E3B43").setStroke(); packet.lineWidth = 5; packet.stroke()
+            context.setFillColor(UIColor(hex: "#29B6E8").cgColor)
+            context.fill(CGRect(x: 9, y: 12, width: 142, height: 16))
+            context.fill(CGRect(x: 9, y: 174, width: 142, height: 14))
+            let paragraph = NSMutableParagraphStyle(); paragraph.alignment = .center
+            ("FISH\nBISCUITS" as NSString).draw(in: CGRect(x: 10, y: 36, width: 140, height: 60), withAttributes: [
+                .font: UIFont.boldSystemFont(ofSize: 23), .foregroundColor: UIColor(hex: "#0E3B43"), .paragraphStyle: paragraph,
+            ])
+            context.setFillColor(UIColor(hex: "#D59643").cgColor)
+            context.fillEllipse(in: CGRect(x: 41, y: 107, width: 68, height: 42))
+            context.move(to: CGPoint(x: 100, y: 128)); context.addLine(to: CGPoint(x: 130, y: 107))
+            context.addLine(to: CGPoint(x: 130, y: 149)); context.closePath(); context.fillPath()
+            context.setFillColor(UIColor(hex: "#0E3B43").cgColor)
+            context.fillEllipse(in: CGRect(x: 54, y: 120, width: 6, height: 6))
+        }
+    }
+
+    static var fishBiscuit: SKTexture {
+        drawn("fish-biscuit", size: CGSize(width: 100, height: 64)) { context, _ in
+            context.setFillColor(UIColor(hex: "#D59643").cgColor)
+            context.fillEllipse(in: CGRect(x: 7, y: 10, width: 64, height: 44))
+            context.move(to: CGPoint(x: 65, y: 32)); context.addLine(to: CGPoint(x: 94, y: 10))
+            context.addLine(to: CGPoint(x: 94, y: 54)); context.closePath(); context.fillPath()
+            context.setFillColor(UIColor(hex: "#855522").cgColor)
+            context.fillEllipse(in: CGRect(x: 20, y: 24, width: 6, height: 6))
+        }
+    }
+
     /// A soft round glow, used for particles.
     static var glow: SKTexture {
         drawn("glow", size: CGSize(width: 48, height: 48)) { context, rect in

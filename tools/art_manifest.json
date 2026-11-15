@@ -24,7 +24,8 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "Redraw this plush toy as ONE single 2D cartoon character illustration (one figure only: not a character sheet, no extra poses, no labels, no scenery, no water). He is a cute, friendly male mosasaur, a prehistoric sea reptile (not a land dinosaur, whale, shark or dolphin). Keep the toy's identity: bright ocean-blue body, a soft pale-grey bobbly frill running along his back and a second frill along his side, pale turquoise belly, golden-amber eyes, exactly four long paddle-shaped swimming flippers edged with pale frill, and a long aquatic tail ending in a fluke. Rounded friendly snout, gentle closed-mouth smile with no teeth showing, large expressive eyes with bright highlights and little eyelashes, and a small golden star charm on a cord round his neck. Relaxed floating pose, side-on three-quarter view with his head pointing to the RIGHT of the picture, whole body including tail and all four flippers visible."
+   "prompt": "Redraw this plush toy as ONE single 2D cartoon character illustration (one figure only: not a character sheet, no extra poses, no labels, no scenery, no water). He is a cute, friendly male mosasaur, a prehistoric sea reptile (not a land dinosaur, whale, shark or dolphin). Keep the toy's identity: bright ocean-blue body, a soft pale-grey bobbly frill running along his back and a second frill along his side, pale turquoise belly, golden-amber eyes, exactly four long paddle-shaped swimming flippers edged with pale frill, and a long aquatic tail ending in a fluke. Rounded friendly snout, gentle closed-mouth smile with no teeth showing, large expressive eyes with bright highlights and no eyelashes, a slightly bold brow, a cheeky boyish grin, and nothing round his neck. Relaxed floating pose, side-on three-quarter view with his head pointing to the RIGHT of the picture, whole body including tail and all four flippers visible.",
+   "note": "tools/raw/mosey_ref.png (and mosey_idle.png) is the approved 'Option A' edit of the earlier reference: docs/art-proposals/mosey-boy/option_a.png."
   },
   {
    "name": "otter_blink",
@@ -78,7 +79,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: identical floating pose to the reference, but with his eyes closed in a happy contented blink."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character (a boy): same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with no eyelashes, four frill-edged flippers, tail fluke, nothing round his neck, same proportions and art style. One figure only, head pointing to the right. New pose: identical floating pose to the reference, but with his eyes closed in a happy contented blink."
   },
   {
    "name": "mosey_cheer",
@@ -87,7 +88,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: leaping upward with joy, body curved in a happy arc, front flippers raised high, mouth open in a big friendly laugh (rounded, no sharp teeth)."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character (a boy): same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with no eyelashes, four frill-edged flippers, tail fluke, nothing round his neck, same proportions and art style. One figure only, head pointing to the right. New pose: leaping upward with joy, body curved in a happy arc, front flippers raised high, mouth open in a big friendly laugh (rounded, no sharp teeth)."
   },
   {
    "name": "mosey_think",
@@ -96,7 +97,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: floating upright and thinking, one front flipper touching his chin, eyes looking up, curious little smile."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character (a boy): same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with no eyelashes, four frill-edged flippers, tail fluke, nothing round his neck, same proportions and art style. One figure only, head pointing to the right. New pose: floating upright and thinking, one front flipper touching his chin, eyes looking up, curious little smile."
   },
   {
    "name": "mosey_oops",
@@ -105,7 +106,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: a funny surprised 'oops' reaction: very wide eyes, one flipper over his mouth, slightly leaning back."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character (a boy): same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with no eyelashes, four frill-edged flippers, tail fluke, nothing round his neck, same proportions and art style. One figure only, head pointing to the right. New pose: a funny surprised 'oops' reaction: very wide eyes, one flipper over his mouth, slightly leaning back."
   },
   {
    "name": "mosey_swim",
@@ -114,7 +115,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "This is Mosey the mosasaur. Draw exactly the same character: same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with lashes, four frill-edged flippers, tail fluke, gold star necklace, same proportions and art style. One figure only, head pointing to the right. New pose: swimming fast towards the right in a full side view, body stretched long and streamlined, flippers swept back, tail mid-swish, happy determined smile."
+   "prompt": "This is Mosey the mosasaur. Draw exactly the same character (a boy): same ocean-blue body, pale-grey bobbly frills along back and side, turquoise belly, golden-amber eyes with no eyelashes, four frill-edged flippers, tail fluke, nothing round his neck, same proportions and art style. One figure only, head pointing to the right. New pose: swimming fast towards the right in a full side view, body stretched long and streamlined, flippers swept back, tail mid-swish, happy determined smile."
   },
   {
    "name": "duo_ride",
@@ -124,7 +125,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "These are Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace). Draw exactly these two characters together as one isolated sticker-style sprite in the same art style: Otter sits on Mosey's back riding him, holding on with one paw and punching the air with the other, scarf streaming behind; Mosey is stretched out swimming fast towards the right in full side view, both grinning with delight. Mosey is much bigger than Otter. Only the two figures: absolutely no water, no waves, no splashes, no sky, no scenery.",
+   "prompt": "These are Otter (brown otter with teal scarf) and Mosey (a boy: blue mosasaur with pale-grey frills, no eyelashes and nothing round his neck). Draw exactly these two characters together as one isolated sticker-style sprite in the same art style: Otter sits on Mosey's back riding him, holding on with one paw and punching the air with the other, scarf streaming behind; Mosey is stretched out swimming fast towards the right in full side view, both grinning with delight. Mosey is much bigger than Otter. Only the two figures: absolutely no water, no waves, no splashes, no sky, no scenery.",
    "size": "1536x1024"
   },
   {
@@ -135,7 +136,7 @@
    ],
    "model": "gpt-image-2.5-sunburst",
    "quality": "high",
-   "prompt": "App icon artwork, square, full-bleed: close-up of Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills) cheek to cheek, grinning at the viewer, in front of a glowing rainbow crystal and a turquoise tropical sea. Same characters and art style as the references. Bold, simple, readable at small size. No text, no border, no rounded corners.",
+   "prompt": "App icon artwork, square, full-bleed: close-up of Otter (brown otter with teal scarf) and Mosey (a boy: blue mosasaur with pale-grey frills, no eyelashes and nothing round his neck) cheek to cheek, grinning at the viewer, in front of a glowing rainbow crystal and a turquoise tropical sea. Same characters and art style as the references. Bold, simple, readable at small size. No text, no border, no rounded corners.",
    "background": "opaque",
    "style": "scene_with_characters"
   },
@@ -426,7 +427,7 @@
    "size": "1536x1024",
    "background": "opaque",
    "style": "scene_with_characters",
-   "prompt": "A joyful ending illustration: on a beautiful tropical island beach at sunset, Otter (brown otter with teal scarf) and Mosey (blue mosasaur with pale-grey frills and gold star necklace, resting in the shallow water) celebrate beneath the huge restored Great Rainbow Crystal, which beams rainbow light across the sky. Around them, their new friends cheer: a smiling blossom-covered tree, a happy purple octopus in a sailor hat, a chubby orange dragon in blue trousers, a little cloud wizard in a purple star hat, a pink marshmallow monster and a small sparkling violet shadow creature. Confetti and fireflies in the air. Same characters and art style as the references. No text."
+   "prompt": "A joyful ending illustration: on a beautiful tropical island beach at sunset, Otter (brown otter with teal scarf) and Mosey (a boy: blue mosasaur with pale-grey frills, no eyelashes and nothing round his neck, resting in the shallow water) celebrate beneath the huge restored Great Rainbow Crystal, which beams rainbow light across the sky. Around them, their new friends cheer: a smiling blossom-covered tree, a happy purple octopus in a sailor hat, a chubby orange dragon in blue trousers, a little cloud wizard in a purple star hat, a pink marshmallow monster and a small sparkling violet shadow creature. Confetti and fireflies in the air. Same characters and art style as the references. No text."
   },
   {
    "name": "otter_talk_gen",
@@ -810,7 +811,7 @@
    "refs": [
     "tools/raw/mosey_ref.png"
    ],
-   "prompt": "This is Mosey. Draw exactly the same character in the same art style: just his head and neck as a portrait, turned towards the viewer with a gentle happy smile, pearl frill and star necklace visible. One figure only."
+   "prompt": "This is Mosey. Draw exactly the same character in the same art style: just his head and neck as a portrait, turned towards the viewer with a gentle happy smile, pearl frill visible, no eyelashes, nothing round his neck. One figure only."
   },
   {
    "name": "reward_pet-firefly",

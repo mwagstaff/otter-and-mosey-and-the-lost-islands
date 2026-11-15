@@ -64,7 +64,7 @@ export class TypingTurboScene extends GameScene {
   }
 
   protected override caption(): string {
-    return this.options.inputProfile === "hardware" ? "Type the words on your keyboard to zoom!" : "Type the words to zoom!";
+    return "Tap the letters or type on your keyboard to zoom!";
   }
 
   protected override shouldSpeak(): boolean { return false; }
@@ -195,7 +195,7 @@ export class TypingTurboScene extends GameScene {
   private completeText(): void {
     if (this.meter.accuracy < 0.9) this.markImperfect();
     // Tapping on-screen keys is far slower than typing, so its speed is recorded separately.
-    this.session.recordTyping(this.meter.keystrokes, this.meter.correct, this.meter.wordsPerMinute, this.options.inputProfile !== "hardware");
+    this.session.recordTyping(this.meter.keystrokes, this.meter.correct, this.meter.wordsPerMinute, this.options.inputProfile !== "hardware" || this.bridge.usedOnScreenKeyboard);
     const outcome = this.succeed(this.rider.x + this.rider.width * 0.3, this.rider.y - this.rider.height * 0.4);
     this.pace = Math.min(this.pace + 160, 640);
     if (this.board) run(this.board, sequence(wait(0.25), fadeOut(0.2), remove()), "leave");

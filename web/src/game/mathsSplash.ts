@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import { isCorrectChoice, type Question } from "../core";
 import { easeIn, easeOut, fadeOut, fadeTo, group, moveTo, remove, run, sequence, wobble } from "../engine/actions";
-import { texture } from "../engine/art";
+import { iconName, iconSprite } from "../engine/art";
 import type { Emitter } from "../engine/particles";
 import { audio } from "./audio";
 import { burst, rainbowBurst, trail } from "./effects";
@@ -19,6 +19,7 @@ export class MathsSplashScene extends GameScene {
   private phase: Phase = "cruising";
   private gates: Container[] = [];
   private pearls: Sprite[] = [];
+  private originalGateSize = 1;
   private pace = 120;
   private targetPace = 120;
   private targetY = 0;
@@ -27,7 +28,7 @@ export class MathsSplashScene extends GameScene {
   protected override get scrollsBackdrop(): boolean { return true; }
 
   override art(): string[] {
-    return [...super.art(), "ring", "pearl"];
+    return [...super.art(), ...[this.theme.collectible, this.theme.gateDecoration].map(iconName).filter((name) => name !== undefined)];
   }
 
   protected build(): void {
@@ -63,21 +64,25 @@ export class MathsSplashScene extends GameScene {
     // The play area shrinks when the speech panel appears; keep Mosey in view above it.
     this.targetY = Math.min(Math.max(this.targetY, lanes[0]), lanes[2]);
     this.mosey.position.set(this.swimmerX, this.targetY);
-    if (this.phase === "choosing") this.gates.forEach((gate, index) => gate.position.set(this.gateX, lanes[index]!));
+    if (this.phase === "choosing") this.gates.forEach((gate, index) => { gate.position.set(this.gateX, lanes[index]!); gate.scale.set(this.gateSize / this.originalGateSize); });
   }
 
   protected present(question: Question): void {
     this.phase = "arriving";
     this.gates.forEach((gate) => gate.destroy({ children: true }));
     const size = this.gateSize;
+    this.originalGateSize = size;
     this.gates = question.choices.map((choice, index) => {
       const gate = new Container();
       gate.label = choice;
-      const ring = new Sprite(texture("ring"));
-      ring.anchor.set(0.5);
-      ring.setSize(size, size);
+      for (let petal = 0; petal < 8; petal += 1) {
+        const decoration = iconSprite(this.theme.gateDecoration, size * 0.28);
+        const angle = petal * Math.PI / 4;
+        decoration.position.set(Math.cos(angle) * size * 0.36, Math.sin(angle) * size * 0.36);
+        gate.addChild(decoration);
+      }
       const plate = this.makeSign(choice, size * 0.7, size * 0.46, size * 0.46 * 0.66);
-      gate.addChild(ring, plate);
+      gate.addChild(plate);
       const y = this.lanes[index] ?? this.lanes[1];
       gate.position.set(this.width + size, y);
       gate.zIndex = 15;
@@ -86,7 +91,7 @@ export class MathsSplashScene extends GameScene {
       return gate;
     });
     this.targetPace = 40;
-    this.after(1, () => { if (this.phase === "arriving") this.phase = "choosing"; });
+    this.after(1, () => { if (this.phase === "arriving") { this.phase = "choosing"; this.layout(); } });
   }
 
   // Touch and mouse
@@ -102,6 +107,12 @@ export class MathsSplashScene extends GameScene {
   }
 
   override pointerDown(x: number, y: number): void {
+    const hit = this.pearls.find((item) => Math.hypot(item.x - x, item.y - y) <= Math.max(24, item.width * 0.6));
+    if (hit) {
+      this.collect(hit);
+      this.pearls = this.pearls.filter((item) => item !== hit);
+      return;
+    }
     if (this.phase === "choosing" && x > this.swimmerX + this.mosey.size * 0.5) this.choose(this.lane(y));
     else this.targetY = this.clampY(y);
   }
@@ -155,20 +166,27 @@ export class MathsSplashScene extends GameScene {
   }
 
   private spawnPearls(): void {
-    this.bridge.set({ caption: "Drag up and down to scoop the pearls!" });
+    this.bridge.set({ caption: this.theme.collectInstruction });
     const lane = this.lanes[Math.floor(Math.random() * 3)]!;
     const size = this.gateSize * 0.36;
     this.pearlsOffered += 5;
     for (let index = 0; index < 5; index += 1) {
-      const pearl = new Sprite(texture("pearl"));
+      const pearl = iconSprite(this.theme.collectible, size);
       pearl.anchor.set(0.5);
-      pearl.setSize(size, size);
+
       const wave = Math.sin(index * 0.9) * this.play.height * 0.12;
       pearl.position.set(this.width + 30 + index * this.gateSize * 0.6, this.clampY(lane - wave));
       pearl.zIndex = 14;
       this.world.addChild(pearl);
       this.pearls.push(pearl);
     }
+  }
+
+  private collect(item: Sprite): void {
+    this.pearlsScooped += 1;
+    audio.play("pop", 0.6);
+    burst(this.world, item.x, item.y, this.theme.tint, 8);
+    item.destroy();
   }
 
   // Frame loop
@@ -188,9 +206,8 @@ export class MathsSplashScene extends GameScene {
       pearl.x -= 280 * delta;
       const scooped = Math.abs(pearl.x - this.swimmerX) < mosey.size * 0.45 && Math.abs(pearl.y - y) < mosey.size * 0.3;
       if (scooped) {
-        this.pearlsScooped += 1;
-        audio.play("star", 0.6);
-        burst(this.world, pearl.x, pearl.y, "#FFD9F0", 8);
+        this.collect(pearl);
+        return false;
       }
       if (!scooped && pearl.x >= -40) return true;
       pearl.destroy();

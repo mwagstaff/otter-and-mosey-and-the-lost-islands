@@ -360,3 +360,14 @@ import Testing
         #expect(Chatter.level(at: duration + 1, duration: duration) == 0)
     }
 }
+
+
+@Suite struct WorkedHintTests {
+    @Test func additionKeepsPlaceValueAndCarries() {
+        #expect(MathsGenerator.additionHint(178, 256) == "Hundreds: 100 + 200 = 300. Tens: 70 + 50 = 120. Ones: 8 + 6 = 14. Add these totals together.")
+        #expect(MathsGenerator.additionHint(47, 38).contains("Tens: 40 + 30 = 70. Ones: 7 + 8 = 15."))
+    }
+    @Test func subtractionCanCrossZeroDigits() {
+        #expect(MathsGenerator.subtractionHint(402, 178) == "Start at 402. 402 − 100 = 302. 302 − 70 = 232. Then take away 8.")
+    }
+}

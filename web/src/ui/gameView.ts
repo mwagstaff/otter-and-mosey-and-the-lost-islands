@@ -17,9 +17,9 @@ import { TypingTurboScene } from "../game/typingTurbo";
 import { WordBlasterScene } from "../game/wordBlaster";
 import { dialogueHeight, showDialogue as sharedDialogue } from "./dialogue";
 import { button, h, picture, roundButton, symbol } from "./dom";
-import { openSettings } from "./settings";
 import { starRow, type Screen } from "./menus";
 import { crystalShowcase, fragmentRow, miniCabinet, trophyBadge } from "./trophies";
+import { keyboardRows } from "./keyboard";
 import { options } from "../game/options";
 
 type Stage = "loading" | "intro" | "playing" | "outro" | "results";
@@ -53,7 +53,6 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   const testing = model.playtest !== undefined;
   const compact = () => window.innerHeight < 520;
   const input = inputProfile(compact());
-  const hardware = input === "hardware";
   const bridge = new GameBridge();
   let stage: Stage = "loading";
   let paused = false;
@@ -140,31 +139,21 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
 
   function renderKeys(): void {
     const kind: KeyboardKind = stage === "playing" && bridge.dialogue.length === 0 ? bridge.keyboard : { kind: "none" };
-    const signature = hardware ? `hardware:${kind.kind}` : JSON.stringify(kind);
+    const signature = JSON.stringify(kind);
     if (signature === keysShown) return;
     keysShown = signature;
     keys.className = `keys ${kind.kind}`;
     keys.hidden = kind.kind === "none";
-    if (hardware) {
-      keys.className = "keys pill";
-      keys.replaceChildren(h("p.keyboard-note", {}, symbol("keyboard"), "Type on your keyboard"));
-      return;
-    }
-    const cap = (label: string, press: () => void, className = "") => {
-      const key = h(`button.key${className}`, { type: "button", "aria-label": label === "␣" ? "space" : label === "⌫" ? "delete" : label }, label);
-      // Act on press, not release, and keep the page from selecting or scrolling.
-      key.addEventListener("pointerdown", (event) => { event.preventDefault(); press(); });
-      return key;
-    };
-    const letter = (character: string) => cap(character, () => bridge.onKey?.(character));
-    const row = (...children: HTMLElement[]) => h("div.key-row", {}, ...children);
-    if (kind.kind === "tray") keys.replaceChildren(row(...kind.letters.map(letter)));
-    else if (kind.kind === "numbers") keys.replaceChildren(row(...[..."1234567890"].map(letter), cap("⌫", () => bridge.onBackspace?.(), ".coral")));
-    else if (kind.kind === "qwerty") {
-      const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"].map((letters) => row(...[...letters].map(letter)));
-      if (kind.space) rows[2]!.append(cap("␣", () => bridge.onKey?.(" "), ".gold.wide"));
-      keys.replaceChildren(...rows);
-    } else keys.replaceChildren();
+    keys.setAttribute("role", "group");
+    keys.setAttribute("aria-label", "Game keyboard");
+    keys.replaceChildren(...keyboardRows(kind, (key) => {
+      if (paused || stage !== "playing" || bridge.dialogue.length > 0) return;
+      // Mixed input should not count as a physical-keyboard speed sample.
+      bridge.usedOnScreenKeyboard = true;
+      bridge.onKey?.(key);
+    }, () => {
+      if (!paused && stage === "playing" && bridge.dialogue.length === 0) bridge.onBackspace?.();
+    }));
   }
 
   // Layout
@@ -174,17 +163,16 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
     // Guardians only need keys when they ask spelling questions.
     const typesWords = level.skills.some((skill) => subjectOf(skill) === "spelling");
     if (mode === "mathsSplash" || mode === "bridgeBuilder" || (mode === "guardian" && !typesWords)) return 0;
-    if (hardware) return 40;
     const heights = keyHeights(compact());
     if (mode === "typingTurbo") return heights.qwerty + 14;
     if (mode === "eggRescue") return heights.numbers + 14;
-    return (compact() ? heights.tray : heights.qwerty) + 14;
+    return (input === "compactTouch" ? heights.tray : heights.qwerty) + 14;
   }
 
   function insets(): Insets {
     const talking = stage === "intro" || stage === "outro" || bridge.dialogue.length > 0 || stage === "loading";
     const bottom = talking ? dialogueHeight(compact()) : stage === "results" ? 0 : reservedKeys();
-    return { top: (compact() ? 64 : 92) + 6, left: 8, right: 8, bottom };
+    return { top: (compact() ? 64 : 92) + 6 + (hint.hidden ? 0 : hint.offsetHeight + 12), left: 8, right: 8, bottom };
   }
 
   function applyInsets(): void {
@@ -375,7 +363,6 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
       button("teal.big", [symbol("play"), "Keep playing"], () => setPaused(false)),
       h("div.actions", {},
         button("cream", [symbol("again"), "Start again"], replay),
-        button("cream", [symbol("gear"), "Sound"], () => openSettings(model)),
         testing
           ? button("coral", ["Dashboard"], () => model.endPlaytest())
           : button("coral", [picture("🏝️"), "Leave"], () => model.go({ name: "island", id: island.id })),
@@ -386,7 +373,8 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   // Keyboard
 
   function onKeyDown(event: KeyboardEvent): void {
-    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.metaKey || event.ctrlKey || event.altKey || event.isComposing) return;
+    if (event.target instanceof HTMLElement && event.target.closest(".key") && (event.key === " " || event.key === "Enter")) return;
     if (event.key === "Escape" && stage === "playing") {
       setPaused(!paused);
       return;
@@ -441,6 +429,8 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   };
   const onResize = () => applyInsets();
 
+  const hintObserver = new ResizeObserver(() => applyInsets());
+  hintObserver.observe(hint);
   bridge.onChange(render);
   window.addEventListener("keydown", onKeyDown);
   overlay.replaceChildren(h("p.loading", {}, "Getting ready…"));
@@ -482,6 +472,7 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
     element,
     destroy() {
       destroyed = true;
+      hintObserver.disconnect();
       window.clearTimeout(toastTimer);
       window.removeEventListener("keydown", onKeyDown);
       app.ticker.remove(frame);

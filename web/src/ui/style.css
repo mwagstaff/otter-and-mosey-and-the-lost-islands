@@ -322,7 +322,7 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
   border: 3px solid var(--ink); border-radius: 999px; padding: 8px 10px; animation: star-pop 0.25s ease-out;
 }
 .hud-extras { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 20px; pointer-events: none !important; }
-.hint { display: inline-flex; align-items: center; gap: 8px; background: #ffd35c; border-radius: 16px; padding: 8px 14px; font-size: 22px; font-weight: 700; animation: drop 0.3s ease-out; }
+.hint { margin: 0; max-width: 100%; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; background: #ffd35c; border-radius: 16px; padding: 8px 14px; font-size: 22px; font-weight: 700; animation: drop 0.3s ease-out; }
 @keyframes drop { from { transform: translateY(-20px); opacity: 0; } }
 .hud-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .meter { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; }
@@ -454,7 +454,7 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
 .cabinet-plaque { display: flex; flex-direction: column; gap: 4px; min-width: 260px; padding: 6px 16px 8px; background: var(--gold); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink); }
 .cabinet-plaque strong { font-size: 24px; }
 .cabinet-plaque small { font-size: 14px; font-variant-numeric: tabular-nums; }
-.trophies-bar .tabs { flex: none; justify-content: flex-end; }
+.trophies-bar .tabs { flex: 0 1 auto; min-width: 0; justify-content: flex-end; }
 .tmeter { display: block; flex: 1; min-width: 40px; height: 10px; overflow: hidden; background: rgba(255, 255, 255, 0.12); border-radius: 999px; }
 .tmeter i { display: block; height: 100%; background: var(--gold); border-radius: 999px; }
 .tmeter.plaque-bar, .tmeter.light { height: 13px; background: rgba(14, 59, 67, 0.18); border: 2px solid var(--ink); }
@@ -484,6 +484,13 @@ span.glyph { font-size: 1.2em; height: auto; margin: 0; }
 .level-medals .pair .button { margin: 0 -2px; }
 .level-medals small { max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px; color: #cfe9e5; }
 .level-medals.big .trophy-badge { width: 80px; height: 80px; }
+/* Shelf medals size to the glass, so a whole island's row fits on narrower iPads too:
+   five levels of two medals, then the island's own two trophies. */
+.cabinet-glass { container-type: inline-size; }
+.shelf-row { --medal: clamp(34px, calc((100cqw - 102px) / 13.8), 54px); }
+.shelf-row .trophy-badge { width: var(--medal); height: var(--medal); }
+.shelf-row .level-medals.big .trophy-badge { width: calc(var(--medal) * 1.5); height: calc(var(--medal) * 1.5); }
+.shelf-row .level-medals small { max-width: calc(var(--medal) * 2); }
 .button.trophy-pick { padding: 0; min-height: 0; color: inherit; background: none; border: 0; box-shadow: none; border-radius: 16px; font-size: inherit; }
 .button.trophy-pick:active:not(:disabled) { transform: scale(0.95); box-shadow: none; }
 .ladders { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
@@ -643,3 +650,40 @@ body.high-contrast .caption, body.high-contrast .dialogue { background: #fff; co
   .bob, .screen, .results, .pause, .dedication .heroes, .nickname.wobble, .name-hint.shown { animation: none; }
 }
 body.calm .bob, body.calm .screen, body.calm .results, body.calm .pause, body.calm .dedication .heroes, body.calm .nickname.wobble, body.calm .name-hint.shown { animation: none; }
+
+/* The explorer keyboard stays inside its scrolling panel on small screens. */
+.name-help { margin: 0; text-align: center; font-size: clamp(16px, 2vw, 22px); }
+.name-keyboard { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+.name-keyboard .key-row { gap: 5px; }
+.name-keyboard .key { flex: 1 1 0; min-width: 0; max-width: 60px; width: auto; height: 46px; font-size: clamp(18px, 3vw, 26px); }
+.name-keyboard .key.wide { flex-grow: 2; max-width: 120px; font-size: 17px; }
+.name-keyboard .name-punctuation { min-height: 36px; padding: 0 18px; font-size: 20px; }
+.name-keyboard .key:focus-visible { outline-color: var(--teal); }
+.profile-form > * { flex-shrink: 0; }
+
+@media (max-height: 520px) and (min-width: 650px) {
+  .profile-form { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); column-gap: 16px; }
+  .profile-form > * { grid-column: 1; min-width: 0; }
+  .profile-form .name-keyboard { grid-column: 2; grid-row: 1 / span 5; }
+  .profile-form .nickname { width: 100%; min-width: 0; font-size: 24px; }
+  .profile-form .name-row { width: 100%; }
+  .profile-form .name-help { font-size: 16px; }
+  .profile-form .actions { flex-wrap: wrap; }
+  .profile-form .name-hint.shown { font-size: 14px; border-radius: 12px; }
+}
+
+/* Keep home navigation clear of the title artwork. */
+.title-header { position: absolute; top: 0; left: 0; right: 0; z-index: 1; display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 28px 0; }
+.title .logo { height: 32vh; margin-top: 76px; }
+@media (max-height: 480px) { .title-header { padding: 8px 8px 0; } .title .logo { height: 30vh; margin-top: 58px; } }
+
+/* Narrower iPads (a 4:3 iPad is about 1080 wide): slimmer records and tabs so nothing runs off the edge. */
+@media (min-height: 520px) and (max-width: 1180px) {
+  .records { width: clamp(220px, 23vw, 262px); }
+  .cabinet-plaque { min-width: 240px; }
+  .trophies-bar .tabs { gap: 6px; }
+  .trophies-bar .tabs .button { font-size: 15px; padding-left: 12px; padding-right: 12px; }
+}
+@media (max-height: 519px) {
+  .shelf-row { --medal: clamp(26px, calc((100cqw - 86px) / 13.8), 34px); gap: 4px; }
+}

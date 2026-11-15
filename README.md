@@ -14,7 +14,7 @@ network calls.
   Candy Kingdom and Starlight Island. Each has four levels and a guardian encounter.
 - **Six game modes**
   - *Word Blaster*: type the missing letters to pop word bubbles (look-cover-write at higher levels).
-  - *Maths Splash*: Mosey swims through the tunnel with the right answer; drag to scoop pearls.
+  - *Maths Splash*: Mosey swims through the tunnel with the right answer; tap or drag to collect island-themed items.
   - *Rainbow Bridge*: drag the right answer into the gap to build a bridge plank by plank.
   - *Number Rescue*: type the answer on a number pad to hatch eggs and open chests and jars.
   - *Typing Turbo*: every correct key speeds the ride. Stars come from accuracy, never speed.

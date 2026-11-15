@@ -380,3 +380,21 @@ describe("speech", () => {
     expect(Chatter.level(duration + 1, duration)).toBe(0);
   });
 });
+
+
+describe("worked maths hints", () => {
+  test("addition partitions hundreds and carries without losing place value", async () => {
+    const { additionHint } = await import("../src/core/maths");
+    expect(additionHint(178, 256)).toBe("Hundreds: 100 + 200 = 300. Tens: 70 + 50 = 120. Ones: 8 + 6 = 14. Add these totals together.");
+    expect(additionHint(47, 38)).toContain("Tens: 40 + 30 = 70. Ones: 7 + 8 = 15.");
+  });
+  test("subtraction crosses zero digits by counting back whole amounts", async () => {
+    const { subtractionHint } = await import("../src/core/maths");
+    expect(subtractionHint(402, 178)).toBe("Start at 402. 402 − 100 = 302. 302 − 70 = 232. Then take away 8.");
+  });
+  test("small multiplication facts stop at the required number of jumps", () => {
+    const question = makeMathsFact("mul:5x1", 1, new SeededGenerator(4))!;
+    expect(question.hint).toContain("1 jump of 5: 5.");
+    expect(question.hint).not.toContain("10");
+  });
+});

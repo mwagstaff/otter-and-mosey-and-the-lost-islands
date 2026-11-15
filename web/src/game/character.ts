@@ -142,6 +142,12 @@ export class CharacterNode extends Container {
     return `${this.kind}_${pose === "move" ? (this.kind === "otter" ? "run" : "swim") : pose}`;
   }
 
+  /** The resting sprite's width and height on screen, for laying characters out side by side. */
+  get footprint(): { width: number; height: number } {
+    const idle = texture(`${this.kind}_idle`);
+    return { width: idle.width * this.unit, height: idle.height * this.unit };
+  }
+
   resize(size: number): void {
     this.size = size;
     const idle = texture(`${this.kind}_idle`);

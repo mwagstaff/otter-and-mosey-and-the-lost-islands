@@ -18,16 +18,17 @@ struct TrophyCabinetView: View {
     var body: some View {
         GeometryReader { geometry in
             let compact = geometry.size.height < 480
+            let layout = Layout(width: geometry.size.width, compact: compact, catalog: model.catalog)
             ZStack {
                 VStack(spacing: compact ? 6 : 14) {
-                    header(compact: compact)
-                    HStack(alignment: .top, spacing: compact ? 8 : 16) {
+                    header(compact: compact, layout: layout)
+                    HStack(alignment: .top, spacing: layout.columnSpacing) {
                         records(compact: compact)
-                            .frame(width: compact ? 178 : 262)
-                        cabinet(compact: compact)
+                            .frame(width: layout.recordsWidth)
+                        cabinet(compact: compact, medal: layout.medal)
                     }
                 }
-                .padding(compact ? 8 : 24)
+                .padding(layout.padding)
                 if let selected {
                     detail(selected, compact: compact)
                         .transition(.opacity.combined(with: .scale(scale: 0.92)))
@@ -46,7 +47,36 @@ struct TrophyCabinetView: View {
 
     // MARK: - Header
 
-    private func header(compact: Bool) -> some View {
+    /// Sizes worked out from the screen width, so the whole cabinet fits on every iPad
+    /// (a 4:3 iPad is a good deal narrower than the newer ones) as well as on phones.
+    struct Layout {
+        let compact: Bool
+        let padding: CGFloat
+        let columnSpacing: CGFloat
+        let recordsWidth: CGFloat
+        let titleWidth: CGFloat
+        /// Medal size on the island shelves.
+        let medal: CGFloat
+
+        init(width: CGFloat, compact: Bool, catalog: Catalog) {
+            self.compact = compact
+            padding = compact ? 8 : 24
+            columnSpacing = compact ? 8 : 16
+            recordsWidth = compact ? 178 : min(262, max(220, width * 0.23))
+            titleWidth = compact ? 190 : min(300, max(240, width * 0.26))
+            // The widest shelf: two medals per level, then the island's own trophies.
+            let trophies = Trophies.all(catalog)
+            let levels = CGFloat(catalog.islands.map(\.levels.count).max() ?? 5)
+            let extras = CGFloat(catalog.islands.map { island in trophies.filter { $0.islandID == island.id && $0.levelID == nil }.count }.max() ?? 2)
+            let spacing: CGFloat = compact ? 4 : 10
+            // Cabinet frame (14) and glass (16) padding on both sides.
+            let inside = width - padding * 2 - recordsWidth - columnSpacing - (compact ? 32 : 60)
+            let fitted = (inside - (levels + extras) * spacing) / (levels * 2 + extras * 1.9)
+            medal = min(max(fitted.rounded(.down), compact ? 26 : 34), compact ? 34 : 54)
+        }
+    }
+
+    private func header(compact: Bool, layout: Layout) -> some View {
         let count = Trophies.count(in: profile, catalog: model.catalog)
         return HStack(spacing: compact ? 8 : 14) {
             RoundButton(symbol: "chevron.left", label: "Back") { model.route = model.trophiesReturn }
@@ -57,15 +87,24 @@ struct TrophyCabinetView: View {
             }
             .padding(.horizontal, compact ? 12 : 18)
             .padding(.vertical, compact ? 4 : 8)
-            .frame(width: compact ? 190 : 300)
+            .frame(width: layout.titleWidth)
             .panel(fill: Palette.gold, radius: 18)
             Spacer(minLength: 0)
-            HStack(spacing: compact ? 5 : 8) {
-                ForEach(TrophyGroup.allCases, id: \.self) { item in
-                    Button(action: tapped { group = item; selected = nil }) { Text(item.title) }
-                        .buttonStyle(ChunkyButtonStyle(fill: group == item ? Palette.gold : Palette.cream, size: compact ? 13 : 18))
-                        .accessibilityAddTraits(group == item ? .isSelected : [])
+            // The tabs shrink a little on narrower screens rather than running off the edge.
+            ViewThatFits(in: .horizontal) {
+                ForEach(compact ? [13, 12, 11] : [18, 16, 14, 12] as [CGFloat], id: \.self) { size in
+                    tabs(size: size, spacing: compact ? 5 : (size >= 16 ? 8 : 6))
                 }
+            }
+        }
+    }
+
+    private func tabs(size: CGFloat, spacing: CGFloat) -> some View {
+        HStack(spacing: spacing) {
+            ForEach(TrophyGroup.allCases, id: \.self) { item in
+                Button(action: tapped { group = item; selected = nil }) { Text(item.title).lineLimit(1).fixedSize() }
+                    .buttonStyle(ChunkyButtonStyle(fill: group == item ? Palette.gold : Palette.cream, size: size))
+                    .accessibilityAddTraits(group == item ? .isSelected : [])
             }
         }
     }
@@ -118,14 +157,14 @@ struct TrophyCabinetView: View {
 
     // MARK: - Cabinet
 
-    private func cabinet(compact: Bool) -> some View {
+    private func cabinet(compact: Bool, medal: CGFloat) -> some View {
         ZStack {
             LinearGradient(colors: [Self.glassTop, Self.glassBottom], startPoint: .top, endPoint: .bottom)
             ScrollView(showsIndicators: true) {
                 VStack(spacing: compact ? 8 : 12) {
                     if !profile.pendingTrophies.isEmpty { waiting(compact: compact) }
                     switch group {
-                    case .islands: islands(compact: compact)
+                    case .islands: islands(compact: compact, medal: medal)
                     case .milestones: ladders(compact: compact)
                     case .secret, .learning, .collections: grid(all.filter { $0.group == group }, compact: compact)
                     }
@@ -156,9 +195,8 @@ struct TrophyCabinetView: View {
         .background(RoundedRectangle(cornerRadius: 14).fill(.white.opacity(0.08)).overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Palette.gold.opacity(0.6), lineWidth: 2)))
     }
 
-    private func islands(compact: Bool) -> some View {
-        let medal: CGFloat = compact ? 34 : 54
-        return VStack(spacing: compact ? 6 : 10) {
+    private func islands(compact: Bool, medal: CGFloat) -> some View {
+        VStack(spacing: compact ? 6 : 10) {
             ForEach(model.catalog.islands) { island in
                 let mine = all.filter { $0.islandID == island.id }
                 VStack(alignment: .leading, spacing: compact ? 2 : 4) {

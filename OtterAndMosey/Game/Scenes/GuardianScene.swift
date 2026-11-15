@@ -46,10 +46,31 @@ final class GuardianScene: GameScene {
         guardianBadge.position = CGPoint(x: guardian.position.x - guardian.size.width * 0.42, y: guardian.position.y + guardian.size.height * 0.78)
         otter.resize(min(play.height * 0.36, 250))
         mosey.resize(min(play.height * 0.46, 330))
-        otter.position = CGPoint(x: play.minX + play.width * 0.1, y: groundY)
-        mosey.position = CGPoint(x: play.minX + play.width * 0.2, y: groundY + play.height * 0.27)
+        placeHeroes()
         sign?.position = signPosition
         layoutOrbs()
+    }
+
+    /// Otter stands on the left with Mosey beside him. Where the screen is too narrow for that
+    /// (4:3 iPads, and phones once the answer orbs are out), Mosey hovers just above Otter's head
+    /// instead, so the two of them never cover each other.
+    private func placeHeroes() {
+        // Keep clear of the leftmost answer orb (three orbs, centred under the sign).
+        let laneRight = signPosition.x - orbSize * 1.75 - 8
+        // On squarer screens Mosey can be wider than the space left of the orbs, so she shrinks to fit.
+        if mosey.size > laneRight - play.minX { mosey.resize(max(laneRight - play.minX, 80)) }
+        let otterSize = otter.footprint
+        let moseySize = mosey.footprint
+        let otterX = play.minX + max(play.width * 0.08, otterSize.width * 0.5)
+        otter.position = CGPoint(x: otterX, y: groundY)
+        let besideX = otterX + otterSize.width * 0.5 + moseySize.width * 0.52
+        if besideX + moseySize.width * 0.45 <= laneRight {
+            mosey.position = CGPoint(x: besideX, y: groundY + moseySize.height * 0.62)
+        } else {
+            let x = min(otterX + otterSize.width * 0.2, laneRight - moseySize.width * 0.45)
+            mosey.position = CGPoint(x: max(x, play.minX + moseySize.width * 0.45),
+                                     y: groundY + otterSize.height * 1.02 + moseySize.height * 0.5)
+        }
     }
 
     override func start() {

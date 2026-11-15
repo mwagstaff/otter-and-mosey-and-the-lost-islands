@@ -40,6 +40,7 @@ export function settingsControls(model: AppModel): HTMLElement {
 
 /** Shows the settings over whatever is on screen. Escape, the cross or a tap outside closes it. */
 export function openSettings(model: AppModel): void {
+  if (!model.parentUnlocked) { model.go({ name: "parent" }); return; }
   const host = document.querySelector<HTMLElement>("#app")!;
   const close = () => {
     window.removeEventListener("keydown", onKey, true);

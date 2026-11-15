@@ -185,7 +185,7 @@ struct HomeIslandView: View {
     }
 }
 
-/// Sound and accessibility options that children can safely change themselves.
+/// Sound and accessibility options for the grown-ups area.
 struct SettingsOverlay: View {
     @Environment(AppModel.self) private var model
 
