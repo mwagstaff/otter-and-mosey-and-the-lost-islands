@@ -5,6 +5,7 @@ import {
   scaleToXY, sequence, stop, wait, wobble,
 } from "../engine/actions";
 import { bubble, iconName, iconSprite, loadArt, mix, palette, panel, texture } from "../engine/art";
+import { GameLabel } from "../engine/label";
 import { audio, narrator } from "./audio";
 import { applyWash } from "./backdrop";
 import { characterArt, CharacterNode } from "./character";
@@ -13,16 +14,50 @@ import type { Insets, Rect } from "./gameScene";
 import { options } from "./options";
 import { WordSlots } from "./wordSlots";
 
-const pictures = ["🥀", "☀️", "🌻", "🌸", "🌼", "🌷", "🌺", "🦋"];
+/** One question in the practice round that follows the opening story. */
+export interface PracticeQuestion {
+  /** Type the missing letters on a one-row tray, or tap the right answer from a few choices. */
+  answer:
+    | { kind: "letters"; masked: string; word: string; tray: string[] }
+    | { kind: "choice"; prompt: string; answer: string; choices: string[] };
+  /** A picture clue shown above the question. */
+  clue?: string;
+  instruction: string;
+  speechKey: string;
+  speech: string;
+}
+
+/**
+ * The practice round: one missing letter, then two, then a times-tables question to tap.
+ * Each right answer brings a little more colour back.
+ */
+export const practice: PracticeQuestion[] = [
+  {
+    answer: { kind: "letters", masked: "s_n", word: "sun", tray: ["a", "u", "o", "e", "i", "t"] }, clue: "☀️",
+    instruction: "Tap the missing letter to bring the flower back!", speechKey: "word_sun", speech: "Sun. The sun is hot and bright.",
+  },
+  {
+    answer: { kind: "letters", masked: "f__h", word: "fish", tray: ["s", "a", "i", "t", "o", "e"] }, clue: "🐟",
+    instruction: "Two letters are missing now. Fill them in one at a time!", speechKey: "word_fish", speech: "Fish. A fish swims in the sea.",
+  },
+  {
+    answer: { kind: "choice", prompt: "5 × 2 = ?", answer: "10", choices: ["7", "10", "12"] },
+    instruction: "Now a sum! Tap the right answer.", speechKey: "mul_2x5", speech: "5 times 2.",
+  },
+];
+
+const pictures = ["🥀", "☀️", "🐟", "🌻", "🌸", "🌼", "🌷", "🌺", "🦋"];
 
 /**
  * The opening story: the Great Rainbow Crystal shatters and the colour drains away, then a
- * one-question tutorial brings a little of it back.
+ * three-question practice round brings it back.
  */
 export class IntroScene {
   readonly root = new Container();
-  /** The letters offered in the tutorial. */
-  static readonly tutorialLetters = ["a", "u", "o", "e", "i", "t"];
+  /** Called as each practice question appears, with its index. */
+  onQuestion?: (index: number) => void;
+  /** Called when a second wrong letter brings up a peek at the whole word. */
+  onPeek?: () => void;
   onTutorialDone?: () => void;
 
   private readonly cover = new Sprite();
@@ -37,6 +72,11 @@ export class IntroScene {
   private flower?: Container;
   private bubble?: Container;
   private slots?: WordSlots;
+  private question = 0;
+  /** The letters still to fill in the current word, in order. */
+  private expected: string[] = [];
+  private slips = 0;
+  private started = false;
   private tutorialActive = false;
   private shattered = false;
   private built = false;
@@ -152,10 +192,10 @@ export class IntroScene {
     this.setColour(0.08, 2.2);
   }
 
-  /** One grey flower and a word bubble with a single missing letter. */
+  /** One grey flower, then the first practice question. */
   startTutorial(): void {
-    if (!this.built || this.tutorialActive || this.flower) return;
-    this.tutorialActive = true;
+    if (!this.built || this.started) return;
+    this.started = true;
     const play = this.play;
     const flower = new Container();
     const wilted = iconSprite("🥀", play.height * 0.24);
@@ -166,23 +206,50 @@ export class IntroScene {
     flower.zIndex = 10;
     this.root.addChild(flower);
     this.flower = flower;
+    this.present(0);
+  }
 
+  /** A word bubble for practice question `index`. */
+  private present(index: number): void {
+    this.question = index;
+    this.slips = 0;
+    const item = practice[index]!;
+    const play = this.play;
     const node = new Container();
     const diameter = Math.min(play.height * 0.46, 220);
     const glass = new Sprite(bubble());
     glass.anchor.set(0.5);
     glass.setSize(diameter * 1.25, diameter);
+    node.addChild(glass);
     const letterWidth = diameter * 0.24;
-    const plate = new Sprite(panel(letterWidth * 3 + 26, letterWidth * 1.75, "#FFFDF3", palette.ink, 16, 3));
-    plate.anchor.set(0.5);
-    plate.y = diameter * 0.12;
-    // A picture clue: without it "s_n" could just as well be "son" or "sin".
-    const clue = iconSprite("☀️", diameter * 0.3);
-    clue.y = -diameter * 0.27;
-    const word = new WordSlots("s_n", "sun", letterWidth, palette.ink, "#E8743B");
-    word.y = plate.y;
-    node.addChild(glass, plate, clue, word);
-    this.slots = word;
+    const plateY = item.clue ? diameter * 0.12 : 0;
+    const plate = (width: number) => {
+      const sprite = new Sprite(panel(width, letterWidth * 1.75, "#FFFDF3", palette.ink, 16, 3));
+      sprite.anchor.set(0.5);
+      sprite.y = plateY;
+      return sprite;
+    };
+    if (item.answer.kind === "letters") {
+      const { masked, word } = item.answer;
+      const slots = new WordSlots(masked, word, letterWidth, palette.ink, "#E8743B");
+      slots.y = plateY;
+      node.addChild(plate(letterWidth * masked.length + 26), slots);
+      this.slots = slots;
+      this.expected = [...masked].flatMap((character, at) => (character === "_" ? [word[at]!] : []));
+    } else {
+      const width = diameter * 0.95;
+      const label = new GameLabel(item.answer.prompt, letterWidth * 0.95, palette.ink, { tracking: 0, fitWidth: width - 20 });
+      label.y = plateY;
+      node.addChild(plate(width), label);
+      this.slots = undefined;
+      this.expected = [];
+    }
+    if (item.clue) {
+      // A picture clue: without it "s_n" could just as well be "son" or "sin".
+      const clue = iconSprite(item.clue, diameter * 0.3);
+      clue.y = -diameter * 0.27;
+      node.addChild(clue);
+    }
     node.position.set(play.midX, this.flowerY - play.height * 0.42);
     node.zIndex = 15;
     node.scale.set(0);
@@ -190,47 +257,104 @@ export class IntroScene {
     run(node, pop(), "pop");
     this.bubble = node;
     audio.play("whoosh", 0.5);
+    this.tutorialActive = true;
+    this.onQuestion?.(index);
   }
 
   handleKey(character: string): void {
-    if (!this.tutorialActive || !this.slots) return;
-    if (character.toLowerCase() === "u") {
-      this.tutorialActive = false;
-      this.slots.fillNext("u");
-      this.finishTutorial();
-    } else if (/^\p{L}$/u.test(character)) {
+    const next = this.expected[0];
+    if (!this.tutorialActive || !this.slots || !next || !/^\p{L}$/u.test(character)) return;
+    if (character.toLowerCase() === next) {
+      this.expected.shift();
+      this.slots.fillNext(next);
+      if (this.expected.length === 0) this.complete();
+      else audio.play("pop", 0.5);
+    } else {
       // Even here a wrong key is just a friendly wobble.
       this.slots.flashWrong(character);
-      if (this.bubble) run(this.bubble, wobble(), "wobble");
-      audio.play("wrong", 0.5);
+      this.slip();
     }
   }
 
-  private finishTutorial(): void {
+  /** Answers the tap-the-answer question. Returns whether `choice` was right. */
+  choose(choice: string): boolean {
+    const item = practice[this.question]!;
+    if (!this.tutorialActive || item.answer.kind !== "choice") return false;
+    if (choice === item.answer.answer) {
+      this.complete();
+      return true;
+    }
+    this.slip();
+    return false;
+  }
+
+  private slip(): void {
+    this.slips += 1;
+    if (this.bubble) run(this.bubble, wobble(), "wobble");
+    audio.play("wrong", 0.5);
+    // As in the levels, a second slip brings help: here a peek at the whole word.
+    if (this.slips === 2 && this.slots) {
+      this.slots.flashWord(1.6);
+      this.onPeek?.();
+    }
+  }
+
+  private complete(): void {
+    this.tutorialActive = false;
     const node = this.bubble;
-    const flower = this.flower;
-    if (!node || !flower) return;
-    const play = this.play;
+    if (!node) return;
     audio.play("correct");
     audio.play("pop");
     rainbowBurst(this.root, node.x, node.y, 60);
     run(node, sequence(wait(0.35), group(scaleTo(1.4, 0.16), fadeOut(0.16)), remove()), "pop");
     this.bubble = undefined;
+    this.slots = undefined;
+    this.otter.celebrate();
+    this.mosey.celebrate();
+    // Colour returns a little more with every answer: a flower, a meadow, then butterflies.
+    const question = this.question;
+    const last = question === practice.length - 1;
+    this.setColour([0.25, 0.4, 0.55][Math.min(question, 2)]!, 1.6);
+    if (question === 0) this.bloomFlower();
+    else if (question === 1) this.bloomMeadow();
+    else this.releaseButterflies();
+    run(this.root, sequence(wait(last ? 2.2 : 1.8), call(() => {
+      if (last) this.onTutorialDone?.();
+      else this.present(question + 1);
+    })));
+  }
+
+  private randomBloom(x: number, delay: number, kinds: string[]): void {
+    const play = this.play;
+    run(this.root, sequence(wait(delay), call(() => {
+      bloom(this.root, kinds[Math.floor(Math.random() * kinds.length)]!, x, this.flowerY + 6 - Math.random() * 16, play.height * 0.1);
+    })));
+  }
+
+  private bloomFlower(): void {
+    const flower = this.flower;
+    if (!flower) return;
+    const play = this.play;
     const sunflower = iconSprite("🌻", play.height * 0.24);
     sunflower.anchor.set(0.5, 1);
     flower.removeChildren().forEach((child) => child.destroy());
     flower.addChild(sunflower);
     run(flower, pop(), "pop");
-    // Colour returns to part of the world: flowers bloom and butterflies appear.
-    this.setColour(0.55, 1.6);
-    const flowerX = flower.x;
-    const flowerY = flower.y;
-    for (let index = 0; index < 10; index += 1) {
-      const x = flowerX + (index - 5) * play.width * 0.05 + (Math.random() - 0.5) * 20;
-      run(this.root, sequence(wait(0.1 * index), call(() => {
-        bloom(this.root, ["🌸", "🌼", "🌷", "🌺"][Math.floor(Math.random() * 4)]!, x, flowerY + 6 - Math.random() * 16, play.height * 0.1);
-      })));
+    [-2, -1, 1, 2].forEach((step, index) => this.randomBloom(flower.x + step * play.width * 0.05, 0.1 * index, ["🌸", "🌼"]));
+  }
+
+  private bloomMeadow(): void {
+    const play = this.play;
+    for (let index = 0; index < 12; index += 1) {
+      const x = play.x + play.width * (0.08 + (0.84 * index) / 11) + (Math.random() - 0.5) * 20;
+      this.randomBloom(x, 0.08 * index, ["🌸", "🌼", "🌷", "🌺"]);
     }
+  }
+
+  private releaseButterflies(): void {
+    const play = this.play;
+    const flowerX = play.midX;
+    const flowerY = this.flowerY;
     for (let index = 0; index < 4; index += 1) {
       const butterfly = new Container();
       butterfly.addChild(iconSprite("🦋", 40));
@@ -241,9 +365,6 @@ export class IntroScene {
       run(butterfly, sequence(wait(0.5 + 0.2 * index), moveTo(flowerX + (index - 2) * 110 + 50, targetY, 1.4, easeInOut)), "fly");
       if (!options.reducedMotion) run(butterfly, repeatForever(sequence(scaleToXY(0.5, 1, 0.15), scaleToXY(1, 1, 0.15))), "flap");
     }
-    this.otter.celebrate();
-    this.mosey.celebrate();
-    run(this.root, sequence(wait(2.2), call(() => this.onTutorialDone?.())));
   }
 
   destroy(): void {

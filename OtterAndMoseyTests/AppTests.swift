@@ -51,7 +51,7 @@ import Testing
 
     @Test func everyCharacterLineHasARecording() {
         let missing = Catalog.voicedLines.filter { Narrator.clipURL($0.key) == nil }.map(\.value.text).sorted()
-        #expect(Catalog.voicedLines.count == 178, "133 for Otter and Mosey, 41 for the guardians, 4 story lines")
+        #expect(Catalog.voicedLines.count == 200, "146 for Otter and Mosey, 47 for the guardians, 7 story lines")
         #expect(missing.isEmpty, "\(missing.count) character lines missing a recording, e.g. \(missing.prefix(3))")
     }
 

@@ -354,7 +354,42 @@ final class WorldMapScene: CoverScene {
 
 /// The opening story: the crystal shatters, the world fades, and one tiny, very easy
 /// challenge shows that answers bring the colour back.
+/// One question in the practice round that follows the opening story.
+struct PracticeQuestion {
+    enum Answer {
+        /// Type the missing letters, offered on a one-row tray as in the word levels.
+        case letters(masked: String, word: String, tray: [Character])
+        /// Tap the right answer from a few choices, as in the maths levels.
+        case choice(prompt: String, answer: String, choices: [String])
+    }
+
+    var answer: Answer
+    /// A picture clue shown above the question.
+    var clue: String?
+    var instruction: String
+    var speechKey: String
+    var speech: String
+}
+
 final class IntroScene: CoverScene {
+    /// The practice round: one missing letter, then two, then a times-tables question to tap.
+    /// Each right answer brings a little more colour back.
+    static let practice: [PracticeQuestion] = [
+        PracticeQuestion(answer: .letters(masked: "s_n", word: "sun", tray: ["a", "u", "o", "e", "i", "t"]), clue: "☀️",
+                         instruction: "Tap the missing letter to bring the flower back!",
+                         speechKey: "word_sun", speech: "Sun. The sun is hot and bright."),
+        PracticeQuestion(answer: .letters(masked: "f__h", word: "fish", tray: ["s", "a", "i", "t", "o", "e"]), clue: "🐟",
+                         instruction: "Two letters are missing now. Fill them in one at a time!",
+                         speechKey: "word_fish", speech: "Fish. A fish swims in the sea."),
+        PracticeQuestion(answer: .choice(prompt: "5 × 2 = ?", answer: "10", choices: ["7", "10", "12"]), clue: nil,
+                         instruction: "Now a sum! Tap the right answer.",
+                         speechKey: "mul_2x5", speech: "5 times 2."),
+    ]
+
+    /// Called as each practice question appears, with its index.
+    var onQuestion: ((Int) -> Void)?
+    /// Called when a second wrong letter brings up a peek at the whole word.
+    var onPeek: (() -> Void)?
     var onTutorialDone: (() -> Void)?
     private let otter = CharacterNode(kind: .otter, size: 120)
     private let mosey = CharacterNode(kind: .mosey, size: 200)
@@ -362,8 +397,12 @@ final class IntroScene: CoverScene {
     private var flower: SKSpriteNode?
     private var bubble: SKNode?
     private var slots: WordSlotsNode?
+    private var question = 0
+    /// The letters still to fill in the current word, in order.
+    private var expected: [Character] = []
+    private var slips = 0
+    private var started = false
     private var tutorialActive = false
-    static let tutorialLetters: [Character] = ["a", "u", "o", "e", "i", "t"]
 
     init() { super.init(background: "bg_title") }
 
@@ -390,10 +429,11 @@ final class IntroScene: CoverScene {
         crystal.size = CGSize(width: height * texture.width / texture.height, height: height)
         crystal.position = CGPoint(x: play.midX, y: play.minY + play.height * 0.66)
         flower?.position = flowerPosition
-        bubble?.position = CGPoint(x: flowerPosition.x, y: flowerPosition.y + play.height * 0.42)
+        bubble?.position = bubblePosition
     }
 
     private var flowerPosition: CGPoint { CGPoint(x: play.midX, y: play.minY + play.height * 0.08) }
+    private var bubblePosition: CGPoint { CGPoint(x: flowerPosition.x, y: flowerPosition.y + play.height * 0.42) }
 
     /// The crystal starts to tremble.
     func rumble() {
@@ -431,9 +471,10 @@ final class IntroScene: CoverScene {
         greyCover.run(.fadeAlpha(to: 0.92, duration: 2.2))
     }
 
-    /// One grey flower and a word bubble with a single missing letter.
+    /// One grey flower, then the first practice question.
     func startTutorial() {
-        tutorialActive = true
+        guard !started else { return }
+        started = true
         let bloom = SKSpriteNode(texture: Art.emoji("🥀", size: 160), size: CGSize(width: play.height * 0.24, height: play.height * 0.24))
         bloom.anchorPoint = CGPoint(x: 0.5, y: 0)
         bloom.position = flowerPosition
@@ -442,68 +483,152 @@ final class IntroScene: CoverScene {
         bloom.colorBlendFactor = 0.8
         addChild(bloom)
         flower = bloom
+        present(0)
+    }
 
+    /// A word bubble for practice question `index`.
+    private func present(_ index: Int) {
+        question = index
+        slips = 0
+        let item = Self.practice[index]
+        let ink = UIColor(hex: "#0E3B43")
         let node = SKNode()
         let diameter = min(play.height * 0.46, 220)
         node.addChild(SKSpriteNode(texture: Art.bubble(), size: CGSize(width: diameter * 1.25, height: diameter)))
         let letterWidth = diameter * 0.24
-        let plateSize = CGSize(width: letterWidth * 3 + 26, height: letterWidth * 1.75)
-        let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFFDF3"), radius: 16, lineWidth: 3), size: plateSize)
-        plate.zPosition = 1
-        plate.position.y = -diameter * 0.12
-        node.addChild(plate)
-        // A picture clue: without it "s_n" could just as well be "son" or "sin".
-        let clue = SKSpriteNode(texture: Art.emoji("☀️", size: 160), size: CGSize(width: diameter * 0.3, height: diameter * 0.3))
-        clue.position.y = diameter * 0.27
-        clue.zPosition = 1
-        node.addChild(clue)
-        let word = WordSlotsNode(masked: "s_n", answer: "sun", letterWidth: letterWidth, ink: UIColor(hex: "#0E3B43"), accent: UIColor(hex: "#E8743B"))
-        word.zPosition = 2
-        word.position.y = plate.position.y
-        node.addChild(word)
-        slots = word
-        node.position = CGPoint(x: flowerPosition.x, y: flowerPosition.y + play.height * 0.42)
+        let plateY = item.clue == nil ? 0 : -diameter * 0.12
+        switch item.answer {
+        case let .letters(masked, word, _):
+            let plateSize = CGSize(width: letterWidth * CGFloat(masked.count) + 26, height: letterWidth * 1.75)
+            node.addChild(plate(size: plateSize, y: plateY))
+            let slots = WordSlotsNode(masked: masked, answer: word, letterWidth: letterWidth, ink: ink, accent: UIColor(hex: "#E8743B"))
+            slots.zPosition = 2
+            slots.position.y = plateY
+            node.addChild(slots)
+            self.slots = slots
+            expected = zip(masked, word).filter { $0.0 == "_" }.map(\.1)
+        case let .choice(prompt, _, _):
+            let plateSize = CGSize(width: diameter * 0.95, height: letterWidth * 1.75)
+            node.addChild(plate(size: plateSize, y: plateY))
+            let label = GameLabel(prompt, size: letterWidth * 0.95, colour: ink, tracking: 0)
+            label.fitWidth = plateSize.width - 20
+            label.zPosition = 2
+            label.position.y = plateY
+            node.addChild(label)
+            slots = nil
+            expected = []
+        }
+        if let clue = item.clue {
+            // A picture clue: without it "s_n" could just as well be "son" or "sin".
+            let picture = SKSpriteNode(texture: Art.emoji(clue, size: 160), size: CGSize(width: diameter * 0.3, height: diameter * 0.3))
+            picture.position.y = diameter * 0.27
+            picture.zPosition = 1
+            node.addChild(picture)
+        }
+        node.position = bubblePosition
         node.zPosition = 15
         node.setScale(0)
         addChild(node)
         node.run(.pop())
         bubble = node
         AudioManager.shared.play(.whoosh, volume: 0.5)
+        tutorialActive = true
+        onQuestion?(index)
+    }
+
+    private func plate(size: CGSize, y: CGFloat) -> SKSpriteNode {
+        let plate = SKSpriteNode(texture: Art.panel(size: size, fill: UIColor(hex: "#FFFDF3"), radius: 16, lineWidth: 3), size: size)
+        plate.zPosition = 1
+        plate.position.y = y
+        return plate
     }
 
     func handleKey(_ character: Character) {
-        guard tutorialActive, let slots else { return }
-        if character == "u" || character == "U" {
-            tutorialActive = false
-            slots.fillNext(with: "u")
-            finishTutorial()
+        guard tutorialActive, let slots, let next = expected.first, character.isLetter else { return }
+        if Character(character.lowercased()) == next {
+            expected.removeFirst()
+            slots.fillNext(with: next)
+            if expected.isEmpty { complete() } else { AudioManager.shared.play(.pop, volume: 0.5) }
         } else {
             // Even here a wrong key is just a friendly wobble.
             slots.flashWrong(character)
-            bubble?.run(.wobble())
-            AudioManager.shared.play(.wrong, volume: 0.5)
+            slip()
         }
     }
 
-    private func finishTutorial() {
-        guard let bubble, let flower else { return }
+    /// Answers the tap-the-answer question. Returns whether `choice` was right.
+    func choose(_ choice: String) -> Bool {
+        guard tutorialActive, case let .choice(_, answer, _) = Self.practice[question].answer else { return false }
+        if choice == answer {
+            complete()
+            return true
+        }
+        slip()
+        return false
+    }
+
+    private func slip() {
+        slips += 1
+        bubble?.run(.wobble())
+        AudioManager.shared.play(.wrong, volume: 0.5)
+        // As in the levels, a second slip brings help: here a peek at the whole word.
+        if slips == 2, let slots {
+            slots.flashWord(for: 1.6)
+            onPeek?()
+        }
+    }
+
+    private func complete() {
+        tutorialActive = false
+        guard let node = bubble else { return }
         AudioManager.shared.play(.correct)
         AudioManager.shared.play(.pop)
         Haptics.shared.success()
-        Effects.rainbowBurst(at: bubble.position, in: self, count: 60)
-        bubble.run(.sequence([.wait(forDuration: 0.35), .group([.scale(to: 1.4, duration: 0.16), .fadeOut(withDuration: 0.16)]), .removeFromParent()]))
+        Effects.rainbowBurst(at: node.position, in: self, count: 60)
+        node.run(.sequence([.wait(forDuration: 0.35), .group([.scale(to: 1.4, duration: 0.16), .fadeOut(withDuration: 0.16)]), .removeFromParent()]))
+        bubble = nil
+        slots = nil
+        otter.celebrate()
+        mosey.celebrate()
+        // Colour returns a little more with every answer: a flower, a meadow, then butterflies.
+        let last = question == Self.practice.count - 1
+        greyCover.run(.fadeAlpha(to: [0.75, 0.6, 0.45][min(question, 2)], duration: 1.6))
+        switch question {
+        case 0: bloomFlower()
+        case 1: bloomMeadow()
+        default: releaseButterflies()
+        }
+        run(.sequence([.wait(forDuration: last ? 2.2 : 1.8), .run { [weak self] in
+            guard let self else { return }
+            if last { self.onTutorialDone?() } else { self.present(self.question + 1) }
+        }]))
+    }
+
+    private func bloomFlower() {
+        guard let flower else { return }
         flower.texture = Art.emoji("🌻", size: 160)
         flower.colorBlendFactor = 0
         flower.run(.pop())
-        // Colour returns to part of the world: flowers bloom and butterflies appear.
-        greyCover.run(.fadeAlpha(to: 0.45, duration: 1.6))
-        for index in 0..<10 {
-            let x = flowerPosition.x + CGFloat(index - 5) * play.width * 0.05 + CGFloat.random(in: -10...10)
+        for index in 0..<4 {
+            let x = flowerPosition.x + CGFloat(index < 2 ? index - 2 : index - 1) * play.width * 0.05
             run(.sequence([.wait(forDuration: 0.1 * Double(index)), .run { [weak self] in
+                guard let self else { return }
+                Effects.bloom(["🌸", "🌼"].randomElement()!, at: CGPoint(x: x, y: self.flowerPosition.y + .random(in: -6...10)), size: self.play.height * 0.1, in: self)
+            }]))
+        }
+    }
+
+    private func bloomMeadow() {
+        for index in 0..<12 {
+            let x = play.minX + play.width * (0.08 + 0.84 * CGFloat(index) / 11) + .random(in: -10...10)
+            run(.sequence([.wait(forDuration: 0.08 * Double(index)), .run { [weak self] in
                 guard let self else { return }
                 Effects.bloom(["🌸", "🌼", "🌷", "🌺"].randomElement()!, at: CGPoint(x: x, y: self.flowerPosition.y + .random(in: -6...10)), size: self.play.height * 0.1, in: self)
             }]))
         }
+    }
+
+    private func releaseButterflies() {
         for index in 0..<4 {
             let butterfly = SKSpriteNode(texture: Art.emoji("🦋"), size: CGSize(width: 40, height: 40))
             butterfly.position = flowerPosition
@@ -515,8 +640,5 @@ final class IntroScene: CoverScene {
                 butterfly.run(.repeatForever(.sequence([.scaleX(to: 0.5, duration: 0.15), .scaleX(to: 1, duration: 0.15)])))
             }
         }
-        otter.celebrate()
-        mosey.celebrate()
-        run(.sequence([.wait(forDuration: 2.2), .run { [weak self] in self?.onTutorialDone?() }]))
     }
 }

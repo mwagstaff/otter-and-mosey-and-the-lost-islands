@@ -943,3 +943,9 @@ body.calm .bob, body.calm .screen, body.calm .results, body.calm .pause, body.ca
   .photo-thumb { height: 24px; }
 }
 body.calm .photo-polaroid, body.calm .photo-viewer { animation: none; }
+
+/* The practice round after the opening story. */
+.tutorial-banner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tutorial-progress { font-size: clamp(13px, 2vh, 17px); font-weight: 800; opacity: 0.7; }
+.keys.tray .key.choice { max-width: 140px; border-radius: 999px; }
+.keys.tray .key.choice:disabled { opacity: 0.35; }

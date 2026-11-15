@@ -340,11 +340,17 @@ private struct Wobble: GeometryEffect {
     }
 }
 
-/// The opening story and the one-question tutorial.
+/// The opening story and the practice round that follows it.
 struct IntroView: View {
     @Environment(AppModel.self) private var model
     @State private var scene = IntroScene()
-    @State private var step = 0 // 0 = story, 1 = tutorial, 2 = after-story
+    @State private var step = 0 // 0 = story, 1 = practice, 2 = after-story
+    @State private var question = 0
+    @State private var peeking = false
+    /// Wrong answers already tapped on the current tap-the-answer question.
+    @State private var ruledOut: Set<String> = []
+
+    private var practice: PracticeQuestion { IntroScene.practice[question] }
 
     var body: some View {
         GeometryReader { geometry in
@@ -359,13 +365,9 @@ struct IntroView: View {
                     }, onFinish: startTutorial)
                 } else if step == 1 {
                     VStack {
-                        Text("Tap the missing letter to bring the flower back!")
-                            .font(.game(compact ? 20 : 30, weight: .bold)).foregroundStyle(Palette.ink)
-                            .padding(.horizontal, 18).padding(.vertical, 10).panel(radius: 18)
-                            .padding(.top, 8)
+                        banner(compact: compact)
                         Spacer()
-                        GameKeyboard(kind: .tray(IntroScene.tutorialLetters), width: geometry.size.width - 16,
-                                     onKey: { scene.handleKey($0) }, onBackspace: {})
+                        answerKeys(width: geometry.size.width - 16, compact: compact)
                     }
                     HardwareKeys(onKey: { scene.handleKey($0) }, onBackspace: {}).frame(width: 1, height: 1).opacity(0.01)
                     VStack {
@@ -386,6 +388,13 @@ struct IntroView: View {
             .environment(\.compact, compact)
         }
         .onAppear {
+            scene.onQuestion = { index in
+                question = index
+                peeking = false
+                ruledOut = []
+                say(IntroScene.practice[index])
+            }
+            scene.onPeek = { peeking = true }
             scene.onTutorialDone = {
                 Narrator.shared.stop()
                 step = 2
@@ -393,15 +402,59 @@ struct IntroView: View {
         }
     }
 
+    private func banner(compact: Bool) -> some View {
+        VStack(spacing: 4) {
+            Text("Practice \(question + 1) of \(IntroScene.practice.count)")
+                .font(.game(compact ? 13 : 17, weight: .heavy)).foregroundStyle(Palette.ink.opacity(0.7))
+            Text(peeking ? "Here's a peek! Remember it, then try again." : practice.instruction)
+                .font(.game(compact ? 20 : 30, weight: .bold)).foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 18).padding(.vertical, 10).panel(radius: 18)
+        .padding(.top, 8)
+        .padding(.horizontal, compact ? 110 : 150) // Clear of the Skip button.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.updatesFrequently)
+    }
+
+    @ViewBuilder private func answerKeys(width: CGFloat, compact: Bool) -> some View {
+        switch practice.answer {
+        case let .letters(_, _, tray):
+            GameKeyboard(kind: .tray(tray), width: width, onKey: { scene.handleKey($0) }, onBackspace: {})
+        case let .choice(_, _, choices):
+            HStack(spacing: compact ? 12 : 20) {
+                ForEach(choices, id: \.self) { choice in
+                    Button(action: tapped {
+                        if !scene.choose(choice) { ruledOut.insert(choice) }
+                    }) {
+                        Text(choice).frame(minWidth: compact ? 64 : 96)
+                    }
+                    .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 26 : 36))
+                    // A wrong answer fades away, as the tunnels fizz shut in the maths levels.
+                    .opacity(ruledOut.contains(choice) ? 0.35 : 1)
+                    .disabled(ruledOut.contains(choice))
+                }
+            }
+            .frame(height: KeyMetrics.trayHeight(compact: compact) - 14)
+            .padding(.top, 8)
+            .padding(.bottom, 6)
+            .frame(maxWidth: .infinity)
+            .background(Palette.ink.opacity(0.82).ignoresSafeArea(edges: [.bottom, .horizontal]))
+        }
+    }
+
+    /// The question is also said aloud, like every question in the game.
+    private func say(_ item: PracticeQuestion) {
+        if model.settings.spokenInstructions { Narrator.shared.say(key: item.speechKey, fallback: item.speech) }
+    }
+
     private func startTutorial() {
-        // Skipping the story still breaks the crystal, so the tutorial makes sense.
+        // Skipping the story still breaks the crystal, so the practice makes sense.
         scene.shatter()
         step = 1
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
             guard step == 1 else { return }
             scene.startTutorial()
-            // The word is also said aloud, like every spelling question in the game.
-            if model.settings.spokenInstructions { Narrator.shared.say(key: "word_sun", fallback: "Sun. The sun is hot and bright.") }
         }
     }
 }

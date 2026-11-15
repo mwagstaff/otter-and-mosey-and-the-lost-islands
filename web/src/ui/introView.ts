@@ -3,7 +3,7 @@ import type { AppModel } from "../app/model";
 import { catalog } from "../core";
 import { tick } from "../engine/actions";
 import { narrator } from "../game/audio";
-import { IntroScene } from "../game/introScene";
+import { IntroScene, practice } from "../game/introScene";
 import { dialogueHeight, showDialogue } from "./dialogue";
 import { button, h, symbol } from "./dom";
 import type { Screen } from "./menus";
@@ -11,7 +11,7 @@ import { keyboardRows } from "./keyboard";
 
 type Step = "loading" | "story" | "tutorial" | "after";
 
-/** The opening story and the one-question tutorial. */
+/** The opening story and the practice round that follows it. */
 export function introView(model: AppModel, app: Application): Screen {
   const scene = new IntroScene();
   let step: Step = "loading";
@@ -19,14 +19,42 @@ export function introView(model: AppModel, app: Application): Screen {
   const compact = () => window.innerHeight < 520;
   const trayHeight = () => (compact() ? 76 : 104);
 
-  const banner = h("p.tutorial-banner.panel", { hidden: true }, "Tap the missing letter to bring the flower back!");
+  const progress = h("span.tutorial-progress");
+  const instruction = h("span.tutorial-instruction");
+  const banner = h("p.tutorial-banner.panel", { hidden: true, "aria-live": "polite" }, progress, instruction);
   const skip = button("cream.skip.below-hud", ["Skip", symbol("skip")], () => model.finishIntro());
   skip.hidden = true;
-  // The tutorial fills the lowercase "u" in "sun" using the same accessible keys as levels.
-  const keys = h("div.keys.tray", { hidden: true },
-    ...keyboardRows({ kind: "tray", letters: IntroScene.tutorialLetters }, (letter) => {
-      if (step === "tutorial") scene.handleKey(letter);
-    }, () => {}));
+  // Letter questions use the same accessible keys as levels; the sum gets answer buttons instead.
+  const keys = h("div.keys.tray", { hidden: true });
+  let question = 0;
+
+  function showQuestion(index: number): void {
+    question = index;
+    const item = practice[index]!;
+    progress.textContent = `Practice ${index + 1} of ${practice.length}`;
+    instruction.textContent = item.instruction;
+    banner.hidden = false;
+    if (item.answer.kind === "letters") {
+      keys.replaceChildren(...keyboardRows({ kind: "tray", letters: item.answer.tray }, (letter) => {
+        if (step === "tutorial") scene.handleKey(letter);
+      }, () => {}));
+    } else {
+      keys.replaceChildren(h("div.key-row", {}, ...item.answer.choices.map((choice) => {
+        const key = h<"button">("button.key.choice", { type: "button", onClick: () => {
+          // A wrong answer fades away, as the tunnels fizz shut in the maths levels.
+          if (step === "tutorial" && !scene.choose(choice)) key.disabled = true;
+        } }, choice);
+        return key;
+      })));
+    }
+    // The question is also said aloud, like every question in the game.
+    if (model.settings.spokenInstructions) narrator.say(item.speechKey, item.speech);
+  }
+
+  scene.onQuestion = showQuestion;
+  scene.onPeek = () => {
+    if (practice[question]) instruction.textContent = "Here's a peek! Remember it, then try again.";
+  };
   const overlay = h("div.overlay");
   const element = h("section.screen.game", {}, banner, skip, keys, overlay);
 
@@ -37,18 +65,15 @@ export function introView(model: AppModel, app: Application): Screen {
   }
 
   function startTutorial(): void {
-    // Skipping the story still breaks the crystal, so the tutorial makes sense.
+    // Skipping the story still breaks the crystal, so the practice makes sense.
     scene.shatter();
     step = "tutorial";
-    banner.hidden = false;
     skip.hidden = false;
     keys.hidden = false;
     layout();
     window.setTimeout(() => {
       if (destroyed || step !== "tutorial") return;
       scene.startTutorial();
-      // The word is also said aloud, like every spelling question in the game.
-      if (model.settings.spokenInstructions) narrator.say("word_sun", "Sun. The sun is hot and bright.");
     }, 900);
   }
 
