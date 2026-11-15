@@ -4,6 +4,10 @@ import Foundation
 public struct ParentSettings: Codable, Equatable, Sendable {
     public var difficulty: DifficultyMode = .adaptive
     public var tables: [Int] = MathsGenerator.defaultTables
+    /// The numbers times-table and division questions may multiply or divide by.
+    public var multipliers: [Int] = MathsGenerator.defaultMultipliers
+    /// The fractions questions may use, by denominator (2 for halves up to 10 for tenths).
+    public var denominators: [Int] = MathsGenerator.defaultDenominators
     public var spellingTopics: [Skill] = Skill.spellingTopics
     /// Suggested play time in minutes before a gentle break reminder. 0 means no reminder.
     public var sessionMinutes = 0
@@ -16,6 +20,8 @@ public struct ParentSettings: Codable, Equatable, Sendable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         difficulty = c.value(.difficulty, default: .adaptive)
         tables = c.value(.tables, default: MathsGenerator.defaultTables)
+        multipliers = c.value(.multipliers, default: MathsGenerator.defaultMultipliers)
+        denominators = c.value(.denominators, default: MathsGenerator.defaultDenominators)
         spellingTopics = c.value(.spellingTopics, default: Skill.spellingTopics)
         sessionMinutes = c.value(.sessionMinutes, default: 0)
         timedChallenges = c.value(.timedChallenges, default: false)
@@ -176,7 +182,10 @@ public struct ChallengeSession: Sendable {
 
         // Spaced repetition: bring back something the child found tricky.
         if asked > 1, Double.random(in: 0..<1, using: &rng) < 0.35,
-           let key = learner.dueKeys(for: skills).first(where: { !usedKeys.contains($0) }),
+           let key = learner.dueKeys(for: skills).first(where: {
+               !usedKeys.contains($0)
+                   && MathsGenerator.allows(factKey: $0, tables: settings.tables, multipliers: settings.multipliers)
+           }),
            let review = question(forKey: key) {
             usedKeys.insert(key)
             return review
@@ -201,13 +210,15 @@ public struct ChallengeSession: Sendable {
         switch skill.subject {
         case .maths:
             for _ in 0..<8 {
-                let candidate = MathsGenerator.make(skill: skill, level: pitch, tables: settings.tables, format: format(for: skill), using: &rng)
+                let candidate = MathsGenerator.make(skill: skill, level: pitch, tables: settings.tables, multipliers: settings.multipliers,
+                                                      denominators: settings.denominators, format: format(for: skill), using: &rng)
                 if !usedTexts.contains(candidate.prompt) {
                     usedTexts.insert(candidate.prompt)
                     return candidate
                 }
             }
-            return MathsGenerator.make(skill: skill, level: pitch, tables: settings.tables, format: format(for: skill), using: &rng)
+            return MathsGenerator.make(skill: skill, level: pitch, tables: settings.tables, multipliers: settings.multipliers,
+                                                      denominators: settings.denominators, format: format(for: skill), using: &rng)
         case .typing:
             let question = SpellingGenerator.typing(level: pitch, profile: inputProfile, bank: bank, avoiding: usedTexts, using: &rng)
             usedTexts.insert(question.answer)

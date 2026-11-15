@@ -1,4 +1,5 @@
 import { artURL } from "../assets";
+import { photoButton } from "./photo";
 import type { AppModel } from "../app/model";
 import {
   allTrophies, catalog, counterUnits, counterValue, isIslandUnlocked, isLevelUnlocked, totalStars, trophyCount, trophyGroups,
@@ -197,7 +198,7 @@ export function trophyCabinetScreen(model: AppModel): Screen {
     detailLayer.replaceChildren();
     render();
   }));
-  const element = h("section.screen.trophies", { style: `background-image: url("${artURL("bg_title")}")` },
+  const element: HTMLElement = h("section.screen.trophies", { style: `background-image: url("${artURL("bg_title")}")` },
     h("div.veil.soft"),
     h("header.bar.trophies-bar", {},
       roundButton("back", "Back", () => model.go(model.trophiesReturn)),
@@ -205,6 +206,7 @@ export function trophyCabinetScreen(model: AppModel): Screen {
         h("span.tmeter.plaque-bar", {}, h("i", { style: `width: ${Math.round((count.won / count.total) * 100)}%` })),
         h("small", {}, `${count.won} of ${count.total} trophies`)),
       h("span.grow"),
+      photoButton(model, (): HTMLElement => element),
       h("div.tabs", {}, ...tabButtons),
     ),
     h("div.cabinet-body", {}, records(profile), h("div.cabinet-frame", {}, glass)),

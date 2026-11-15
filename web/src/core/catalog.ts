@@ -118,6 +118,18 @@ export interface RawCatalog {
   intro: string[];
   introAfter: string[];
   askGrownUp: string[];
+  finale?: { opening: string[]; guardians: Record<string, string>; thanks: string[]; photo: string[]; countdown?: string[]; after: string[] };
+}
+
+/** The script for the end-of-game celebration. Guardian lines are keyed by island id. */
+export interface Finale {
+  opening: DialogueLine[];
+  guardians: Record<string, DialogueLine>;
+  thanks: DialogueLine[];
+  photo: DialogueLine[];
+  /** Otter counting down to the photo: three, two, one. */
+  countdown: DialogueLine[];
+  after: DialogueLine[];
 }
 
 /** Decorations everyone starts with or earns from star totals. */
@@ -136,6 +148,7 @@ export class Catalog {
   readonly introAfter: DialogueLine[];
   /** Kind suggestions from Otter or Mosey to fetch a grown-up when a child keeps getting stuck. */
   readonly askGrownUp: DialogueLine[];
+  readonly finale: Finale;
 
   constructor(raw: RawCatalog) {
     const lines = (list: string[]) => list.map(parseDialogueLine);
@@ -155,6 +168,15 @@ export class Catalog {
     this.intro = lines(raw.intro);
     this.introAfter = lines(raw.introAfter);
     this.askGrownUp = lines(raw.askGrownUp ?? []);
+    const finale = raw.finale ?? { opening: [], guardians: {}, thanks: [], photo: [], after: [] };
+    this.finale = {
+      opening: lines(finale.opening),
+      guardians: Object.fromEntries(Object.entries(finale.guardians).map(([id, line]) => [id, parseDialogueLine(line)])),
+      thanks: lines(finale.thanks),
+      photo: lines(finale.photo),
+      countdown: lines(finale.countdown ?? []),
+      after: lines(finale.after),
+    };
   }
 
   get allLevels(): LevelDef[] {

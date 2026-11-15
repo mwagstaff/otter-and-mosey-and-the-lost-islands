@@ -134,6 +134,21 @@ public struct Catalog: Codable, Sendable {
     public let introAfter: [DialogueLine]
     /// Kind suggestions from Otter or Mosey to fetch a grown-up when a child keeps getting stuck.
     public let askGrownUp: [DialogueLine]
+    /// The script for the end-of-game celebration.
+    public var finale: Finale? = nil
+
+    /// What is said in the finale. Nothing spoken uses the player's name, so every line is
+    /// recorded once; the name only appears as on-screen text.
+    public struct Finale: Codable, Sendable {
+        public let opening: [DialogueLine]
+        /// One thank-you from each guardian, keyed by island id.
+        public let guardians: [String: DialogueLine]
+        public let thanks: [DialogueLine]
+        public let photo: [DialogueLine]
+        /// Otter counting down to the photo: three, two, one.
+        public let countdown: [DialogueLine]?
+        public let after: [DialogueLine]
+    }
 
     public static let shared: Catalog = {
         do {

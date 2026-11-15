@@ -55,8 +55,8 @@ export function islandTheme(island: string): IslandTheme {
 const activities: Record<string, Pick<IslandTheme, "collectible" | "collectInstruction" | "gateDecoration" | "snack" | "snackName">> = {
   woods: { collectible: "🍓", collectInstruction: "Tap berries to eat them, or drag to collect!", gateDecoration: "🌸", snack: "🍓", snackName: "berries" },
   bay: { collectible: "pearl", collectInstruction: "Tap pearls to pop them, or drag to collect!", gateDecoration: "🐚", snack: "fish_biscuits", snackName: "fish biscuits" },
-  dragon: { collectible: "💎", collectInstruction: "Tap gems to pop them, or drag to collect!", gateDecoration: "💎", snack: "🍪", snackName: "warm cookies" },
+  dragon: { collectible: "💎", collectInstruction: "Tap gems to pop them, or drag to collect!", gateDecoration: "💎", snack: "cookie", snackName: "warm cookies" },
   cloud: { collectible: "☁️", collectInstruction: "Tap clouds to pop them, or drag to collect!", gateDecoration: "🌈", snack: "🧁", snackName: "cloud cakes" },
   candy: { collectible: "🍬", collectInstruction: "Tap candies to eat them, or drag to collect!", gateDecoration: "🍬", snack: "🍬", snackName: "candies" },
-  star: { collectible: "⭐️", collectInstruction: "Tap stars to pop them, or drag to collect!", gateDecoration: "⭐️", snack: "🍪", snackName: "star cookies" },
+  star: { collectible: "⭐️", collectInstruction: "Tap stars to pop them, or drag to collect!", gateDecoration: "⭐️", snack: "star_cookie", snackName: "star cookies" },
 };

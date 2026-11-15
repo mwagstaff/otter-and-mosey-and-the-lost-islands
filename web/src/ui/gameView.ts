@@ -19,7 +19,7 @@ import { dialogueHeight, showDialogue as sharedDialogue } from "./dialogue";
 import { button, h, picture, roundButton, symbol } from "./dom";
 import { starRow, type Screen } from "./menus";
 import { crystalShowcase, fragmentRow, miniCabinet, trophyBadge } from "./trophies";
-import { keyboardRows } from "./keyboard";
+import { keyboardRows, setKeyboardUppercase } from "./keyboard";
 import { options } from "../game/options";
 
 type Stage = "loading" | "intro" | "playing" | "outro" | "results";
@@ -140,7 +140,10 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   function renderKeys(): void {
     const kind: KeyboardKind = stage === "playing" && bridge.dialogue.length === 0 ? bridge.keyboard : { kind: "none" };
     const signature = JSON.stringify(kind);
-    if (signature === keysShown) return;
+    if (signature === keysShown) {
+      setKeyboardUppercase(keys, bridge.keyboardUppercase);
+      return;
+    }
     keysShown = signature;
     keys.className = `keys ${kind.kind}`;
     keys.hidden = kind.kind === "none";
@@ -153,7 +156,7 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
       bridge.onKey?.(key);
     }, () => {
       if (!paused && stage === "playing" && bridge.dialogue.length === 0) bridge.onBackspace?.();
-    }));
+    }, bridge.keyboardUppercase));
   }
 
   // Layout
@@ -240,6 +243,8 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
         model.unlockedIsland = nextIsland?.id;
         model.go({ name: "map" });
       }),
+      // Beating a guardian again once every fragment is home: the finale can be watched again.
+      !testing && earned?.endingReplay && button("gold", [picture("🌈"), "Watch the ending"], () => model.go({ name: "ending" })),
       // Replaying the end of an island already finished: nothing new to unlock, so head back to the map.
       !testing && !earned?.gameComplete && !canGoOn && !earned?.crystalIsland
         && button("teal.big", ["Continue to map", symbol("arrow")], () => model.go({ name: "map" })),

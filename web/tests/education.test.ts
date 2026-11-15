@@ -1,9 +1,9 @@
 // Ported from Packages/LostIslandsCore/Tests/LostIslandsCoreTests/EducationTests.swift.
 import { describe, expect, test } from "vitest";
 import {
-  Chatter, isCorrectChoice, isCorrectTyped, LearnerModel, makeMaths, makeMathsFact, makeSpelling, makeTyping,
+  allowsFact, Chatter, isCorrectChoice, isCorrectTyped, LearnerModel, makeMaths, makeMathsFact, makeSpelling, makeTyping,
   averageTouchWordsPerMinuteOf, mathsTopics, MouthGate, narration, newTypingStats, recordTypingStats, SeededGenerator, spellingTopics,
-  subjectOf, TypingMeter, wordBank as bank,
+  newParentSettings, readParentSettings, settingsSummary, subjectOf, TypingMeter, wordBank as bank,
   type Question, type Skill, type SpellingStyle,
 } from "../src/core";
 
@@ -71,6 +71,69 @@ describe("maths generator", () => {
   test("multiplication respects chosen tables", () => {
     const rng = new SeededGenerator(3);
     times(300, () => expect(makeMaths("multiplication", 4, rng, { tables: [8] }).key).toMatch(/^mul:8x/));
+  });
+
+  test("switched-off tables never appear on either side", () => {
+    const rng = new SeededGenerator(21);
+    const tables = [2, 3, 5, 10];
+    for (const skill of ["multiplication", "division", "wordProblems", "sequences"] as const) {
+      for (const level of [1, 2, 3, 4, 5]) {
+        times(200, () => {
+          const question = makeMaths(skill, level, rng, { tables });
+          if (/^(mul|div):/.test(question.key)) expect(allowsFact(question.key, tables), question.key).toBe(true);
+          const numbers = (question.prompt.match(/\d+/g) ?? []).map(Number);
+          if (skill === "multiplication" && question.prompt.includes("0 ×")) {
+            expect(numbers.includes(40) || numbers.includes(80), question.prompt).toBe(false);
+          }
+          if (skill === "sequences" && numbers.length >= 2) {
+            expect([4, 8].includes(Math.abs(numbers[1]! - numbers[0]!)), question.prompt).toBe(false);
+          }
+        });
+      }
+    }
+  });
+
+  test("chosen multipliers are the only ones used", () => {
+    const rng = new SeededGenerator(22);
+    const chosen = [2, 5, 6, 7];
+    for (const skill of ["multiplication", "division"] as const) {
+      for (const level of [1, 2, 3, 4]) {
+        times(300, () => {
+          const question = makeMaths(skill, level, rng, { multipliers: chosen });
+          expect(chosen.includes(Number(question.key.split("x")[1])), question.prompt).toBe(true);
+        });
+      }
+    }
+    // Only big multipliers chosen: the grown-up's choice wins over level 1's usual 1 to 6.
+    times(50, () => expect(makeMaths("multiplication", 1, rng, { multipliers: [11, 12] }).key).toMatch(/x1[12]$/));
+  });
+
+  test("review facts respect tables and multipliers", () => {
+    expect(allowsFact("mul:3x7", [2, 3])).toBe(true);
+    expect(allowsFact("mul:8x3", [2, 3])).toBe(false);
+    expect(allowsFact("mul:3x8", [2, 3])).toBe(false);
+    expect(allowsFact("div:3x11", [2, 3], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toBe(false);
+    expect(allowsFact("word:because", [2], [5])).toBe(true);
+  });
+
+  test("fractions use only chosen denominators", () => {
+    const rng = new SeededGenerator(23);
+    for (const chosen of [[2], [3], [2, 4], [10], [5, 8], [3, 6, 9]]) {
+      for (const level of levels) {
+        times(150, () => {
+          const { prompt } = makeMaths("fractions", level, rng, { denominators: chosen });
+          const used = prompt.startsWith("Half") ? 2 : Number(/\/(\d+)/.exec(prompt)?.[1]);
+          expect(chosen.includes(used), `${chosen}: ${prompt}`).toBe(true);
+        });
+      }
+    }
+  });
+
+  test("older settings keep every multiplier and fraction", () => {
+    const settings = readParentSettings({ tables: [2, 5] });
+    expect(settings.multipliers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(settings.denominators).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(settings.tables).toEqual([2, 5]);
   });
 
   test("missing factor answers are consistent", () => {
@@ -225,9 +288,14 @@ describe("word bank", () => {
     const rng = new SeededGenerator(8);
     times(50, () => {
       expect(makeTyping(2, "compactTouch", bank, rng).answer, "phones get single words at low levels").not.toContain(" ");
-      expect(makeTyping(2, "hardware", bank, rng).answer, "hardware keyboards get sentences").toContain(" ");
+      const sentence = makeTyping(2, "hardware", bank, rng);
+      expect(sentence.answer, "hardware keyboards get sentences").toContain(" ");
+      expect(sentence.typingTarget).toMatch(/^[A-Z]/);
     });
-    for (const sentence of bank.sentences) expect(sentence.text).toMatch(/^[a-z ]+$/);
+    for (const sentence of bank.sentences) {
+      expect(sentence.text).toMatch(/^[A-Z][A-Za-z ]*$/);
+      expect(sentence.text).not.toMatch(/\bi\b|\bmosey\b/);
+    }
   });
 });
 
@@ -396,5 +464,52 @@ describe("worked maths hints", () => {
     const question = makeMathsFact("mul:5x1", 1, new SeededGenerator(4))!;
     expect(question.hint).toContain("1 jump of 5: 5.");
     expect(question.hint).not.toContain("10");
+  });
+});
+
+describe("settings summary", () => {
+  const values = (settings: ReturnType<typeof newParentSettings>) =>
+    Object.fromEntries(settingsSummary(settings).map((line) => [line.label, line.value.replaceAll("\u00a0", " ")]));
+  const changed = (settings: ReturnType<typeof newParentSettings>) =>
+    settingsSummary(settings).filter((line) => line.changed).map((line) => line.label);
+
+  test("a new player's settings read as everything, with nothing changed", () => {
+    const fresh = newParentSettings();
+    expect(values(fresh)).toEqual({
+      "Difficulty": "Adaptive",
+      "Times tables": "2, 3, 4, 5, 8 and 10",
+      "Multiply and divide by": "Everything from × 1 to × 12",
+      "Fractions": "Halves to tenths",
+      "Spelling": "All 5 topics",
+    });
+    expect(changed(fresh)).toEqual([]);
+  });
+
+  test("a switched-off table drops out of the multipliers too", () => {
+    const settings = { ...newParentSettings(), tables: [2, 3, 4, 5, 10], multipliers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
+    expect(values(settings)["Times tables"]).toBe("2, 3, 4, 5 and 10");
+    expect(values(settings)["Multiply and divide by"]).toBe("× 1 to × 10, but not × 8");
+    expect(changed(settings)).toEqual(["Times tables", "Multiply and divide by"]);
+  });
+
+  test("multipliers and fractions use ranges, gaps, single picks and lists", () => {
+    const base = newParentSettings();
+    const multiply = (multipliers: number[]) => values({ ...base, multipliers })["Multiply and divide by"];
+    const fractions = (denominators: number[]) => values({ ...base, denominators })["Fractions"];
+    expect(multiply([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toBe("× 1 to × 10");
+    expect(multiply([1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12])).toBe("All but × 8");
+    expect(multiply([5])).toBe("Only × 5");
+    expect(multiply([2, 5, 10])).toBe("× 2, × 5 and × 10");
+    expect(fractions([2, 3, 4, 5, 6, 8, 10])).toBe("All but sevenths and ninths");
+    expect(fractions([2, 3, 4])).toBe("Halves to quarters");
+    expect(fractions([2, 4, 10])).toBe("Halves, quarters and tenths");
+    expect(fractions([2, 3, 5, 6])).toBe("Halves to sixths, but not quarters");
+  });
+
+  test("difficulty and spelling read naturally", () => {
+    const settings = { ...newParentSettings(), difficulty: "gentle" as const, spellingTopics: ["starterWords", "exceptionWords"] as Skill[] };
+    expect(values(settings)["Difficulty"]).toBe("Gentle");
+    expect(values(settings)["Spelling"]).toBe("Warm-up words and tricky words");
+    expect(values({ ...settings, spellingTopics: ["starterWords", "exceptionWords", "prefixes"] })["Spelling"]).toBe("All but suffixes and homophones");
   });
 });

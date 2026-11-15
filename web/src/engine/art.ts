@@ -270,6 +270,54 @@ export function fishBiscuits(): Texture {
   });
 }
 
+/**
+ * The picture for an island's snack: drawn here for the fish biscuits and cookies, which have no
+ * painted art (the cookie emoji renders as an empty box on iPad), otherwise its painted icon.
+ */
+export function snackSprite(key: string, size: number): Sprite {
+  const drawnSnack = key === "fish_biscuits" ? fishBiscuit() : key === "cookie" ? cookie(false) : key === "star_cookie" ? cookie(true) : undefined;
+  if (!drawnSnack) return iconSprite(key, size);
+  const sprite = new Sprite(drawnSnack);
+  sprite.anchor.set(0.5);
+  sprite.scale.set(size / Math.max(drawnSnack.width, drawnSnack.height));
+  return sprite;
+}
+
+/** A chunky golden cookie with chocolate chips: round for the dragons, star-shaped for Star Island. */
+export function cookie(star: boolean): Texture {
+  return drawn(star ? "star-cookie" : "cookie", 120, 120, (context) => {
+    const cx = 60, cy = 60;
+    const shape = new Path2D();
+    if (star) {
+      for (let index = 0; index < 10; index += 1) {
+        const angle = -Math.PI / 2 + (index * Math.PI) / 5;
+        const radius = index % 2 === 0 ? 56 : 27;
+        const x = cx + Math.cos(angle) * radius, y = cy + 3 + Math.sin(angle) * radius;
+        if (index === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+      }
+      shape.closePath();
+    } else {
+      shape.arc(cx, cy, 52, 0, Math.PI * 2);
+    }
+    context.lineJoin = "round";
+    context.fillStyle = "#E2A85A";
+    context.fill(shape);
+    context.save();
+    context.clip(shape);
+    context.fillStyle = "#F4C987";
+    context.beginPath(); context.ellipse(cx - 11, cy - 23, 25, 17, 0, 0, Math.PI * 2); context.fill();
+    context.restore();
+    context.strokeStyle = "#7A4A22";
+    context.lineWidth = 6;
+    context.stroke(shape);
+    const chips = star ? [[-10, -6], [12, 4], [-4, 18], [0, -28]] : [[-22, -14], [14, -22], [22, 10], [-14, 20], [2, 0]];
+    context.fillStyle = "#4A2A16";
+    for (const [x, y] of chips) {
+      context.beginPath(); context.roundRect(cx + x! - 6, cy + y! - 5, 12, 10, 4); context.fill();
+    }
+  });
+}
+
 export function fishBiscuit(): Texture {
   return drawn("fish-biscuit", 100, 64, (context) => {
     context.fillStyle = "#D59643";

@@ -1,10 +1,10 @@
 import type { AppModel } from "../app/model";
 import {
   accuracyOf, allDifficultyModes, averageSecondsOf, averageTouchWordsPerMinuteOf, averageWordsPerMinuteOf, catalog,
-  defaultTables, difficultyTitles, gameModeTitles, playSecondsOver, skillTitles, spellingTopics, starsFor, totalStars, trophy, trophyCount,
+  defaultDenominators, defaultMultipliers, defaultTables, difficultyTitles, gameModeTitles, playSecondsOver, skillTitles, spellingTopics, starsFor, totalStars, trophy, trophyCount,
   typingAccuracyOf, type DifficultyMode, type Profile,
 } from "../core";
-import { h } from "./dom";
+import { h, picture, symbol } from "./dom";
 import type { Screen } from "./menus";
 import { settingsControls } from "./settings";
 
@@ -32,9 +32,11 @@ function describe(key: string): string {
 /**
  * The grown-ups' area. Kept behind a gate and styled plainly so it reads as separate from play.
  */
-export function parentScreen(model: AppModel): Screen {
+export function parentScreen(model: AppModel, setup = false): Screen {
   const element = h("section.screen.parent");
   let cleanUp = () => {};
+  const unlocked = () => (setup ? quickSetup() : dashboard());
+  const leave = () => (setup ? model.leaveQuickSetup(false) : model.leaveParentArea());
 
   // A sum most Year 3 children cannot yet do in their head.
   function gate(): void {
@@ -65,7 +67,7 @@ export function parentScreen(model: AppModel): Screen {
       if (Number(entry) === a * b) {
         cleanUp();
         model.parentUnlocked = true;
-        dashboard();
+        unlocked();
       } else {
         wrong.hidden = false;
         fresh();
@@ -80,13 +82,15 @@ export function parentScreen(model: AppModel): Screen {
     cleanUp = () => window.removeEventListener("keydown", onKey);
     next.addEventListener("click", submit);
     const digit = (value: string) => h("button.plain.digit", { type: "button", onClick: () => type(value) }, value);
+    const who = setup ? model.profile : undefined;
     element.replaceChildren(h("div.gate", {},
+      who && h("p.gate-context", {}, `Setting up the game for ${who.nickname}`),
       h("h1", {}, "Grown-ups only"),
       h("p.muted", {}, "To continue, please answer:"),
       sum,
       wrong,
       h("div.digits", {}, ...[..."1234567890"].map(digit), h("button.plain.digit", { type: "button", "aria-label": "Delete", onClick: erase }, "⌫")),
-      h("div.gate-actions", {}, h("button.plain", { type: "button", onClick: () => model.leaveParentArea() }, "Back"), next),
+      h("div.gate-actions", {}, h("button.plain", { type: "button", onClick: () => { cleanUp(); leave(); } }, "Back"), next),
     ));
     fresh();
   }
@@ -121,12 +125,13 @@ export function parentScreen(model: AppModel): Screen {
     })();
     element.replaceChildren(header, h("div.parent-body", {},
       picker,
+      learning(profile, refresh),
       overview(profile),
       skills(profile),
       practice(profile),
       recent(profile),
-      learning(profile, refresh),
       playtest(profile),
+      ending(profile),
       section("Sound and accessibility", settingsControls(model)),
       player(profile, refresh),
     ));
@@ -197,7 +202,8 @@ export function parentScreen(model: AppModel): Screen {
     );
   }
 
-  function learning(profile: Profile, refresh: () => void): HTMLElement {
+  /** The controls for one player's learning settings, in groups the dashboard and quick setup lay out differently. */
+  function learningControls(profile: Profile, refresh: () => void) {
     const parent = profile.parent;
     const change = (apply: () => void) => {
       apply();
@@ -218,6 +224,29 @@ export function parentScreen(model: AppModel): Screen {
         },
       }, `${table}×`);
     });
+    /** The list with `value` switched on or off, kept sorted. At least one value always stays on. */
+    const toggled = (values: number[], value: number): number[] => {
+      const next = values.includes(value) ? values.filter((each) => each !== value) : [...values, value].sort((a, b) => a - b);
+      return next.length > 0 ? next : values;
+    };
+    const multipliers = defaultMultipliers.map((value) => {
+      // A switched-off table is never used as the other number either, so its button is off too.
+      const blocked = defaultTables.includes(value) && !parent.tables.includes(value);
+      const on = !blocked && parent.multipliers.includes(value);
+      return h(`button.plain.table${on ? ".on" : ""}`, {
+        type: "button", "aria-pressed": String(on), disabled: blocked,
+        title: blocked ? `Switch the ${value}× table on to use this` : undefined,
+        onClick: () => change(() => { parent.multipliers = toggled(parent.multipliers, value); }),
+      }, `× ${value}`);
+    });
+    const fractionNames = ["halves", "thirds", "quarters", "fifths", "sixths", "sevenths", "eighths", "ninths", "tenths"];
+    const denominators = defaultDenominators.map((denominator) => {
+      const on = parent.denominators.includes(denominator);
+      return h(`button.plain.table${on ? ".on" : ""}`, {
+        type: "button", "aria-pressed": String(on), "aria-label": fractionNames[denominator - 2],
+        onClick: () => change(() => { parent.denominators = toggled(parent.denominators, denominator); }),
+      }, `1/${denominator}`);
+    });
     const topics = spellingTopics.map((topic) => {
       const input = h<"input">("input", { type: "checkbox", role: "switch", checked: parent.spellingTopics.includes(topic) });
       input.addEventListener("change", () => {
@@ -234,14 +263,63 @@ export function parentScreen(model: AppModel): Screen {
     breaks.addEventListener("change", () => change(() => { parent.sessionMinutes = Number(breaks.value); }));
     const timed = h<"input">("input", { type: "checkbox", role: "switch", checked: parent.timedChallenges });
     timed.addEventListener("change", () => change(() => { parent.timedChallenges = timed.checked; }));
+    return {
+      maths: [
+        row("Difficulty", difficulty),
+        h("div.stack", {}, h("span", {}, "Times tables"), h("div.tables", {}, ...tables)),
+        h("div.stack", {}, h("span", {}, "Multiply and divide by"), h("div.tables", {}, ...multipliers)),
+        h("div.stack", {}, h("span", {}, "Fractions"), h("div.tables", {}, ...denominators)),
+      ],
+      topics,
+      play: [row("Suggest a break after", breaks), h("label.toggle", {}, h("span", {}, "Timed bonus points"), timed)],
+    };
+  }
+
+  const learningHelp = "Adaptive difficulty raises or lowers each skill separately based on recent answers. " +
+    "Switching a times table off also leaves it out as the other number, so with 8× off there's no 8 × 3 either. " +
+    "“Multiply and divide by” picks the other number: switch off × 11 and × 12 to keep things gentler. " +
+    "“Fractions” picks which fractions come up, from halves to tenths. " +
+    "Timed bonus points only add extra score for quick answers; nothing ever runs out of time.";
+
+  function learning(profile: Profile, refresh: () => void): HTMLElement {
+    const controls = learningControls(profile, refresh);
     return section("Learning settings",
-      row("Difficulty", difficulty),
-      h("div.stack", {}, h("span", {}, "Times tables"), h("div.tables", {}, ...tables)),
-      h("div.stack", {}, h("span", {}, "Spelling topics"), ...topics),
-      row("Suggest a break after", breaks),
-      h("label.toggle", {}, h("span", {}, "Timed bonus points"), timed),
-      h("p.muted.small", {}, "Adaptive difficulty raises or lowers each skill separately based on recent answers. " +
-        "Timed bonus points only add extra score for quick answers; nothing ever runs out of time."),
+      ...controls.maths,
+      h("div.stack", {}, h("span", {}, "Spelling topics"), ...controls.topics),
+      ...controls.play,
+      h("p.muted.small", {}, learningHelp),
+    );
+  }
+
+  /** Just the learning settings for a new player, then straight back to the grown-up check. */
+  function quickSetup(): void {
+    const profile = model.profile;
+    if (!profile) return model.leaveQuickSetup(false);
+    const body = h("div.setup-body");
+    const draw = () => {
+      const scroll = body.scrollTop;
+      const controls = learningControls(profile, draw);
+      body.replaceChildren(
+        h("p.setup-intro", {}, h("span.setup-who", {}, picture(profile.avatar), profile.nickname),
+          h("span", {}, `Check these suit ${profile.nickname}, then hand the game back. You can change them later in the parent dashboard.`)),
+        h("div.setup-cards", {},
+          section("Maths", ...controls.maths),
+          section("Spelling", ...controls.topics),
+          section("Play", ...controls.play),
+          h("p.muted.small.setup-help", {}, learningHelp),
+        ),
+      );
+      body.scrollTop = scroll;
+    };
+    draw();
+    element.classList.add("setup");
+    element.replaceChildren(
+      h("header.parent-bar", {}, h("button.plain", { type: "button", onClick: () => model.leaveQuickSetup(false) }, "Back"),
+        h("h1", {}, "Quick setup"), h("span.parent-spacer")),
+      body,
+      h("footer.setup-foot", {},
+        h("p", {}, "Progress reports, sound and accessibility settings are in the parent dashboard, from the title screen."),
+        h("button.plain.primary.big", { type: "button", onClick: () => model.leaveQuickSetup(true) }, `Hand back to ${profile.nickname}`, symbol("arrow"))),
     );
   }
 
@@ -270,16 +348,40 @@ export function parentScreen(model: AppModel): Screen {
     );
   }
 
+  /** Replays the finale for this child, for anyone who missed a bit of it. */
+  function ending(profile: Profile): HTMLElement {
+    const finished = profile.crystals.length === catalog.islands.length;
+    return section("The ending",
+      h("p.muted.small", {}, finished
+        ? `Plays the end-of-game celebration again, with ${profile.nickname}'s name and totals. Watch it as often as you like.`
+        : `${profile.nickname} hasn't found all six crystal pieces yet, so this will show how the story ends before they get there.`),
+      h("button.plain.playtest-level", {
+        type: "button", "aria-label": `Watch the ending with ${profile.nickname}`,
+        onClick: () => { cleanUp(); model.watchEnding(profile.id); },
+      },
+      h("span.playtest-text", {}, h("strong", {}, "Watch the ending"), h("span.muted.small", {}, "Nothing is saved or changed.")),
+      h("span.playtest-play", { "aria-hidden": "true" }, "▶")),
+    );
+  }
+
   /** Reset or delete a player, each behind its own confirmation. */
   function player(profile: Profile, refresh: () => void): HTMLElement {
-    const askReset = h("button.plain.danger", { type: "button" }, `Reset ${profile.nickname}'s progress`);
+    const askReset = h("button.plain.danger", { type: "button" }, `Restart ${profile.nickname}'s adventure`);
     const askDelete = h("button.plain.danger", { type: "button" }, `Delete ${profile.nickname}`);
     const asks = h("div.confirm", {}, askReset, askDelete);
-    const cancel = () => { sureReset.hidden = true; sureDelete.hidden = true; asks.hidden = false; };
-    const sureReset = h("div.confirm", { hidden: true, role: "alertdialog", "aria-label": "Reset progress" },
-      h("p", {}, `Reset all of ${profile.nickname}'s progress? Stars, crystals, treasures, trophies and learning history are cleared. This can't be undone.`),
+    const keepRewards = h<"input">("input", { type: "checkbox", checked: true });
+    const keepChoice = h("label", {}, keepRewards, " Keep trophies and treasures");
+    const resetMessage = h("p");
+    const cancel = () => {
+      const wasReset = !sureReset.hidden;
+      sureReset.hidden = true; sureDelete.hidden = true; asks.hidden = false;
+      keepRewards.disabled = false;
+      (wasReset ? askReset : askDelete).focus();
+    };
+    const sureReset = h("div.confirm", { hidden: true, role: "alertdialog", "aria-label": "Restart adventure" },
+      resetMessage,
       h("button.plain", { type: "button", onClick: cancel }, "Keep progress"),
-      h("button.plain.danger.filled", { type: "button", onClick: () => { model.resetProgress(profile.id); refresh(); } }, "Reset progress"),
+      h("button.plain.danger.filled", { type: "button", onClick: () => { model.resetProgress(profile.id, keepRewards.checked); refresh(); } }, "Restart adventure"),
     );
     const sureDelete = h("div.confirm", { hidden: true, role: "alertdialog", "aria-label": "Delete player" },
       h("p", {}, `Delete ${profile.nickname}? They and all their progress will be removed from this browser. This can't be undone.`),
@@ -290,15 +392,24 @@ export function parentScreen(model: AppModel): Screen {
         refresh();
       } }, "Delete"),
     );
-    askReset.addEventListener("click", () => { asks.hidden = true; sureReset.hidden = false; });
+    askReset.addEventListener("click", () => {
+      resetMessage.textContent = `Restart ${profile.nickname}'s adventure? The story, levels, stars, crystals, playtime and learning history will start again. `
+        + (keepRewards.checked ? "Trophies, achievements, treasures, accessories and home decorations will be kept. "
+          : "Trophies, achievements, treasures, accessories and home decorations will also be cleared. ")
+        + "The player and settings will be kept. This can't be undone.";
+      keepRewards.disabled = true;
+      asks.hidden = true; sureReset.hidden = false;
+      sureReset.querySelector("button")?.focus();
+    });
+    sureReset.addEventListener("keydown", (event) => { if ((event as KeyboardEvent).key === "Escape") cancel(); });
     askDelete.addEventListener("click", () => { asks.hidden = true; sureDelete.hidden = false; });
-    return section("Player", asks, sureReset, sureDelete,
-      h("p.muted.small", {}, "Resetting keeps the player and these settings but clears their stars, treasures and learning history. " +
+    return section("Player", keepChoice, asks, sureReset, sureDelete,
+      h("p.muted.small", {}, "Restarting returns to the opening story and clears levels, stars, crystals, playtime and learning history. Keep trophies and treasures to save achievements, accessories and home decorations. The player and settings are always kept. " +
         "Deleting removes the player completely. Everything is stored in this browser only. The game has no accounts, adverts or " +
         "purchases and collects no personal information."));
   }
 
-  if (model.parentUnlocked) dashboard();
+  if (model.parentUnlocked) unlocked();
   else gate();
   return { element, destroy: () => cleanUp() };
 }

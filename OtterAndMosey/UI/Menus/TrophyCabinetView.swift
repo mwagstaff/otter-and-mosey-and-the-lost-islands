@@ -8,6 +8,7 @@ struct TrophyCabinetView: View {
     @Environment(AppModel.self) private var model
     @State private var group = TrophyGroup.islands
     @State private var selected: Trophy?
+    @State private var showingPhoto = false
 
     private static let woodDark = Color(hex: 0x8C5130)
     private static let wood = Color(hex: 0xA8643A)
@@ -33,6 +34,7 @@ struct TrophyCabinetView: View {
                     detail(selected, compact: compact)
                         .transition(.opacity.combined(with: .scale(scale: 0.92)))
                 }
+                if showingPhoto { GroupPhotoViewer { showingPhoto = false } }
             }
             .animation(.spring(duration: 0.3), value: selected?.id)
             .screenBackground("bg_title", blur: 8, dim: 0.35)
@@ -89,6 +91,9 @@ struct TrophyCabinetView: View {
             .padding(.vertical, compact ? 4 : 8)
             .frame(width: layout.titleWidth)
             .panel(fill: Palette.gold, radius: 18)
+            if GroupPhoto.isUnlocked(model.profile, catalog: model.catalog) {
+                GroupPhotoButton(size: compact ? 14 : 18, showsTitle: !compact) { showingPhoto = true }
+            }
             Spacer(minLength: 0)
             // The tabs shrink a little on narrower screens rather than running off the edge.
             ViewThatFits(in: .horizontal) {

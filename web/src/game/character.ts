@@ -74,6 +74,16 @@ export class SpeechBadge extends Container {
 export type CharacterKind = "otter" | "mosey";
 export type Pose = "idle" | "blink" | "cheer" | "think" | "oops" | "move";
 
+/** The top of Mosey's head in each painted pose, as a fraction of the sprite from its centre. */
+const moseyHead: Record<Pose, { x: number; y: number }> = {
+  idle: { x: 0.32, y: 0.31 },
+  blink: { x: 0.32, y: 0.31 },
+  cheer: { x: 0.3, y: 0.45 },
+  think: { x: 0.28, y: 0.46 },
+  oops: { x: 0.26, y: 0.46 },
+  move: { x: 0.36, y: 0.22 },
+};
+
 /** Every picture a character can show, for loading before a level starts. */
 export function characterArt(kind: CharacterKind): string[] {
   return ["idle", "blink", "cheer", "think", "oops", "talk", kind === "otter" ? "run" : "swim"].map((pose) => `${kind}_${pose}`);
@@ -166,9 +176,15 @@ export class CharacterNode extends Container {
     if (this.kind === "otter") this.badge.position.set(side * this.size * 0.12, -height * 0.98);
     else this.badge.position.set(side * width * 0.3, -height * 0.36);
     if (!this.hat) return;
-    this.hat.setSize(this.size * 0.3);
-    if (this.kind === "otter") this.hat.position.set(side * this.size * 0.04, -height * 0.97);
-    else this.hat.position.set(side * width * 0.3, -height * 0.38);
+    if (this.kind === "otter") {
+      this.hat.setSize(this.size * 0.3);
+      this.hat.position.set(side * this.size * 0.04, -height * 0.97);
+    } else {
+      const hat = this.size * 0.2;
+      const head = moseyHead[this.pose];
+      this.hat.setSize(hat);
+      this.hat.position.set(side * width * head.x, -(height * head.y + hat * 0.3));
+    }
     this.hat.visible = !(this.pose === "move" && this.kind === "otter");
   }
 

@@ -10,6 +10,7 @@ import { islandTheme } from "../game/theme";
 export type Route =
   | { name: "title" }
   | { name: "profiles" }
+  | { name: "check" }
   | { name: "intro" }
   | { name: "map" }
   | { name: "island"; id: string }
@@ -17,8 +18,10 @@ export type Route =
   | { name: "collection" }
   | { name: "trophies" }
   | { name: "home" }
-  | { name: "parent" }
-  | { name: "ending" };
+  /** The grown-ups' area: the full dashboard, or with `setup` just the new player's quick setup. */
+  | { name: "parent"; setup?: boolean }
+  /** The finale. From the grown-ups' area it plays for `profileID` and leads back there. */
+  | { name: "ending"; fromGrownUps?: boolean; profileID?: string };
 
 /** The game modes built for the web. A level in any other mode is shown as coming soon. */
 export const playableModes: ReadonlySet<GameMode> = new Set<GameMode>(["wordBlaster", "mathsSplash", "bridgeBuilder", "eggRescue", "typingTurbo", "guardian"]);
@@ -173,7 +176,7 @@ export class AppModel {
   }
 
   /** Wipes one player's progress, keeping their name, picture and the grown-ups' choices. */
-  resetProgress(id: string): void {
+  resetProgress(id: string, keepRewards = false): void {
     const index = this.save.profiles.findIndex((profile) => profile.id === id);
     const old = this.save.profiles[index];
     if (!old) return;
@@ -181,7 +184,21 @@ export class AppModel {
     fresh.id = old.id;
     fresh.parent = old.parent;
     fresh.rewards = ["deco-palm"];
+    if (keepRewards) {
+      const kept = cloneProfile(old);
+      fresh.rewards = kept.rewards;
+      fresh.equippedAccessory = kept.equippedAccessory;
+      fresh.decorations = kept.decorations;
+      fresh.achievements = kept.achievements;
+      fresh.pendingTrophies = kept.pendingTrophies;
+      fresh.trophiesReady = kept.trophiesReady;
+      fresh.trophiesSeen = kept.trophiesSeen;
+    }
     this.save.profiles[index] = fresh;
+    if (this.save.activeProfileID === id) {
+      this.sessionSeconds = 0;
+      this.unlockedIsland = undefined;
+    }
     this.persist();
   }
 
@@ -189,6 +206,7 @@ export class AppModel {
   addPlaytime(seconds: number): void {
     const profile = this.profile;
     if (!profile || this.playtest || this.current.name === "title" || this.current.name === "parent" || this.current.name === "profiles") return;
+    if (this.current.name === "ending" && this.current.fromGrownUps) return;
     this.sessionSeconds += seconds;
     addPlaytime(profile, seconds);
   }
@@ -210,6 +228,11 @@ export class AppModel {
     this.go({ name: "play", level: levelID });
   }
 
+  /** Plays the finale from the grown-ups' area for the chosen child, any number of times. */
+  watchEnding(profileID: string | undefined): void {
+    this.go({ name: "ending", fromGrownUps: true, profileID });
+  }
+
   endPlaytest(): void {
     this.playtest = undefined;
     this.go({ name: "parent" });
@@ -229,11 +252,32 @@ export class AppModel {
 
   // Navigation
 
-  /** Where Play leads: choosing a player, then the opening story, then the map. */
+  /** Where Play leads: choosing a player, then the grown-up check and the opening story, then the map. */
   play(): void {
     const profile = this.profile;
     if (!profile) this.go({ name: "profiles" });
-    else this.go({ name: profile.seenIntro ? "map" : "intro" });
+    else this.go({ name: profile.seenIntro ? "map" : "check" });
+  }
+
+  /** From the grown-up check to its quick setup, behind the grown-ups' gate. */
+  openQuickSetup(): void {
+    this.go({ name: "parent", setup: true });
+  }
+
+  /** Back to the grown-up check from the quick setup or its gate, marking it checked if `done`. */
+  leaveQuickSetup(done: boolean): void {
+    const profile = this.profile;
+    if (done && profile && !profile.grownUpChecked) {
+      profile.grownUpChecked = true;
+      this.persist();
+    }
+    this.go({ name: "check" });
+  }
+
+  /** Leaves the grown-up check for the opening story. */
+  startAdventure(): void {
+    this.parentUnlocked = false;
+    this.go({ name: "intro" });
   }
 
   /** Jumps straight to the island with the next unfinished level. */

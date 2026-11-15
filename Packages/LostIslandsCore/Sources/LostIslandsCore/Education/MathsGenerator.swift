@@ -3,23 +3,66 @@ import Foundation
 /// Generates Year 3 maths questions that always have exactly one right answer.
 public enum MathsGenerator {
     public static let defaultTables = [2, 3, 4, 5, 8, 10]
+    /// The numbers a times-table question can multiply or divide by.
+    public static let defaultMultipliers = Array(1...12)
+    /// The fractions a fraction question can use, by denominator: halves up to tenths.
+    public static let defaultDenominators = Array(2...10)
+
+    /// The times tables a grown-up has chosen, plus what each one may be multiplied by.
+    struct Limits {
+        var tables: [Int]
+        var multipliers: [Int]
+
+        /// Whether a question may multiply by `value`: the grown-up picked it, and it isn't a table
+        /// they switched off. "8 × 3" reads as the 8 times table, so it is left out when 8× is off.
+        func allows(multiplier value: Int) -> Bool {
+            multipliers.contains(value) && (!MathsGenerator.defaultTables.contains(value) || tables.contains(value))
+        }
+
+        /// The numbers in `range` a question may multiply by. When the grown-up's choices miss this
+        /// level's usual range, their choices win over the level.
+        func multipliers(_ range: ClosedRange<Int>) -> [Int] {
+            let inRange = range.filter(allows(multiplier:))
+            if !inRange.isEmpty { return inRange }
+            let chosen = multipliers.filter(allows(multiplier:))
+            return chosen.isEmpty ? Array(range) : chosen
+        }
+
+        func allows(table: Int, multiplier: Int) -> Bool {
+            tables.contains(table) && allows(multiplier: multiplier)
+        }
+    }
+
+    /// Whether a spaced-repetition fact ("mul:8x3") still fits the grown-up's chosen tables and multipliers.
+    /// Anything that isn't a times-table or division fact is always allowed.
+    public static func allows(factKey key: String, tables: [Int], multipliers: [Int] = defaultMultipliers) -> Bool {
+        let parts = key.split(separator: ":")
+        guard parts.count == 2, parts[0] == "mul" || parts[0] == "div" else { return true }
+        let numbers = parts[1].split(separator: "x").compactMap { Int($0) }
+        guard numbers.count == 2 else { return true }
+        let limits = Limits(tables: tables.isEmpty ? defaultTables : tables,
+                            multipliers: multipliers.isEmpty ? defaultMultipliers : multipliers)
+        return limits.allows(table: numbers[0], multiplier: numbers[1])
+    }
 
     public static func make<R: RandomNumberGenerator>(
-        skill: Skill, level: Int, tables: [Int] = defaultTables,
-        format: AnswerFormat = .choice, using rng: inout R
+        skill: Skill, level: Int, tables: [Int] = defaultTables, multipliers: [Int] = defaultMultipliers,
+        denominators: [Int] = defaultDenominators, format: AnswerFormat = .choice, using rng: inout R
     ) -> Question {
         let level = min(max(level, 1), 5)
-        let tables = tables.isEmpty ? defaultTables : tables
+        let limits = Limits(tables: tables.isEmpty ? defaultTables : tables,
+                            multipliers: multipliers.isEmpty ? defaultMultipliers : multipliers)
+        let denominators = denominators.filter { $0 >= 2 }.isEmpty ? defaultDenominators : denominators.filter { $0 >= 2 }
         let draft: Draft
         switch skill {
         case .addition: draft = addition(level, &rng)
         case .subtraction: draft = subtraction(level, &rng)
-        case .multiplication: draft = multiplication(level, tables, &rng)
-        case .division: draft = division(level, tables, &rng)
-        case .fractions: draft = fractions(level, &rng)
+        case .multiplication: draft = multiplication(level, limits, &rng)
+        case .division: draft = division(level, limits, &rng)
+        case .fractions: draft = fractions(level, denominators, &rng)
         case .placeValue: draft = placeValue(level, &rng)
-        case .sequences: draft = sequences(level, &rng)
-        case .wordProblems: draft = wordProblem(level, tables, &rng)
+        case .sequences: draft = sequences(level, limits.tables, &rng)
+        case .wordProblems: draft = wordProblem(level, limits, &rng)
         default: draft = addition(level, &rng)
         }
         return draft.question(skill: skill, level: level, format: format, using: &rng)
@@ -204,11 +247,11 @@ public enum MathsGenerator {
         return usable.isEmpty ? enabled : usable
     }
 
-    static func multiplication<R: RandomNumberGenerator>(_ level: Int, _ tables: [Int], _ rng: inout R) -> Draft {
-        let table = MathsGenerator.tables(for: level, from: tables).randomElement(using: &rng)!
+    static func multiplication<R: RandomNumberGenerator>(_ level: Int, _ limits: Limits, _ rng: inout R) -> Draft {
+        let table = MathsGenerator.tables(for: level, from: limits.tables).randomElement(using: &rng)!
         if level == 5, Bool.random(using: &rng) {
             // Year 3 extension: a multiple of ten times a single digit.
-            let tens = Int.random(in: 2...8, using: &rng) * 10
+            let tens = limits.multipliers(2...8).randomElement(using: &rng)! * 10
             let answer = tens * table
             return Draft(
                 prompt: "\(tens) × \(table) = ?", answer: answer,
@@ -216,7 +259,7 @@ public enum MathsGenerator {
                 hint: "Work out \(tens / 10) × \(table) first, then make it ten times bigger."
             )
         }
-        let other = Int.random(in: (level == 1 ? 1...6 : 2...12), using: &rng)
+        let other = limits.multipliers(level == 1 ? 1...6 : 2...12).randomElement(using: &rng)!
         if level >= 4, Bool.random(using: &rng) {
             let product = table * other
             return Draft(
@@ -231,39 +274,35 @@ public enum MathsGenerator {
         return timesFact(table, other)
     }
 
-    static func division<R: RandomNumberGenerator>(_ level: Int, _ tables: [Int], _ rng: inout R) -> Draft {
-        let table = MathsGenerator.tables(for: level, from: tables).randomElement(using: &rng)!
-        let quotient = Int.random(in: (level == 1 ? 1...6 : 2...12), using: &rng)
+    static func division<R: RandomNumberGenerator>(_ level: Int, _ limits: Limits, _ rng: inout R) -> Draft {
+        let table = MathsGenerator.tables(for: level, from: limits.tables).randomElement(using: &rng)!
+        let quotient = limits.multipliers(level == 1 ? 1...6 : 2...12).randomElement(using: &rng)!
         return divisionFact(table: table, quotient: quotient)
     }
 
     // MARK: - Fractions, place value, sequences
 
-    static func fractions<R: RandomNumberGenerator>(_ level: Int, _ rng: inout R) -> Draft {
+    static func fractions<R: RandomNumberGenerator>(_ level: Int, _ denominators: [Int], _ rng: inout R) -> Draft {
+        /// One of the denominators this level normally uses, if the grown-up allows any; otherwise
+        /// any allowed denominator big enough for the question.
+        func choose(_ wanted: [Int], atLeast smallest: Int) -> Int? {
+            let usable = wanted.filter(denominators.contains)
+            return (usable.isEmpty ? denominators.filter { $0 >= smallest } : usable).randomElement(using: &rng)
+        }
         switch level {
         case 1:
-            let half = Int.random(in: 2...10, using: &rng)
-            return Draft(prompt: "Half of \(half * 2) = ?", answer: half, near: [half + 1, half - 1, half * 2, half + 2],
-                         hint: "Split \(half * 2) into 2 equal groups.")
-        case 2, 3:
-            let denominator = (level == 2 ? [3, 4] : [3, 4, 5, 8, 10]).randomElement(using: &rng)!
-            let part = Int.random(in: 2...(level == 2 ? 6 : 9), using: &rng)
-            let whole = denominator * part
-            return Draft(prompt: "1/\(denominator) of \(whole) = ?", answer: part,
-                         near: [part + 1, part - 1, denominator, part * 2, whole - denominator].filter { $0 > 0 },
-                         hint: "Share \(whole) into \(denominator) equal groups.",
-                         spoken: "What is one \(ordinal(denominator)) of \(whole)?")
+            return unitFraction(choose([2], atLeast: 2)!, parts: 2...(denominators.contains(2) ? 10 : 5), &rng)
+        case 2:
+            return unitFraction(choose([3, 4], atLeast: 2)!, parts: 2...6, &rng)
+        case 3:
+            return unitFraction(choose([3, 4, 5, 8, 10], atLeast: 2)!, parts: 2...9, &rng)
         case 4:
-            let denominator = [3, 4, 5].randomElement(using: &rng)!
-            let numerator = Int.random(in: 2...(denominator - 1), using: &rng)
-            let part = Int.random(in: 2...6, using: &rng)
-            let whole = denominator * part
-            return Draft(prompt: "\(numerator)/\(denominator) of \(whole) = ?", answer: numerator * part,
-                         near: [part, whole - part, numerator * part + part, numerator * part - 1, numerator * part + 1].filter { $0 > 0 },
-                         hint: "First share \(whole) into \(denominator) groups: \(whole) ÷ \(denominator) = \(part). Then add \(numerator) lots of \(part).",
-                         spoken: "What is \(numerator) \(ordinal(denominator))s of \(whole)?")
+            guard let denominator = choose([3, 4, 5], atLeast: 3) else { return unitFraction(2, parts: 2...10, &rng) }
+            return nonUnitFraction(denominator, &rng)
         default:
-            let denominator = [5, 6, 7, 8, 9, 10].randomElement(using: &rng)!
+            guard let denominator = choose(Array(5...10), atLeast: 4) else {
+                return choose([3], atLeast: 3).map { nonUnitFraction($0, &rng) } ?? unitFraction(2, parts: 2...10, &rng)
+            }
             let a = Int.random(in: 1...(denominator - 3), using: &rng)
             let b = Int.random(in: 1...(denominator - a - 1), using: &rng)
             return Draft(prompt: "\(a)/\(denominator) + \(b)/\(denominator) = ?/\(denominator)", answer: a + b,
@@ -271,6 +310,31 @@ public enum MathsGenerator {
                          hint: "The bottom number stays the same. Just add the top numbers.",
                          spoken: "\(a) \(ordinal(denominator))s plus \(b) \(ordinal(denominator))s. How many \(ordinal(denominator))s?")
         }
+    }
+
+    /// "Half of 12" or "1/4 of 20".
+    static func unitFraction<R: RandomNumberGenerator>(_ denominator: Int, parts: ClosedRange<Int>, _ rng: inout R) -> Draft {
+        let part = Int.random(in: parts, using: &rng)
+        let whole = denominator * part
+        if denominator == 2 {
+            return Draft(prompt: "Half of \(whole) = ?", answer: part, near: [part + 1, part - 1, whole, part + 2],
+                         hint: "Split \(whole) into 2 equal groups.")
+        }
+        return Draft(prompt: "1/\(denominator) of \(whole) = ?", answer: part,
+                     near: [part + 1, part - 1, denominator, part * 2, whole - denominator].filter { $0 > 0 },
+                     hint: "Share \(whole) into \(denominator) equal groups.",
+                     spoken: "What is one \(ordinal(denominator)) of \(whole)?")
+    }
+
+    /// "2/3 of 15".
+    static func nonUnitFraction<R: RandomNumberGenerator>(_ denominator: Int, _ rng: inout R) -> Draft {
+        let numerator = Int.random(in: 2...(denominator - 1), using: &rng)
+        let part = Int.random(in: 2...6, using: &rng)
+        let whole = denominator * part
+        return Draft(prompt: "\(numerator)/\(denominator) of \(whole) = ?", answer: numerator * part,
+                     near: [part, whole - part, numerator * part + part, numerator * part - 1, numerator * part + 1].filter { $0 > 0 },
+                     hint: "First share \(whole) into \(denominator) groups: \(whole) ÷ \(denominator) = \(part). Then add \(numerator) lots of \(part).",
+                     spoken: "What is \(numerator) \(ordinal(denominator))s of \(whole)?")
     }
 
     static func ordinal(_ denominator: Int) -> String {
@@ -329,15 +393,18 @@ public enum MathsGenerator {
         }
     }
 
-    static func sequences<R: RandomNumberGenerator>(_ level: Int, _ rng: inout R) -> Draft {
-        let step: Int
+    static func sequences<R: RandomNumberGenerator>(_ level: Int, _ tables: [Int], _ rng: inout R) -> Draft {
+        let steps: [Int]
         switch level {
-        case 1: step = [2, 5, 10].randomElement(using: &rng)!
-        case 2: step = [3, 4].randomElement(using: &rng)!
-        case 3: step = [4, 8].randomElement(using: &rng)!
-        case 4: step = [50, 100].randomElement(using: &rng)!
-        default: step = [3, 4, 8, 50].randomElement(using: &rng)!
+        case 1: steps = [2, 5, 10]
+        case 2: steps = [3, 4]
+        case 3: steps = [4, 8]
+        case 4: steps = [50, 100]
+        default: steps = [3, 4, 8, 50]
         }
+        // Counting in 8s is the 8 times table, so skip steps from tables that are switched off.
+        let allowed = steps.filter { !defaultTables.contains($0) || tables.contains($0) }
+        let step = (allowed.isEmpty ? tables : allowed).randomElement(using: &rng)!
         let start = step * Int.random(in: (level >= 4 ? 0...4 : 1...6), using: &rng)
         var terms = (0..<5).map { start + step * $0 }
         if level == 5, Bool.random(using: &rng) { terms.reverse() }
@@ -352,7 +419,7 @@ public enum MathsGenerator {
 
     // MARK: - Word problems
 
-    static func wordProblem<R: RandomNumberGenerator>(_ level: Int, _ tables: [Int], _ rng: inout R) -> Draft {
+    static func wordProblem<R: RandomNumberGenerator>(_ level: Int, _ limits: Limits, _ rng: inout R) -> Draft {
         let things = ["shells", "pearls", "berries", "acorns", "starfish", "pebbles"].randomElement(using: &rng)!
         switch Int.random(in: 0...(level >= 4 ? 4 : 3), using: &rng) {
         case 0:
@@ -368,15 +435,15 @@ public enum MathsGenerator {
                          near: [a - b + 1, a - b - 1, a + b, a - b + 10, a - b - 10].filter { $0 > 0 },
                          hint: "Giving away means subtract. \(subtractionHint(a, b))")
         case 2:
-            let table = MathsGenerator.tables(for: max(level, 2), from: tables).randomElement(using: &rng)!
-            let groups = Int.random(in: 2...(level <= 2 ? 5 : 9), using: &rng)
+            let table = MathsGenerator.tables(for: max(level, 2), from: limits.tables).randomElement(using: &rng)!
+            let groups = limits.multipliers(2...(level <= 2 ? 5 : 9)).randomElement(using: &rng)!
             return Draft(key: "mul:\(table)x\(groups)",
                          prompt: "\(groups) baby dragons eat \(table) \(things) each. How many altogether?", answer: groups * table,
                          near: [groups + table, groups * table + table, groups * table - table, groups * table + 1].filter { $0 > 0 },
                          hint: "\(groups) lots of \(table) is \(groups) × \(table).")
         case 3:
-            let table = MathsGenerator.tables(for: max(level, 2), from: tables).randomElement(using: &rng)!
-            let each = Int.random(in: 2...(level <= 2 ? 5 : 9), using: &rng)
+            let table = MathsGenerator.tables(for: max(level, 2), from: limits.tables).randomElement(using: &rng)!
+            let each = limits.multipliers(2...(level <= 2 ? 5 : 9)).randomElement(using: &rng)!
             return Draft(key: "div:\(table)x\(each)",
                          prompt: "Otter shares \(table * each) \(things) equally between \(table) friends. How many each?", answer: each,
                          near: [each + 1, each - 1, table, each + 2, table * each - table].filter { $0 > 0 },

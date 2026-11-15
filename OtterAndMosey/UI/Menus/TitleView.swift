@@ -93,8 +93,10 @@ struct TitleView: View {
 
 /// Choose, add or remove a player. Only a nickname and a picture are ever asked for.
 struct ProfilesView: View {
+    private enum CreationStep { case character, name }
     @Environment(AppModel.self) private var model
     @State private var adding = false
+    @State private var creationStep = CreationStep.character
     @State private var nickname = ""
     @State private var avatar = "🦦"
     @State private var deleting: Profile?
@@ -104,6 +106,7 @@ struct ProfilesView: View {
     @State private var nameWobbles: CGFloat = 0
     private static let nameHint = "What shall we call you? Type your name in the box!"
     private let avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"]
+    private var creating: Bool { adding || model.save.profiles.isEmpty }
 
     var body: some View {
         GeometryReader { geometry in
@@ -111,20 +114,25 @@ struct ProfilesView: View {
             ZStack {
                 VStack(spacing: compact ? 8 : 18) {
                     HStack {
-                        RoundButton(symbol: "chevron.left", label: "Back") { model.route = .title }
+                        RoundButton(symbol: "chevron.left", label: creating && creationStep == .name ? "Back to character" : "Back", action: goBack)
                         Spacer()
-                        Text(adding ? "New explorer" : "Who's playing?").font(.game(compact ? 28 : 42)).foregroundStyle(.white).shadow(radius: 4)
+                        Text(creating ? "New explorer" : "Who's playing?").font(.game(compact ? 28 : 42)).foregroundStyle(.white).shadow(radius: 4)
+                            .lineLimit(1).minimumScaleFactor(0.7).accessibilityAddTraits(.isHeader)
                         Spacer()
                         Color.clear.frame(width: 54, height: 54)
                     }
-                    if adding || model.save.profiles.isEmpty {
-                        ScrollView {
-                            form(compact: compact)
-                                .frame(maxWidth: .infinity)
+                    if creating {
+                        if creationStep == .character {
+                            characterForm(compact: compact)
+                        } else {
+                            let formWidth = min(760, geometry.size.width - (compact ? 20 : 56))
+                            ScrollView {
+                                nameForm(compact: compact, width: formWidth)
+                                    .padding(.bottom, 6) // Keep the panel's shadow inside the scroll area.
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .defaultScrollAnchor(.center, for: .alignment)
                         }
-                        GameKeyboard(kind: .qwerty(space: true), width: geometry.size.width - (compact ? 20 : 56),
-                                     onKey: typeName, onBackspace: deleteName)
-                            .background(HardwareKeys(onKey: typeName, onBackspace: deleteName).frame(width: 0, height: 0))
                     } else { list(compact: compact) }
                     Spacer(minLength: 0)
                 }
@@ -165,7 +173,13 @@ struct ProfilesView: View {
                     .buttonStyle(.plain)
                     .contextMenu { Button("Remove player", role: .destructive) { deleting = profile } }
                 }
-                Button(action: tapped { adding = true }) {
+                Button(action: tapped {
+                    nickname = ""
+                    avatar = avatars[0]
+                    askingForName = false
+                    creationStep = .character
+                    adding = true
+                }) {
                     VStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill").font(.system(size: compact ? 44 : 64)).foregroundStyle(Palette.teal)
                         Text("New player").font(.game(compact ? 18 : 24)).foregroundStyle(Palette.ink)
@@ -179,14 +193,59 @@ struct ProfilesView: View {
         }
     }
 
-    private func form(compact: Bool) -> some View {
-        VStack(spacing: compact ? 8 : 16) {
+    private func characterForm(compact: Bool) -> some View {
+        VStack(spacing: compact ? 10 : 18) {
+            Text("1 of 2 · Choose your character")
+                .font(.game(compact ? 20 : 26)).foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 60 : 80), spacing: 12)], spacing: 12) {
+                    ForEach(Array(avatars.enumerated()), id: \.element) { index, choice in
+                        Button(action: tapped { avatar = choice }) {
+                            Glyph(choice, size: compact ? 44 : 58)
+                                .frame(width: compact ? 60 : 80, height: compact ? 60 : 80)
+                                .background(Circle().fill(choice == avatar ? Palette.gold : .white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Picture \(index + 1)")
+                        .accessibilityAddTraits(choice == avatar ? .isSelected : [])
+                    }
+                }
+                .padding(4)
+            }
             HStack(spacing: 12) {
-                Glyph(avatar, size: compact ? 52 : 72)
+                Button("Cancel", action: tapped(goBack))
+                    .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
+                Button(action: tapped { creationStep = .name }) {
+                    IconLabel("Next", symbol: "arrow.right", size: compact ? 22 : 28, trailing: true)
+                }
+                .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: compact ? 150 : 200))
+            }
+        }
+        .padding(compact ? 14 : 28)
+        .panel()
+        .frame(maxWidth: 760)
+    }
+
+    private func nameKeyboard(width: CGFloat) -> some View {
+        GameKeyboard(kind: .qwerty(space: true), width: width, onKey: typeName, onBackspace: deleteName, embedded: true,
+                     uppercase: KeyboardCapitalization.name(after: nickname))
+            .background(HardwareKeys(onKey: typeName, onBackspace: deleteName).frame(width: 0, height: 0))
+            .accessibilityLabel("Nickname keyboard")
+    }
+
+    private func nameForm(compact: Bool, width: CGFloat) -> some View {
+        VStack(spacing: compact ? 6 : 16) {
+            Text("2 of 2 · What shall we call you?")
+                .font(.game(compact ? 16 : 24)).foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader)
+            HStack(spacing: compact ? 8 : 12) {
+                Glyph(avatar, size: compact ? 40 : 72)
                 Text(nickname.isEmpty ? "Nickname" : nickname)
                     .font(.game(compact ? 24 : 32))
                     .foregroundStyle(nickname.isEmpty ? Palette.ink.opacity(0.5) : Palette.ink)
-                    .frame(maxWidth: 340, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(1).minimumScaleFactor(0.6)
                     .accessibilityLabel("Nickname")
                     .accessibilityValue(nickname.isEmpty ? "Not entered" : nickname)
                     .padding(.horizontal, 14)
@@ -202,43 +261,40 @@ struct ProfilesView: View {
             }
             if askingForName {
                 HStack(spacing: 8) {
-                    Image("otter_idle").resizable().scaledToFit().frame(height: compact ? 30 : 40).accessibilityHidden(true)
-                    Text(Self.nameHint).font(.game(compact ? 16 : 20)).foregroundStyle(Palette.ink)
+                    Image("otter_idle").resizable().scaledToFit().frame(height: compact ? 24 : 40).accessibilityHidden(true)
+                    Text(Self.nameHint).font(.game(compact ? 14 : 20)).foregroundStyle(Palette.ink)
                 }
-                .padding(.horizontal, 14)
+                .padding(.horizontal, compact ? 8 : 14)
                 .padding(.vertical, 4)
                 .background(Capsule().fill(Palette.gold.opacity(0.35)))
                 .transition(.scale(scale: 0.8).combined(with: .opacity))
             }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(avatars, id: \.self) { choice in
-                        Button(action: tapped { avatar = choice }) {
-                            Glyph(choice, size: compact ? 40 : 50)
-                                .frame(width: compact ? 56 : 68, height: compact ? 56 : 68)
-                                .background(Circle().fill(choice == avatar ? Palette.gold : .white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(4)
-            }
+            nameKeyboard(width: width - (compact ? 20 : 56))
             HStack(spacing: 12) {
-                if !model.save.profiles.isEmpty {
-                    Button("Cancel", action: tapped { adding = false; askingForName = false }).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
-                }
+                Button("Back", action: tapped(goBack)).buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 18 : 22))
                 Button(action: tapped(letsGo)) { IconLabel("Let's go!", symbol: "play.fill", size: compact ? 22 : 28, trailing: true) }
-                .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: 200))
+                .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 22 : 28, minWidth: compact ? 150 : 200))
             }
         }
-        .padding(compact ? 14 : 28)
+        .padding(compact ? 10 : 28)
+        .frame(width: width)
         .panel()
-        .frame(maxWidth: 760)
+    }
+
+    private func goBack() {
+        askingForName = false
+        if creating && creationStep == .name {
+            creationStep = .character
+        } else if adding && !model.save.profiles.isEmpty {
+            adding = false
+        } else {
+            model.route = .title
+        }
     }
 
     private func typeName(_ character: Character) {
         guard nickname.count < 12, character.isLetter || character == " " || character == "-" || character == "’" else { return }
-        let startsWord = nickname.isEmpty || nickname.last == " " || nickname.last == "-"
+        let startsWord = KeyboardCapitalization.name(after: nickname)
         nickname += startsWord ? String(character).uppercased() : String(character)
     }
 
@@ -347,32 +403,5 @@ struct IntroView: View {
             // The word is also said aloud, like every spelling question in the game.
             if model.settings.spokenInstructions { Narrator.shared.say(key: "word_sun", fallback: "Sun. The sun is hot and bright.") }
         }
-    }
-}
-
-/// The reward for restoring all six fragments.
-struct EndingView: View {
-    @Environment(AppModel.self) private var model
-
-    var body: some View {
-        GeometryReader { geometry in
-            let compact = geometry.size.height < 480
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 8) {
-                    Text("The Rainbow Crystal is whole again!").font(.game(compact ? 24 : 38)).foregroundStyle(Palette.ink)
-                    Text("Thank you, \(model.profile?.nickname ?? "explorer"). Every island is full of colour because of you.")
-                        .font(.game(compact ? 16 : 22, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.8)).multilineTextAlignment(.center)
-                    Button(action: tapped { model.route = .map }) { IconLabel("Keep exploring", emoji: "🗺", size: compact ? 20 : 26) }
-                        .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26))
-                }
-                .padding(compact ? 14 : 24)
-                .panel(fill: Palette.cream.opacity(0.94))
-                .padding(.bottom, compact ? 10 : 30)
-                .padding(.horizontal, 20)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-            .screenBackground("bg_ending")
-        }
-        .onAppear { AudioManager.shared.play(.victory) }
     }
 }

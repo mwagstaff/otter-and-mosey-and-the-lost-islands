@@ -19,6 +19,8 @@ struct ParentAreaView: View {
 
 /// A sum most Year 3 children cannot yet do in their head, typed on a number pad.
 struct ParentGateView: View {
+    /// A line above the sum saying what the gate leads to, such as which player is being set up.
+    var context: String?
     var onPass: () -> Void
     var onCancel: () -> Void
     @State private var a = Int.random(in: 13...19)
@@ -28,6 +30,13 @@ struct ParentGateView: View {
 
     var body: some View {
         VStack(spacing: 14) {
+            if let context {
+                Text(context)
+                    .font(.system(size: 15, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 14).padding(.vertical, 6)
+                    .background(Capsule().fill(.white).stroke(Color(white: 0.85)))
+            }
             Text("Grown-ups only").font(.system(size: 30, weight: .bold, design: .rounded))
             Text("To continue, please answer:").font(.system(size: 18, design: .rounded)).foregroundStyle(.secondary)
             Text("\(a) × \(b) = \(entry.isEmpty ? "?" : entry)").font(.system(size: 38, weight: .heavy, design: .rounded)).monospacedDigit()
@@ -67,6 +76,7 @@ struct ParentGateView: View {
 struct ParentDashboardView: View {
     @Environment(AppModel.self) private var model
     @State private var confirmReset = false
+    @State private var keepRewards = true
     @State private var confirmDelete = false
 
     private var profile: Profile? {
@@ -85,22 +95,24 @@ struct ParentDashboardView: View {
                                 ForEach(model.save.profiles) { Text("\($0.avatar) \($0.nickname)").tag($0.id) }
                             }
                         }
+                        learning(profile)
                         overview(profile)
                         skills(profile)
                         practice(profile)
                         achievements(profile)
-                        learning(profile)
                         playtest(profile)
+                        ending(profile)
                         Section("Sound and accessibility") {
                             SettingsControls(compact: true).listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
                         }
                         Section {
-                            Button("Reset \(profile.nickname)'s progress", role: .destructive) { confirmReset = true }
+                            Toggle("Keep trophies and treasures", isOn: $keepRewards)
+                            Button("Restart \(profile.nickname)'s adventure", role: .destructive) { confirmReset = true }
                             Button("Delete \(profile.nickname)", role: .destructive) { confirmDelete = true }
                         } header: {
                             Text("Player")
                         } footer: {
-                            Text("Resetting keeps the player and these settings but clears their stars, treasures and learning history. Deleting removes the player completely. Everything is stored on this device only. The game has no accounts, adverts or purchases and collects no personal information.")
+                            Text("Restarting returns to the opening story and clears levels, stars, crystals, playtime and learning history. Keep trophies and treasures to save achievements, accessories and home decorations. The player and settings are always kept. Deleting removes the player completely. Everything is stored on this device only. The game has no accounts, adverts or purchases and collects no personal information.")
                         }
                     }
                 } else {
@@ -118,11 +130,14 @@ struct ParentDashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { Button("Done") { model.leaveParentArea() } }
             }
-            .confirmationDialog("Reset all of \(profile?.nickname ?? "this child")'s progress?", isPresented: $confirmReset, titleVisibility: .visible) {
-                Button("Reset progress", role: .destructive) { if let profile { model.resetProgress(profile.id) } }
+            .confirmationDialog("Restart \(profile?.nickname ?? "this child")'s adventure?", isPresented: $confirmReset, titleVisibility: .visible) {
+                Button("Restart adventure", role: .destructive) { if let profile { model.resetProgress(profile.id, keepRewards: keepRewards) } }
                 Button("Keep progress", role: .cancel) {}
             } message: {
-                Text("Stars, crystals, treasures, trophies and learning history are cleared. This can't be undone.")
+                Text("The story, levels, stars, crystals, playtime and learning history will start again. " + (keepRewards
+                    ? "Trophies, achievements, treasures, accessories and home decorations will be kept. "
+                    : "Trophies, achievements, treasures, accessories and home decorations will also be cleared. ")
+                     + "The player and settings will be kept. This can't be undone.")
             }
             .alert("Delete \(profile?.nickname ?? "this player")?", isPresented: $confirmDelete, presenting: profile) { doomed in
                 Button("Delete", role: .destructive) {
@@ -270,46 +285,159 @@ struct ParentDashboardView: View {
         }
     }
 
-    private func learning(_ profile: Profile) -> some View {
-        let parent = Binding<ParentSettings>(get: { profile.parent }, set: { value in model.updateProfile(profile.id) { $0.parent = value } })
-        return Section {
-            Picker("Difficulty", selection: parent.difficulty) {
-                ForEach(DifficultyMode.allCases, id: \.self) { Text($0.title).tag($0) }
-            }
-            VStack(alignment: .leading) {
-                Text("Times tables")
+    /// Replays the finale for this child, for anyone who missed a bit of it.
+    private func ending(_ profile: Profile) -> some View {
+        Section {
+            Button { model.watchEnding(for: profile.id) } label: {
                 HStack {
-                    ForEach([2, 3, 4, 5, 8, 10], id: \.self) { table in
-                        let on = profile.parent.tables.contains(table)
-                        Button("\(table)×") {
-                            var tables = profile.parent.tables
-                            if on { tables.removeAll { $0 == table } } else { tables.append(table) }
-                            if !tables.isEmpty { parent.wrappedValue.tables = tables.sorted() }
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(on ? .teal : .gray)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Watch the ending").foregroundStyle(.primary)
+                        Text("Nothing is saved or changed.").font(.caption).foregroundStyle(.secondary)
                     }
+                    Spacer()
+                    Image(systemName: "play.circle.fill").font(.title2).foregroundStyle(.teal)
                 }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Watch the ending with \(profile.nickname)")
+        } header: {
+            Text("The ending")
+        } footer: {
+            Text(profile.crystals.count == model.catalog.islands.count
+                 ? "Plays the end-of-game celebration again, with \(profile.nickname)'s name and totals. Watch it as often as you like."
+                 : "\(profile.nickname) hasn't found all six crystal pieces yet, so this will show how the story ends before they get there.")
+        }
+    }
+
+    private func learning(_ profile: Profile) -> some View {
+        Section {
+            MathsSettingsRows(profile: profile)
             VStack(alignment: .leading) {
                 Text("Spelling topics")
-                ForEach(Skill.spellingTopics, id: \.self) { topic in
-                    Toggle(topic.title, isOn: Binding(get: { profile.parent.spellingTopics.contains(topic) }, set: { isOn in
-                        var topics = profile.parent.spellingTopics
-                        if isOn { topics.append(topic) } else { topics.removeAll { $0 == topic } }
-                        if !topics.isEmpty { parent.wrappedValue.spellingTopics = topics }
-                    }))
-                }
+                SpellingTopicRows(profile: profile)
             }
-            Picker("Suggest a break after", selection: parent.sessionMinutes) {
-                Text("Never").tag(0)
-                ForEach([10, 15, 20, 30, 45], id: \.self) { Text("\($0) minutes").tag($0) }
-            }
-            Toggle("Timed bonus points", isOn: parent.timedChallenges)
+            PlaySettingsRows(profile: profile)
         } header: {
             Text("Learning settings")
         } footer: {
-            Text("Adaptive difficulty raises or lowers each skill separately based on recent answers. Timed bonus points only add extra score for quick answers; nothing ever runs out of time.")
+            Text(learningHelp)
         }
+    }
+}
+
+let learningHelp = "Adaptive difficulty raises or lowers each skill separately based on recent answers. Switching a times table off also leaves it out as the other number, so with 8× off there's no 8 × 3 either. \"Multiply and divide by\" picks the other number: switch off × 11 and × 12 to keep things gentler. \"Fractions\" picks which fractions come up, from halves to tenths. Timed bonus points only add extra score for quick answers; nothing ever runs out of time."
+
+/// Saves a change to one player's learning settings straight away.
+private func parentBinding(_ profile: Profile, _ model: AppModel) -> Binding<ParentSettings> {
+    Binding(get: { profile.parent }, set: { value in model.updateProfile(profile.id) { $0.parent = value } })
+}
+
+/// The list with `value` switched on or off, kept sorted. At least one value always stays on.
+private func toggled(_ value: Int, in values: [Int]) -> [Int] {
+    let next = values.contains(value) ? values.filter { $0 != value } : (values + [value]).sorted()
+    return next.isEmpty ? values : next
+}
+
+/// Difficulty, times tables, multipliers and fractions, as rows of a list section.
+struct MathsSettingsRows: View {
+    @Environment(AppModel.self) private var model
+    let profile: Profile
+
+    private func fractionName(_ denominator: Int) -> String {
+        SettingsNames.fraction(denominator)
+    }
+
+    var body: some View {
+        let parent = parentBinding(profile, model)
+        Picker("Difficulty", selection: parent.difficulty) {
+            ForEach(DifficultyMode.allCases, id: \.self) { Text($0.title).tag($0) }
+        }
+        VStack(alignment: .leading) {
+            Text("Times tables")
+            HStack {
+                ForEach(MathsGenerator.defaultTables, id: \.self) { table in
+                    let on = profile.parent.tables.contains(table)
+                    Button("\(table)×") {
+                        var tables = profile.parent.tables
+                        if on { tables.removeAll { $0 == table } } else { tables.append(table) }
+                        if !tables.isEmpty { parent.wrappedValue.tables = tables.sorted() }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(on ? .teal : .gray)
+                    .accessibilityValue(on ? "On" : "Off")
+                }
+            }
+        }
+        VStack(alignment: .leading) {
+            Text("Multiply and divide by")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 64), alignment: .leading)], alignment: .leading) {
+                ForEach(MathsGenerator.defaultMultipliers, id: \.self) { value in
+                    // A switched-off table is never used as the other number either, so its button is off too.
+                    let blocked = MathsGenerator.defaultTables.contains(value) && !profile.parent.tables.contains(value)
+                    let on = profile.parent.multipliers.contains(value) && !blocked
+                    Button("× \(value)") {
+                        parent.wrappedValue.multipliers = toggled(value, in: profile.parent.multipliers)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(on ? .teal : .gray)
+                    .disabled(blocked)
+                    .accessibilityValue(on ? "On" : "Off")
+                }
+            }
+        }
+        VStack(alignment: .leading) {
+            Text("Fractions")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 64), alignment: .leading)], alignment: .leading) {
+                ForEach(MathsGenerator.defaultDenominators, id: \.self) { denominator in
+                    let on = profile.parent.denominators.contains(denominator)
+                    Button("1/\(denominator)") {
+                        parent.wrappedValue.denominators = toggled(denominator, in: profile.parent.denominators)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(on ? .teal : .gray)
+                    .accessibilityLabel(fractionName(denominator))
+                    .accessibilityValue(on ? "On" : "Off")
+                }
+            }
+        }
+    }
+}
+
+/// A switch for each spelling topic. At least one always stays on.
+struct SpellingTopicRows: View {
+    @Environment(AppModel.self) private var model
+    let profile: Profile
+
+    var body: some View {
+        let parent = parentBinding(profile, model)
+        ForEach(Skill.spellingTopics, id: \.self) { topic in
+            Toggle(topic.title, isOn: Binding(get: { profile.parent.spellingTopics.contains(topic) }, set: { isOn in
+                var topics = profile.parent.spellingTopics
+                if isOn { topics.append(topic) } else { topics.removeAll { $0 == topic } }
+                if !topics.isEmpty { parent.wrappedValue.spellingTopics = topics }
+            }))
+        }
+    }
+}
+
+/// Break reminders and timed bonus points.
+struct PlaySettingsRows: View {
+    @Environment(AppModel.self) private var model
+    let profile: Profile
+
+    var body: some View {
+        let parent = parentBinding(profile, model)
+        Picker("Suggest a break after", selection: parent.sessionMinutes) {
+            Text("Never").tag(0)
+            ForEach([10, 15, 20, 30, 45], id: \.self) { Text("\($0) minutes").tag($0) }
+        }
+        Toggle("Timed bonus points", isOn: parent.timedChallenges)
+    }
+}
+
+enum SettingsNames {
+    static func fraction(_ denominator: Int) -> String {
+        ["halves", "thirds", "quarters", "fifths", "sixths", "sevenths", "eighths", "ninths", "tenths"][denominator - 2]
     }
 }

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Mosey Teeth Proposal</title>
+<style>
+  :root { --ink: #3b2a1e; --card: rgba(255, 251, 240, 0.92); }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1600px; height: 1000px; font-family: "Avenir Next", "Trebuchet MS", sans-serif; color: var(--ink);
+         background: #8fd3e8 url(bg_bay.jpg) center / cover no-repeat; position: relative; overflow: hidden; }
+  h1 { position: absolute; top: 20px; left: 0; right: 0; margin: 0; text-align: center; font-size: 40px; font-weight: 800;
+       color: #fff; text-shadow: 0 3px 0 #3b2a1e, 0 0 18px rgba(0,0,0,.35); }
+  .row { position: absolute; top: 90px; left: 30px; right: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .card { background: var(--card); border: 4px solid var(--ink); border-radius: 28px; padding: 10px 14px 14px; text-align: center;
+          box-shadow: 0 8px 0 rgba(59,42,30,.35); }
+  .card.now { opacity: .85; }
+  .card .pic { height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .card .pic img { width: 112%; max-width: none; transform: translateX(-5%); }
+  .card.now .pic img { width: 96%; }
+  .card h2 { margin: 2px 0 4px; font-size: 26px; }
+  .card p { margin: 0; font-size: 17px; line-height: 1.3; }
+  .tag { display: inline-block; font-size: 15px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #3b2a1e; color: #fff; margin-bottom: 6px; }
+  .scenes { position: absolute; left: 30px; right: 30px; bottom: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .scene { position: relative; height: 330px; border: 4px solid var(--ink); border-radius: 28px; overflow: hidden;
+           background: url(bg_bay.jpg) center 70% / 260% no-repeat; box-shadow: 0 8px 0 rgba(59,42,30,.35); }
+  .scene .otter { position: absolute; left: 30px; bottom: 30px; height: 150px; }
+  .scene .mosey { position: absolute; left: 130px; bottom: -40px; width: 340px; }
+  .scene .label { position: absolute; top: 12px; left: 14px; font-size: 16px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+                  background: var(--card); border: 3px solid var(--ink); }
+  .scene .bubble { position: absolute; top: 12px; right: 14px; width: 210px; background: #fffaf0; border: 3px solid var(--ink);
+                   border-radius: 18px; padding: 8px 12px; font-size: 16px; font-weight: 600; }
+  .scene .bubble b { display: block; font-size: 14px; color: #1f6fa8; }
+</style>
+</head>
+<body>
+  <h1>Mosey with teeth: three friendly options</h1>
+  <div class="row">
+    <div class="card now"><div class="pic"><img src="current.png" alt="Current Mosey"></div><span class="tag">Now</span><h2>Current</h2><p>Closed smile, no teeth.</p></div>
+    <div class="card"><div class="pic"><img src="option_a.png" alt="Option A"></div><span class="tag">Option A</span><h2>Peekaboo teeth</h2><p>Same smile, with a neat row of small teeth peeking over his lip.</p></div>
+    <div class="card"><div class="pic"><img src="option_b.png" alt="Option B"></div><span class="tag">Option B</span><h2>Big toothy grin</h2><p>Open, laughing mouth with tidy pointed teeth and a pink tongue.</p></div>
+    <div class="card"><div class="pic"><img src="option_c.png" alt="Option C"></div><span class="tag">Option C</span><h2>Plush teeth</h2><p>Chunky, soft triangle teeth, like the cuddly toy.</p></div>
+  </div>
+  <div class="scenes">
+    <div class="scene"><span class="label">A in the game</span><div class="bubble"><b>Mosey</b>Try the missing letter!</div><img class="otter" src="otter_idle.png" alt=""><img class="mosey" src="option_a.png" alt=""></div>
+    <div class="scene"><span class="label">B in the game</span><div class="bubble"><b>Mosey</b>Try the missing letter!</div><img class="otter" src="otter_idle.png" alt=""><img class="mosey" src="option_b.png" alt=""></div>
+    <div class="scene"><span class="label">C in the game</span><div class="bubble"><b>Mosey</b>Try the missing letter!</div><img class="otter" src="otter_idle.png" alt=""><img class="mosey" src="option_c.png" alt=""></div>
+  </div>
+</body>
+</html>

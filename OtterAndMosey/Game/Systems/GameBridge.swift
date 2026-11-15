@@ -27,6 +27,7 @@ final class GameBridge {
     var toast = ""
     var toastID = 0
     var keyboard: KeyboardKind = .none
+    var keyboardUppercase = false
     /// Friendship Power charge from 0 to 1, or nil when the meter is hidden.
     var friendship: Double?
     var friendshipUses = 0

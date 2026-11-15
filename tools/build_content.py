@@ -31,7 +31,7 @@ for n, line in enumerate((root / "tools/content/sentences.txt").read_text().spli
     if not line.strip() or line.startswith("#"):
         continue
     level, text = line.split("|")
-    if not re.fullmatch(r"[a-z ]+", text): problems.append(f"sentence {n}: letters and spaces only")
+    if not re.fullmatch(r"[A-Z][A-Za-z ]*", text): problems.append(f"sentence {n}: start with a capital; letters and spaces only")
     sentences.append({"level": int(level), "text": text})
 
 if problems:
@@ -124,11 +124,16 @@ for island in source.ISLANDS:
     collect(boss, island["guardian"]["phases"], guardian=kind)
     # Once won over, the guardian sounds different: these lines get the "befriended" delivery.
     collect(boss, island["guardian"]["befriended"], guardian=kind, mood="befriended")
+collect("finale", source.FINALE["opening"] + source.FINALE["thanks"] + source.FINALE["photo"] + source.FINALE["countdown"] + source.FINALE["after"])
+for island in source.ISLANDS:
+    if island["id"] not in source.FINALE["guardians"]: sys.exit(f"finale has no thank-you from the {island['id']} guardian")
+    collect("finale", [source.FINALE["guardians"][island["id"]]], guardian=island["guardian"]["kind"], mood="befriended")
 (out / "dialogue.json").write_text(json.dumps(dialogue, indent=0, ensure_ascii=False) + "\n")
 catalogue = {
     "islands": source.ISLANDS,
     "rewards": [{"id": r[0], "kind": r[1], "name": r[2], "emoji": r[3]} for r in source.REWARDS],
     "intro": source.INTRO, "introAfter": source.INTRO_AFTER, "askGrownUp": source.ASK_GROWN_UP,
+    "finale": source.FINALE,
 }
 (out / "islands.json").write_text(json.dumps(catalogue, indent=1, ensure_ascii=False) + "\n")
 print(f"{len(words)} words, {len(sentences)} sentences, {len(level_ids)} levels, {len(dialogue)} voiced dialogue lines ({sum(len(d['text']) for d in dialogue.values())} characters), {len(lookalikes)} lookalikes, {len(narration)} narration lines ({sum(len(t) for t in narration.values())} characters)")

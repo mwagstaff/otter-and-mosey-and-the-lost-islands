@@ -33,7 +33,7 @@ struct RootView: View {
         // Rebuild text when the typeface option changes.
         .id(model.settings.easyReadFont)
         .onReceive(clock) { _ in
-            guard scenePhase == .active, model.profile != nil, model.route != .title, model.route != .parent else { return }
+            guard scenePhase == .active, model.profile != nil, model.route != .title, model.route != .parent, model.route != .quickSetup else { return }
             model.addPlaytime(10)
         }
         .onChange(of: model.route) { _, route in music(for: route) }
@@ -49,6 +49,8 @@ struct RootView: View {
         switch model.route {
         case .title: TitleView()
         case .profiles: ProfilesView()
+        case .grownUpCheck: GrownUpCheckView()
+        case .quickSetup: QuickSetupView()
         case .intro: IntroView()
         case .map: MapView()
         case .island(let id):
@@ -63,7 +65,7 @@ struct RootView: View {
         case .trophies: TrophyCabinetView()
         case .home: HomeIslandView()
         case .parent: ParentAreaView()
-        case .ending: EndingView()
+        case .ending: FinaleView()
         }
     }
 

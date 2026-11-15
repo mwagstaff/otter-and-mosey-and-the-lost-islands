@@ -304,6 +304,38 @@ describe("progression", () => {
     expect(Object.keys(profile.achievements).length + profile.pendingTrophies.length).toBeGreaterThanOrEqual(60);
     expect(nextLevelFor(profile)).toBeUndefined();
   });
+
+  test("the ending can be watched again after beating any guardian once the game is complete", () => {
+    const profile = newProfile("Test");
+    const summaries = catalog.allLevels.map((level) => applyResult(perfect(level), level.id, profile.learner, profile));
+    // On the way through, only the very last fragment plays the ending, and nothing offers a replay.
+    expect(summaries.filter((summary) => summary.gameComplete).length).toBe(1);
+    expect(summaries.some((summary) => summary.endingReplay)).toBe(false);
+    for (const island of catalog.islands) {
+      const guardian = island.levels.find((level) => level.mode === "guardian")!;
+      const again = applyResult(perfect(guardian), guardian.id, profile.learner, profile);
+      expect(again.endingReplay, island.id).toBe(true);
+      expect(again.gameComplete).toBe(false);
+    }
+    const ordinary = catalog.level("woods-1")!;
+    expect(applyResult(perfect(ordinary), ordinary.id, profile.learner, profile).endingReplay).toBe(false);
+  });
+
+  test("beating a guardian again before the game is complete offers no ending", () => {
+    const profile = newProfile("Test");
+    for (const level of catalog.islands[0]!.levels) applyResult(perfect(level), level.id, profile.learner, profile);
+    const guardian = catalog.islands[0]!.levels.at(-1)!;
+    expect(applyResult(perfect(guardian), guardian.id, profile.learner, profile).endingReplay).toBe(false);
+  });
+
+  test("the finale has a voiced thank-you from every guardian and never says the player's name", () => {
+    const finale = catalog.finale;
+    for (const island of catalog.islands) expect(finale.guardians[island.id]?.speaker, island.id).toBe("guardian");
+    const spoken = [...finale.opening, ...finale.thanks, ...finale.photo, ...finale.after, ...Object.values(finale.guardians)];
+    expect(spoken.length).toBeGreaterThan(10);
+    for (const line of spoken) expect(voicedLines[dialogueAudioKey(line)], line.text).toBeDefined();
+    expect(spoken.some((line) => line.text.includes("{name}"))).toBe(false);
+  });
 });
 
 describe("playtime", () => {

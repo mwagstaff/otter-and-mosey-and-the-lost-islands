@@ -1,7 +1,8 @@
 import { Container, Sprite } from "pixi.js";
 import { catalog, type AnswerOutcome, type ChallengeSession, type InputProfile, type Island, type Question } from "../core";
+import { capitalizesTarget } from "../core/keyboardCase";
 import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, rotateTo, run, scaleTo, sequence, wait } from "../engine/actions";
-import { fishBiscuit, fishBiscuits, iconSprite, loadArt, iconName, mix, palette, panel } from "../engine/art";
+import { fishBiscuits, loadArt, iconName, mix, palette, panel, snackSprite } from "../engine/art";
 import { GameLabel } from "../engine/label";
 import { audio, narrator } from "./audio";
 import { Backdrop } from "./backdrop";
@@ -23,6 +24,15 @@ export interface SceneOptions {
 }
 
 /** Space taken at each edge by the HUD and the on-screen keys. */
+/** Where a hero holds a snack: the node it rides on, its spot there, its size, and which way it faces. */
+export interface SnackSpot {
+  holder: Container;
+  x: number;
+  y: number;
+  side: number;
+  facing: number;
+}
+
 export interface Insets {
   top: number;
   left: number;
@@ -144,7 +154,7 @@ export abstract class GameScene {
       this.backdrop.setRestoration(this.options.startRestoration, 0);
       this.backdrop.resize(width, height, insets.bottom);
       this.otter = new CharacterNode("otter", 100, this.options.accessory);
-      this.mosey = new CharacterNode("mosey", 160);
+      this.mosey = new CharacterNode("mosey", 160, this.options.accessory);
       this.build();
       this.layout();
       this.otter.startIdle();
@@ -225,6 +235,7 @@ export abstract class GameScene {
       hintText: undefined,
       caption: this.caption(question),
       keyboard: this.keyboard(question),
+      keyboardUppercase: capitalizesTarget(question.typingTarget, 0),
       canSpeak: spoken && narrator.canSay(question.audioKey, question.spoken),
     });
     if (options.settings.spokenInstructions && spoken) narrator.say(question.audioKey, question.spoken);
@@ -239,6 +250,10 @@ export abstract class GameScene {
       return { kind: "tray", letters: trayLetters(question.typingTarget) };
     }
     return { kind: "qwerty", space };
+  }
+
+  protected updateKeyboardCase(question: Question, index: number): void {
+    this.bridge.set({ keyboardUppercase: capitalizesTarget(question.typingTarget, index) });
   }
 
   /** A wrong attempt: reassure, never punish. */
@@ -352,17 +367,14 @@ export abstract class GameScene {
     // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
     // (or flippers) until the level closes, so the snack is still there during the chat
     // that follows and nobody misses it.
-    [this.otter, this.mosey].forEach((hero, index) => {
-      const snack = packet ? new Sprite(fishBiscuit()) : iconSprite(this.theme.snack, 64);
-      snack.anchor.set(0.5);
-      const side = Math.max(this.compact ? 40 : 52, hero.size * 0.34);
-      const ratio = side / Math.max(snack.texture.width, snack.texture.height);
-      const facing = hero.facingLeft ? -1 : 1;
-      if (hero === this.otter) snack.position.set(facing * hero.size * 0.14, -hero.size * 0.62);
-      else snack.position.set(facing * hero.size * 0.36, -hero.size * 0.08);
+    this.snackSpots().forEach((spot, index) => {
+      const snack = snackSprite(packet ? "fish_biscuits" : this.theme.snack, 64);
+      const ratio = spot.side / Math.max(snack.texture.width, snack.texture.height);
+      const facing = spot.facing;
+      snack.position.set(spot.x, spot.y);
       snack.zIndex = 50;
       snack.scale.set(0);
-      hero.addChild(snack);
+      spot.holder.addChild(snack);
       const bite = call(() => {
         if (!snack.parent) return;
         audio.play("pop", 0.35);
@@ -376,6 +388,25 @@ export abstract class GameScene {
         wait(0.9),
       );
       run(snack, sequence(wait(0.15 * index), scaleTo(ratio, 0.25, easeInOut), wait(0.9), nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48)));
+    });
+  }
+
+  /**
+   * Where the end-of-level snacks go, in the holder's own units. By default Otter's paws and
+   * Mosey's flippers, for whichever of them is on screen. Modes that draw the heroes some other
+   * way say where instead.
+   */
+  protected snackSpots(): SnackSpot[] {
+    return [this.otter, this.mosey].filter((hero) => hero.parent !== null).map((hero) => {
+      const facing = hero.facingLeft ? -1 : 1;
+      const otter = hero === this.otter;
+      return {
+        holder: hero,
+        x: facing * hero.size * (otter ? 0.14 : 0.36),
+        y: -hero.size * (otter ? 0.62 : 0.08),
+        side: Math.max(this.compact ? 40 : 52, hero.size * 0.34),
+        facing,
+      };
     });
   }
 

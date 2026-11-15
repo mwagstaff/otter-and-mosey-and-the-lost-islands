@@ -3,7 +3,7 @@ import LostIslandsCore
 import Observation
 
 enum Route: Equatable {
-    case title, profiles, intro, map, island(String), play(String), collection, trophies, home, parent, ending
+    case title, profiles, grownUpCheck, quickSetup, intro, map, island(String), play(String), collection, trophies, home, parent, ending
 }
 
 /// Writes save files off the main thread, one at a time and in order.
@@ -58,7 +58,7 @@ final class AppModel {
 
     #if DEBUG
     /// Development shortcuts: `-debugUnlock` clears every level, `-debugLevel bay-1` opens a level,
-    /// `-debugRoute map|collection|home|parent|ending|island:woods` opens a screen (the parent
+    /// `-debugRoute map|collection|home|parent|parent-ending|check|setup|ending|island:woods` opens a screen (the parent
     /// dashboard without its gate), `-debugPlaytest bay-1` play-tests a level from the dashboard.
     private func applyDebugArguments() {
         let arguments = ProcessInfo.processInfo.arguments
@@ -97,7 +97,14 @@ final class AppModel {
                 parentUnlocked = true
                 route = .parent
             case "ending": route = .ending
+            case "parent-ending":
+                parentUnlocked = true
+                watchEnding(for: save.activeProfileID)
             case "intro": route = .intro
+            case "check", "setup":
+                update { $0.seenIntro = false }
+                parentUnlocked = name == "setup"
+                route = name == "setup" ? .quickSetup : .grownUpCheck
             default: if name.hasPrefix("island:") { route = .island(String(name.dropFirst(7))) }
             }
         }
@@ -189,14 +196,27 @@ final class AppModel {
         persist()
     }
 
-    func resetProgress(_ id: UUID) {
+    func resetProgress(_ id: UUID, keepRewards: Bool = false) {
         guard let index = save.profiles.firstIndex(where: { $0.id == id }) else { return }
         let old = save.profiles[index]
         var fresh = Profile(nickname: old.nickname, avatar: old.avatar)
         fresh.id = old.id
         fresh.parent = old.parent
         fresh.rewards = ["deco-palm"]
+        if keepRewards {
+            fresh.rewards = old.rewards
+            fresh.equippedAccessory = old.equippedAccessory
+            fresh.decorations = old.decorations
+            fresh.achievements = old.achievements
+            fresh.pendingTrophies = old.pendingTrophies
+            fresh.trophiesReady = old.trophiesReady
+            fresh.trophiesSeen = old.trophiesSeen
+        }
         save.profiles[index] = fresh
+        if save.activeProfileID == id {
+            sessionSeconds = 0
+            unlockedIsland = nil
+        }
         persist()
     }
 
@@ -225,6 +245,23 @@ final class AppModel {
         route = .play(levelID)
     }
 
+    /// Set while the finale plays from the grown-ups' area, for the child chosen there.
+    private(set) var endingFromGrownUps = false
+    private(set) var endingProfileID: UUID?
+
+    /// Plays the finale from the grown-ups' area for the chosen child, any number of times.
+    func watchEnding(for profileID: UUID?) {
+        endingProfileID = profileID
+        endingFromGrownUps = true
+        route = .ending
+    }
+
+    func leaveEndingForGrownUps() {
+        endingFromGrownUps = false
+        endingProfileID = nil
+        route = .parent
+    }
+
     func endPlaytest() {
         playtest = nil
         route = .parent
@@ -248,7 +285,22 @@ final class AppModel {
             route = .profiles
             return
         }
-        route = profile.seenIntro ? .map : .intro
+        route = profile.seenIntro ? .map : .grownUpCheck
+    }
+
+    /// From the grown-up check to its quick setup, behind the grown-ups' gate.
+    func openQuickSetup() { route = .quickSetup }
+
+    /// Back to the grown-up check from the quick setup or its gate, marking it checked if `done`.
+    func leaveQuickSetup(done: Bool) {
+        if done, profile?.grownUpChecked == false { update { $0.grownUpChecked = true } }
+        route = .grownUpCheck
+    }
+
+    /// Leaves the grown-up check for the opening story.
+    func startAdventure() {
+        parentUnlocked = false
+        route = .intro
     }
 
     /// Jumps straight to the island with the next unfinished level.
@@ -298,6 +350,7 @@ final class AppModel {
 
     func addPlaytime(_ seconds: Double) {
         guard playtest == nil else { return }
+        if case .ending = route, endingFromGrownUps { return }
         sessionSeconds += seconds
         guard var profile = save.activeProfile else { return }
         profile.addPlaytime(seconds)

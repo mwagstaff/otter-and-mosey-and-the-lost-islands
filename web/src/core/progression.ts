@@ -23,6 +23,8 @@ export interface RewardSummary {
   trophyTotal: number;
   decorations: Reward[];
   gameComplete: boolean;
+  /** Set when a guardian is beaten again after the game is complete, so the finale can be watched again. */
+  endingReplay: boolean;
 }
 
 export function isIslandUnlocked(island: Island, profile: Profile, catalog: Catalog = bundled): boolean {
@@ -51,7 +53,7 @@ export function applyResult(
   const catalog = options.catalog ?? bundled;
   const summary: RewardSummary = {
     stars: result.stars, isFirstClear: false, isNewBest: false, trophies: [], trophiesWaiting: 0, trophyCount: 0, trophyTotal: 0,
-    decorations: [], gameComplete: false,
+    decorations: [], gameComplete: false, endingReplay: false,
   };
   const level = catalog.level(levelID);
   const island = catalog.islandContaining(levelID);
@@ -86,6 +88,8 @@ export function applyResult(
     profile.crystals.push(island.id);
     summary.crystalIsland = island;
     summary.gameComplete = profile.crystals.length === catalog.islands.length;
+  } else if (level.mode === "guardian" && profile.crystals.length === catalog.islands.length) {
+    summary.endingReplay = true;
   }
   for (const { stars, reward: id } of starDecorations) {
     const decoration = catalog.reward(id);

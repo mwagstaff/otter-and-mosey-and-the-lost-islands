@@ -5,6 +5,51 @@ import type { Skill } from "./skill";
 // Generates Year 3 maths questions that always have exactly one right answer.
 
 export const defaultTables: readonly number[] = [2, 3, 4, 5, 8, 10];
+/** The numbers a times-table question can multiply or divide by. */
+export const defaultMultipliers: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+/** The fractions a fraction question can use, by denominator: halves up to tenths. */
+export const defaultDenominators: readonly number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+/** The times tables a grown-up has chosen, plus what each one may be multiplied by. */
+interface Limits {
+  tables: readonly number[];
+  multipliers: readonly number[];
+}
+
+/**
+ * Whether a question may multiply by `value`: the grown-up picked it, and it isn't a table they
+ * switched off. "8 × 3" reads as the 8 times table, so it is left out when 8× is off.
+ */
+export function allowsMultiplier(value: number, tables: readonly number[], multipliers: readonly number[]): boolean {
+  return multipliers.includes(value) && (!defaultTables.includes(value) || tables.includes(value));
+}
+
+/**
+ * The numbers from `low` to `high` a question may multiply by. When the grown-up's choices miss this
+ * level's usual range, their choices win over the level.
+ */
+function multipliers(limits: Limits, low: number, high: number): number[] {
+  const all = Array.from({ length: high - low + 1 }, (_, index) => low + index);
+  const allowed = (values: readonly number[]) => values.filter((value) => allowsMultiplier(value, limits.tables, limits.multipliers));
+  const inRange = allowed(all);
+  if (inRange.length) return inRange;
+  const chosen = allowed(limits.multipliers);
+  return chosen.length ? chosen : all;
+}
+
+/**
+ * Whether a spaced-repetition fact ("mul:8x3") still fits the grown-up's chosen tables and multipliers.
+ * Anything that isn't a times-table or division fact is always allowed.
+ */
+export function allowsFact(key: string, tables: readonly number[], multipliers: readonly number[] = defaultMultipliers): boolean {
+  const parts = key.split(":");
+  if (parts.length !== 2 || (parts[0] !== "mul" && parts[0] !== "div")) return true;
+  const numbers = parts[1]!.split("x").map(Number);
+  if (numbers.length !== 2 || !numbers.every(Number.isInteger)) return true;
+  const [table, multiplier] = numbers as [number, number];
+  const enabled = tables.length ? tables : defaultTables;
+  return enabled.includes(table) && allowsMultiplier(multiplier, enabled, multipliers.length ? multipliers : defaultMultipliers);
+}
 
 interface Draft {
   key?: string;
@@ -21,19 +66,24 @@ const clamp = (level: number) => Math.min(Math.max(level, 1), 5);
 
 export function makeMaths(
   skill: Skill, level: number, rng: Rng,
-  options: { tables?: readonly number[]; format?: AnswerFormat } = {},
+  options: {
+    tables?: readonly number[]; multipliers?: readonly number[]; denominators?: readonly number[]; format?: AnswerFormat;
+  } = {},
 ): Question {
   const pitch = clamp(level);
   const tables = options.tables?.length ? options.tables : defaultTables;
+  const limits: Limits = { tables, multipliers: options.multipliers?.length ? options.multipliers : defaultMultipliers };
+  const chosenDenominators = (options.denominators ?? []).filter((each) => each >= 2);
+  const denominators = chosenDenominators.length ? chosenDenominators : defaultDenominators;
   let draft: Draft;
   switch (skill) {
     case "subtraction": draft = subtraction(pitch, rng); break;
-    case "multiplication": draft = multiplication(pitch, tables, rng); break;
-    case "division": draft = division(pitch, tables, rng); break;
-    case "fractions": draft = fractions(pitch, rng); break;
+    case "multiplication": draft = multiplication(pitch, limits, rng); break;
+    case "division": draft = division(pitch, limits, rng); break;
+    case "fractions": draft = fractions(pitch, denominators, rng); break;
     case "placeValue": draft = placeValue(pitch, rng); break;
-    case "sequences": draft = sequences(pitch, rng); break;
-    case "wordProblems": draft = wordProblem(pitch, tables, rng); break;
+    case "sequences": draft = sequences(pitch, tables, rng); break;
+    case "wordProblems": draft = wordProblem(pitch, limits, rng); break;
     default: draft = addition(pitch, rng);
   }
   return finish(draft, skill, pitch, options.format ?? "choice", rng);
@@ -193,11 +243,11 @@ function tablesFor(level: number, enabled: readonly number[]): readonly number[]
   return usable.length === 0 ? enabled : usable;
 }
 
-function multiplication(level: number, tables: readonly number[], rng: Rng): Draft {
-  const table = pick(rng, tablesFor(level, tables));
+function multiplication(level: number, limits: Limits, rng: Rng): Draft {
+  const table = pick(rng, tablesFor(level, limits.tables));
   if (level === 5 && randomBool(rng)) {
     // Year 3 extension: a multiple of ten times a single digit.
-    const tens = randomInt(rng, 2, 8) * 10;
+    const tens = pick(rng, multipliers(limits, 2, 8)) * 10;
     const answer = tens * table;
     return {
       prompt: `${tens} × ${table} = ?`, answer,
@@ -205,7 +255,7 @@ function multiplication(level: number, tables: readonly number[], rng: Rng): Dra
       hint: `Work out ${tens / 10} × ${table} first, then make it ten times bigger.`,
     };
   }
-  const other = level === 1 ? randomInt(rng, 1, 6) : randomInt(rng, 2, 12);
+  const other = pick(rng, level === 1 ? multipliers(limits, 1, 6) : multipliers(limits, 2, 12));
   if (level >= 4 && randomBool(rng)) {
     const product = table * other;
     return {
@@ -220,47 +270,33 @@ function multiplication(level: number, tables: readonly number[], rng: Rng): Dra
   return timesFact(table, other);
 }
 
-function division(level: number, tables: readonly number[], rng: Rng): Draft {
-  const table = pick(rng, tablesFor(level, tables));
-  const quotient = level === 1 ? randomInt(rng, 1, 6) : randomInt(rng, 2, 12);
+function division(level: number, limits: Limits, rng: Rng): Draft {
+  const table = pick(rng, tablesFor(level, limits.tables));
+  const quotient = pick(rng, level === 1 ? multipliers(limits, 1, 6) : multipliers(limits, 2, 12));
   return divisionFact(table, quotient);
 }
 
 // Fractions, place value, sequences
 
-function fractions(level: number, rng: Rng): Draft {
-  if (level === 1) {
-    const half = randomInt(rng, 2, 10);
-    return {
-      prompt: `Half of ${half * 2} = ?`, answer: half, near: [half + 1, half - 1, half * 2, half + 2],
-      hint: `Split ${half * 2} into 2 equal groups.`,
-    };
-  }
-  if (level <= 3) {
-    const denominator = pick(rng, level === 2 ? [3, 4] : [3, 4, 5, 8, 10]);
-    const part = randomInt(rng, 2, level === 2 ? 6 : 9);
-    const whole = denominator * part;
-    return {
-      prompt: `1/${denominator} of ${whole} = ?`, answer: part,
-      near: [part + 1, part - 1, denominator, part * 2, whole - denominator].filter(positive),
-      hint: `Share ${whole} into ${denominator} equal groups.`,
-      spoken: `What is one ${ordinal(denominator)} of ${whole}?`,
-    };
-  }
+function fractions(level: number, denominators: readonly number[], rng: Rng): Draft {
+  /** One of the denominators this level normally uses, if allowed; otherwise any allowed one big enough. */
+  const choose = (wanted: readonly number[], smallest: number): number | undefined => {
+    const usable = wanted.filter((each) => denominators.includes(each));
+    const pool = usable.length ? usable : denominators.filter((each) => each >= smallest);
+    return pool.length ? pick(rng, pool) : undefined;
+  };
+  if (level === 1) return unitFraction(choose([2], 2)!, 2, denominators.includes(2) ? 10 : 5, rng);
+  if (level === 2) return unitFraction(choose([3, 4], 2)!, 2, 6, rng);
+  if (level === 3) return unitFraction(choose([3, 4, 5, 8, 10], 2)!, 2, 9, rng);
   if (level === 4) {
-    const denominator = pick(rng, [3, 4, 5]);
-    const numerator = randomInt(rng, 2, denominator - 1);
-    const part = randomInt(rng, 2, 6);
-    const whole = denominator * part;
-    const answer = numerator * part;
-    return {
-      prompt: `${numerator}/${denominator} of ${whole} = ?`, answer,
-      near: [part, whole - part, answer + part, answer - 1, answer + 1].filter(positive),
-      hint: `First share ${whole} into ${denominator} groups: ${whole} ÷ ${denominator} = ${part}. Then add ${numerator} lots of ${part}.`,
-      spoken: `What is ${numerator} ${ordinal(denominator)}s of ${whole}?`,
-    };
+    const denominator = choose([3, 4, 5], 3);
+    return denominator === undefined ? unitFraction(2, 2, 10, rng) : nonUnitFraction(denominator, rng);
   }
-  const denominator = pick(rng, [5, 6, 7, 8, 9, 10]);
+  const denominator = choose([5, 6, 7, 8, 9, 10], 4);
+  if (denominator === undefined) {
+    const third = choose([3], 3);
+    return third === undefined ? unitFraction(2, 2, 10, rng) : nonUnitFraction(third, rng);
+  }
   const a = randomInt(rng, 1, denominator - 3);
   const b = randomInt(rng, 1, denominator - a - 1);
   const name = ordinal(denominator);
@@ -269,6 +305,38 @@ function fractions(level: number, rng: Rng): Draft {
     near: [a + b + 1, a + b - 1, denominator, a * b, a + b + 2].filter(positive),
     hint: "The bottom number stays the same. Just add the top numbers.",
     spoken: `${a} ${name}s plus ${b} ${name}s. How many ${name}s?`,
+  };
+}
+
+/** "Half of 12" or "1/4 of 20". */
+function unitFraction(denominator: number, low: number, high: number, rng: Rng): Draft {
+  const part = randomInt(rng, low, high);
+  const whole = denominator * part;
+  if (denominator === 2) {
+    return {
+      prompt: `Half of ${whole} = ?`, answer: part, near: [part + 1, part - 1, whole, part + 2],
+      hint: `Split ${whole} into 2 equal groups.`,
+    };
+  }
+  return {
+    prompt: `1/${denominator} of ${whole} = ?`, answer: part,
+    near: [part + 1, part - 1, denominator, part * 2, whole - denominator].filter(positive),
+    hint: `Share ${whole} into ${denominator} equal groups.`,
+    spoken: `What is one ${ordinal(denominator)} of ${whole}?`,
+  };
+}
+
+/** "2/3 of 15". */
+function nonUnitFraction(denominator: number, rng: Rng): Draft {
+  const numerator = randomInt(rng, 2, denominator - 1);
+  const part = randomInt(rng, 2, 6);
+  const whole = denominator * part;
+  const answer = numerator * part;
+  return {
+    prompt: `${numerator}/${denominator} of ${whole} = ?`, answer,
+    near: [part, whole - part, answer + part, answer - 1, answer + 1].filter(positive),
+    hint: `First share ${whole} into ${denominator} groups: ${whole} ÷ ${denominator} = ${part}. Then add ${numerator} lots of ${part}.`,
+    spoken: `What is ${numerator} ${ordinal(denominator)}s of ${whole}?`,
   };
 }
 
@@ -335,9 +403,11 @@ function placeValue(level: number, rng: Rng): Draft {
   }
 }
 
-function sequences(level: number, rng: Rng): Draft {
+function sequences(level: number, tables: readonly number[], rng: Rng): Draft {
   const steps = level === 1 ? [2, 5, 10] : level === 2 ? [3, 4] : level === 3 ? [4, 8] : level === 4 ? [50, 100] : [3, 4, 8, 50];
-  const step = pick(rng, steps);
+  // Counting in 8s is the 8 times table, so skip steps from tables that are switched off.
+  const allowed = steps.filter((each) => !defaultTables.includes(each) || tables.includes(each));
+  const step = pick(rng, allowed.length === 0 ? tables : allowed);
   const start = step * (level >= 4 ? randomInt(rng, 0, 4) : randomInt(rng, 1, 6));
   const terms = [0, 1, 2, 3, 4].map((index) => start + step * index);
   if (level === 5 && randomBool(rng)) terms.reverse();
@@ -353,7 +423,7 @@ function sequences(level: number, rng: Rng): Draft {
 
 // Word problems
 
-function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft {
+function wordProblem(level: number, limits: Limits, rng: Rng): Draft {
   const things = pick(rng, ["shells", "pearls", "berries", "acorns", "starfish", "pebbles"]);
   const easy = level <= 2;
   switch (randomInt(rng, 0, level >= 4 ? 4 : 3)) {
@@ -376,8 +446,8 @@ function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft 
       };
     }
     case 2: {
-      const table = pick(rng, tablesFor(Math.max(level, 2), tables));
-      const groups = randomInt(rng, 2, easy ? 5 : 9);
+      const table = pick(rng, tablesFor(Math.max(level, 2), limits.tables));
+      const groups = pick(rng, multipliers(limits, 2, easy ? 5 : 9));
       const answer = groups * table;
       return {
         key: `mul:${table}x${groups}`,
@@ -387,8 +457,8 @@ function wordProblem(level: number, tables: readonly number[], rng: Rng): Draft 
       };
     }
     case 3: {
-      const table = pick(rng, tablesFor(Math.max(level, 2), tables));
-      const each = randomInt(rng, 2, easy ? 5 : 9);
+      const table = pick(rng, tablesFor(Math.max(level, 2), limits.tables));
+      const each = pick(rng, multipliers(limits, 2, easy ? 5 : 9));
       return {
         key: `div:${table}x${each}`,
         prompt: `Otter shares ${table * each} ${things} equally between ${table} friends. How many each?`, answer: each,

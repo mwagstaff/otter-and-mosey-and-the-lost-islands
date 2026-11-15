@@ -1,5 +1,6 @@
 // The game's rules, ported from the Swift package `LostIslandsCore`. Nothing here touches
 // the page, so it runs the same in the browser and in tests.
+export * from "./bubble";
 export * from "./catalog";
 export * from "./content";
 export * from "./learner";
@@ -11,5 +12,6 @@ export * from "./save";
 export * from "./session";
 export * from "./skill";
 export * from "./speech";
+export * from "./summary";
 export * from "./trophies";
 export * from "./wordbank";

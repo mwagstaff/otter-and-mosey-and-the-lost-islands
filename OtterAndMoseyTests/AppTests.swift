@@ -113,6 +113,47 @@ import Testing
         #expect(second.route == .island("woods"))
     }
 
+    @Test func restartAdventureCanKeepRewards() throws {
+        for keep in [true, false] {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent("reset-test-\(UUID().uuidString)")
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let store = SaveStore(directory: directory)
+            let model = AppModel(store: store)
+            model.createProfile(nickname: "Pip", avatar: "🦦")
+            let id = try #require(model.profile?.id)
+            model.finishIntro()
+            _ = model.complete(levelID: "woods-1", result: LevelResult(stars: 3, accuracy: 1, score: 600, bestCombo: 6, correctFirstTry: 6, total: 6), learner: LearnerModel(), friendshipUses: 1)
+            model.updateProfile(id) {
+                $0.achievements = $0.achievements.mapValues { Date(timeIntervalSince1970: floor($0.timeIntervalSince1970)) }
+                $0.crystals = ["woods"]
+                $0.parent.sessionMinutes = 15
+                $0.playSeconds = 120
+                $0.grownUpChecked = true
+            }
+            let old = try #require(model.profile)
+            model.createProfile(nickname: "Nova", avatar: "🐬")
+            model.updateProfile(try #require(model.profile?.id)) { $0.trophiesReady = true }
+            let other = try #require(model.profile)
+            model.selectProfile(id)
+            model.sessionSeconds = 120
+            model.resetProgress(id, keepRewards: keep)
+            model.persistNow()
+            let loaded = AppModel(store: store)
+            let fresh = try #require(loaded.profile)
+            #expect(fresh.id == id && fresh.nickname == old.nickname && fresh.parent == old.parent)
+            #expect(fresh.levels.isEmpty && fresh.crystals.isEmpty && fresh.lastLevelID == nil)
+            #expect(!fresh.seenIntro && !fresh.grownUpChecked && fresh.playSeconds == 0)
+            #expect(fresh.bestCombo == 0 && fresh.friendshipPowers == 0)
+            #expect(fresh.rewards == (keep ? old.rewards : ["deco-palm"]))
+            #expect(fresh.achievements == (keep ? old.achievements : [:]))
+            #expect(fresh.pendingTrophies == (keep ? old.pendingTrophies : []))
+            #expect(model.sessionSeconds == 0)
+            #expect(loaded.save.profiles.first { $0.id == other.id } == other)
+            loaded.continueGame()
+            #expect(loaded.route == .grownUpCheck)
+        }
+    }
+
     @Test func trayKeyboardAlwaysContainsTheAnswerLetters() {
         for word in ["u", "au", "because", "international"] {
             let letters = GameScene.trayLetters(for: word)

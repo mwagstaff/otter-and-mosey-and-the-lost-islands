@@ -8,6 +8,8 @@ import UIKit
 enum SFX: String, CaseIterable {
     case tap, nav, correct, combo, wrong, pop, crystal, star, jump, swim, crack, chirp
     case portal, guardian, friendship, levelComplete, unlock, victory, key, whoosh, plank
+    /// The whole cast shouting "Hooray!" together, for the finale's three cheers.
+    case cheer
 }
 
 /// Plays music and effects. Uses the ambient audio session, so the ring/silent switch
@@ -147,6 +149,9 @@ final class Narrator {
             synthesizer.speak(utterance)
         }
     }
+
+    /// Whether a recording is still playing, so a scene can wait for the line to finish.
+    var isSpeaking: Bool { player?.isPlaying ?? false }
 
     func stop() {
         player?.stop()

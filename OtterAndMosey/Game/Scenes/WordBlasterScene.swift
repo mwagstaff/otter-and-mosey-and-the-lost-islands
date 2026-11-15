@@ -108,6 +108,7 @@ final class WordBlasterScene: GameScene {
     private func accept(_ character: Character, question: Question, slots: WordSlotsNode) {
         slots.fillNext(with: character)
         typedIndex += 1
+        updateKeyboardCase(for: question, at: typedIndex)
         AudioManager.shared.play(.key, volume: 0.6)
         Haptics.shared.tap()
         if typedIndex >= question.typingTarget.count { pop() }

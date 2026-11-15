@@ -4,7 +4,8 @@ import { catalog, gameModeTitles, isIslandUnlocked, isLevelUnlocked, nextLevelFo
 import { audio } from "../game/audio";
 import { islandTheme } from "../game/theme";
 import { art, button, h, picture, roundButton, symbol } from "./dom";
-import { editName, keyboardRows } from "./keyboard";
+import { bindNameKeyboard, editName, keyboardRows } from "./keyboard";
+import { photoButton } from "./photo";
 import { trophiesButton } from "./trophies";
 
 /** One of the game's screens: what to show, and how to tidy up when it is left. */
@@ -81,13 +82,22 @@ const avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢",
 export function profilesScreen(model: AppModel): Screen {
   const heading = h("h1.banner");
   const body = h("div.profiles-body");
+  let step: "players" | "character" | "name" = "players";
+  let avatar = avatars[0]!;
+  let nickname = "";
+  const back = () => {
+    if (step === "name") characterStep();
+    else if (step === "character" && model.save.profiles.length > 0) list();
+    else model.go({ name: "title" });
+  };
   const element = h("section.screen.profiles", { style: backdrop("bg_title") },
     h("div.veil.soft"),
-    h("header.bar", {}, roundButton("back", "Back", () => model.go({ name: "title" })), heading, h("span.spacer")),
+    h("header.bar", {}, roundButton("back", "Back", back), heading, h("span.spacer")),
     body,
   );
 
   function list(): void {
+    step = "players";
     heading.textContent = "Who's playing?";
     const cards = model.save.profiles.map((profile) => {
       const card = button(`player${profile.id === model.profile?.id ? ".current" : ""}`, [
@@ -124,20 +134,43 @@ export function profilesScreen(model: AppModel): Screen {
   }
 
   function form(): void {
+    avatar = avatars[0]!;
+    nickname = "";
+    characterStep();
+  }
+
+  function characterStep(): void {
+    step = "character";
     heading.textContent = "New explorer";
-    let avatar = avatars[0]!;
+    const choices = avatars.map((choice) => {
+      const option = button(`avatar-choice${choice === avatar ? ".chosen" : ""}`, [picture(choice, "avatar")], () => {
+        avatar = choice;
+        choices.forEach((each) => {
+          each.classList.toggle("chosen", each === option);
+          each.setAttribute("aria-pressed", String(each === option));
+        });
+      }, { "aria-label": `Picture ${avatars.indexOf(choice) + 1}`, "aria-pressed": String(choice === avatar) });
+      return option;
+    });
+    body.replaceChildren(h("div.profile-form.character-step.panel", {},
+      h("p.explorer-step", {}, "1 of 2 · Choose your character"),
+      h("div.avatar-grid", { role: "group", "aria-label": "Choose your character" }, ...choices),
+      h("div.actions", {},
+        button("cream", ["Cancel"], back),
+        button("teal.big", ["Next", symbol("arrow")], nameStep),
+      ),
+    ));
+    // Restore keyboard focus when returning from the name step.
+    body.querySelector<HTMLButtonElement>('.avatar-choice[aria-pressed="true"]')?.focus({ preventScroll: true });
+  }
+
+  function nameStep(): void {
+    step = "name";
     const shown = h("span.avatar-shown", {}, picture(avatar, "avatar"));
     const name = h<"input">("input.nickname", {
       type: "text", required: true, inputmode: "none", "aria-describedby": "name-help name-hint", placeholder: "Nickname", maxlength: 12, autocomplete: "off", autocapitalize: "words", spellcheck: "false", "aria-label": "Nickname",
     });
-    const choices = avatars.map((choice) => {
-      const option = button(`avatar-choice${choice === avatar ? ".chosen" : ""}`, [picture(choice, "avatar")], () => {
-        avatar = choice;
-        shown.replaceChildren(picture(avatar, "avatar"));
-        choices.forEach((each) => each.classList.toggle("chosen", each === option));
-      }, { "aria-label": `Picture ${avatars.indexOf(choice) + 1}` });
-      return option;
-    });
+    name.value = nickname;
     // Filled in only when "Let's go!" is pressed with no name, so screen readers hear it then.
     const hint = h("p.name-hint", { id: "name-hint", "aria-live": "polite" });
     const askForName = () => {
@@ -152,6 +185,7 @@ export function profilesScreen(model: AppModel): Screen {
     };
     name.addEventListener("animationend", () => name.classList.remove("wobble"));
     name.addEventListener("input", () => {
+      nickname = name.value;
       if (!name.value.trim() || !hint.classList.contains("shown")) return;
       hint.classList.remove("shown");
       hint.replaceChildren();
@@ -163,37 +197,26 @@ export function profilesScreen(model: AppModel): Screen {
       model.play();
     };
     name.addEventListener("keydown", (event) => { if (event.key === "Enter") go(); });
-    body.replaceChildren(h("div.profile-form.panel", {},
-      h("p.name-help", { id: "name-help" }, "What shall we call you? Pick a nickname to start!"),
+    body.replaceChildren(h("div.profile-form.name-step.panel", {},
+      h("p.name-help.explorer-step", { id: "name-help" }, "2 of 2 · What shall we call you?"),
       h("div.name-row", {}, shown, name),
       hint,
-      h("div.avatar-row", {}, ...choices),
       h("div.name-keyboard", { role: "group", "aria-label": "Nickname keyboard" },
         ...keyboardRows({ kind: "qwerty", space: true }, (key) => editName(name, key), () => editName(name, "Backspace")),
         h("div.key-row", {}, ...["-", "’"].map((key) => button("cream.name-punctuation", [key], () => editName(name, key)))),
       ),
       h("div.actions", {},
-        model.save.profiles.length > 0 && button("cream", ["Cancel"], list),
+        button("cream", ["Back"], characterStep),
         button("teal.big", ["Let's go!", symbol("play")], go),
       ),
     ));
+    name.focus({ preventScroll: true });
+    name.setSelectionRange(name.value.length, name.value.length);
+    bindNameKeyboard(name, body.querySelector<HTMLElement>(".name-keyboard")!);
   }
 
   if (model.save.profiles.length === 0) form();
   else list();
-  return { element };
-}
-
-/** The reward for restoring all six fragments. */
-export function endingScreen(model: AppModel): Screen {
-  audio.play("victory");
-  const element = h("section.screen.ending", { style: backdrop("bg_ending") },
-    h("div.ending-card.panel", {},
-      h("h1", {}, "The Rainbow Crystal is whole again!"),
-      h("p", {}, `Thank you, ${model.profile?.nickname ?? "explorer"}. Every island is full of colour because of you.`),
-      button("teal.big", [picture("🗺️"), "Keep exploring"], () => model.go({ name: "map" })),
-    ),
-  );
   return { element };
 }
 
@@ -224,7 +247,7 @@ export function mapScreen(model: AppModel): Screen {
       () => model.go({ name: "island", id: island.id }), { disabled: !unlocked });
   });
   const chip = (key: string, text: string) => h("span.count-chip", {}, picture(key), text);
-  const element = h("section.screen.map", { style: backdrop("bg_map") },
+  const element: HTMLElement = h("section.screen.map", { style: backdrop("bg_map") },
     h("header.bar.map-bar", {},
       roundButton("home", "Title screen", () => model.go({ name: "title" })),
       chip(profile?.avatar ?? "🙂", profile?.nickname ?? ""),
@@ -232,6 +255,7 @@ export function mapScreen(model: AppModel): Screen {
       chip("⭐️", String(profile ? totalStars(profile) : 0)),
       chip("💎", `${profile?.crystals.length ?? 0}/6`),
       trophiesButton(model),
+      photoButton(model, (): HTMLElement => element),
       button("gold", [picture("🎒"), "Treasures"], () => model.go({ name: "collection" })),
       button("cream", [picture("🏝️"), "Home"], () => model.go({ name: "home" })),
     ),

@@ -2,7 +2,7 @@ import type { LevelDef } from "./catalog";
 import { wordBank } from "./content";
 import { asObject, bool, int, isInteger, list } from "./decode";
 import { allDifficultyModes, LearnerModel, recordTypingStats, type DifficultyMode } from "./learner";
-import { defaultTables, makeMaths, makeMathsFact } from "./maths";
+import { allowsFact, defaultDenominators, defaultMultipliers, defaultTables, makeMaths, makeMathsFact } from "./maths";
 import type { AnswerFormat, Question } from "./question";
 import { pick, randomInt, SeededGenerator } from "./rng";
 import { isSkill, spellingTopics, subjectOf, type InputProfile, type Skill } from "./skill";
@@ -12,6 +12,10 @@ import { makeSpelling, makeTyping, type WordBank } from "./wordbank";
 export interface ParentSettings {
   difficulty: DifficultyMode;
   tables: number[];
+  /** The numbers times-table and division questions may multiply or divide by. */
+  multipliers: number[];
+  /** The fractions questions may use, by denominator (2 for halves up to 10 for tenths). */
+  denominators: number[];
   spellingTopics: Skill[];
   /** Suggested play time in minutes before a gentle break reminder. 0 means no reminder. */
   sessionMinutes: number;
@@ -20,7 +24,8 @@ export interface ParentSettings {
 }
 
 export function newParentSettings(): ParentSettings {
-  return { difficulty: "adaptive", tables: [...defaultTables], spellingTopics: [...spellingTopics], sessionMinutes: 0, timedChallenges: false };
+  return { difficulty: "adaptive", tables: [...defaultTables], multipliers: [...defaultMultipliers],
+    denominators: [...defaultDenominators], spellingTopics: [...spellingTopics], sessionMinutes: 0, timedChallenges: false };
 }
 
 export function readParentSettings(value: unknown): ParentSettings {
@@ -29,6 +34,8 @@ export function readParentSettings(value: unknown): ParentSettings {
   return {
     difficulty: (allDifficultyModes as readonly unknown[]).includes(raw.difficulty) ? (raw.difficulty as DifficultyMode) : fresh.difficulty,
     tables: list(raw.tables, isInteger, fresh.tables),
+    multipliers: list(raw.multipliers, isInteger, fresh.multipliers),
+    denominators: list(raw.denominators, isInteger, fresh.denominators),
     spellingTopics: list(raw.spellingTopics, isSkill, fresh.spellingTopics),
     sessionMinutes: int(raw.sessionMinutes, 0),
     timedChallenges: bool(raw.timedChallenges, false),
@@ -171,7 +178,8 @@ export class ChallengeSession {
 
     // Spaced repetition: bring back something the child found tricky.
     if (this.asked > 1 && this.rng.next() < 0.35) {
-      const key = this.learner.dueKeys(skills).find((due) => !this.usedKeys.has(due));
+      const key = this.learner.dueKeys(skills).find((due) =>
+        !this.usedKeys.has(due) && allowsFact(due, this.settings.tables, this.settings.multipliers));
       const review = key === undefined ? undefined : this.review(key);
       if (key !== undefined && review) {
         this.usedKeys.add(key);
@@ -203,7 +211,10 @@ export class ChallengeSession {
     const pitch = this.learner.level(skill, this.settings.difficulty);
     switch (subjectOf(skill)) {
       case "maths": {
-        const make = () => makeMaths(skill, pitch, this.rng, { tables: this.settings.tables, format: this.format(skill) });
+        const make = () => makeMaths(skill, pitch, this.rng, {
+          tables: this.settings.tables, multipliers: this.settings.multipliers, denominators: this.settings.denominators,
+          format: this.format(skill),
+        });
         for (let attempt = 0; attempt < 8; attempt += 1) {
           const candidate = make();
           if (!this.usedTexts.has(candidate.prompt)) {

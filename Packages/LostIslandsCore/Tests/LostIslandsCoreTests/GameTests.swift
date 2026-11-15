@@ -288,6 +288,42 @@ import Testing
         #expect(profile.achievements.count + profile.pendingTrophies.count >= 60)
         #expect(Progression.nextLevel(for: profile) == nil)
     }
+
+    @Test func theEndingCanBeWatchedAgainAfterAnyGuardianOnceTheGameIsComplete() {
+        var profile = Profile(nickname: "Test")
+        var summaries: [RewardSummary] = []
+        for level in catalog.allLevels {
+            summaries.append(Progression.apply(perfect(level), levelID: level.id, learner: profile.learner, to: &profile))
+        }
+        // On the way through, only the very last fragment plays the ending, and nothing offers a replay.
+        let completions = summaries.filter { $0.gameComplete }.count
+        let replays = summaries.filter { $0.endingReplay }.count
+        #expect(completions == 1)
+        #expect(replays == 0)
+        for island in catalog.islands {
+            let guardian = island.levels.first { $0.mode == .guardian }!
+            let again = Progression.apply(perfect(guardian), levelID: guardian.id, learner: profile.learner, to: &profile)
+            #expect(again.endingReplay && !again.gameComplete, "\(island.id)")
+        }
+        let ordinary = catalog.level("woods-1")!
+        #expect(!Progression.apply(perfect(ordinary), levelID: ordinary.id, learner: profile.learner, to: &profile).endingReplay)
+    }
+
+    @Test func beatingAGuardianAgainBeforeTheEndOffersNoEnding() {
+        var profile = Profile(nickname: "Test")
+        for level in catalog.islands[0].levels {
+            Progression.apply(perfect(level), levelID: level.id, learner: profile.learner, to: &profile)
+        }
+        let guardian = catalog.islands[0].levels.last!
+        #expect(!Progression.apply(perfect(guardian), levelID: guardian.id, learner: profile.learner, to: &profile).endingReplay)
+    }
+
+    @Test func theFinaleHasAVoicedThankYouFromEveryGuardian() throws {
+        let finale = try #require(catalog.finale)
+        for island in catalog.islands { #expect(finale.guardians[island.id]?.speaker == .guardian, "\(island.id)") }
+        let spoken = finale.opening + finale.thanks + finale.photo + finale.after + Array(finale.guardians.values)
+        for line in spoken { #expect(Catalog.voicedLines[line.audioKey ?? ""] != nil, "\(line.text)") }
+    }
 }
 
 @Suite struct SaveTests {
@@ -521,5 +557,48 @@ import Testing
         profile.wear(nil)
         profile.wear("hat-crown")
         #expect(profile.stats.hatsWorn == ["hat-leaf", "hat-crown"] && profile.equippedAccessory == "hat-crown")
+    }
+}
+
+@Suite struct BubblePlacementTests {
+    let stage = CGSize(width: 1000, height: 600)
+    let bubble = CGSize(width: 300, height: 90)
+
+    func onStage(_ spot: BubblePlacement.Spot) -> Bool {
+        CGRect(origin: .zero, size: stage).contains(CGRect(origin: spot.origin, size: bubble))
+    }
+
+    @Test func goesAboveASpeakerWithRoomOverhead() {
+        let speaker = CGRect(x: 400, y: 300, width: 200, height: 250)
+        let spot = BubblePlacement.place(stage: stage, speaker: speaker, bubble: bubble)
+        #expect(spot.tail == .down)
+        #expect(!CGRect(origin: spot.origin, size: bubble).intersects(speaker))
+    }
+
+    @Test func movesBesideASpeakerNearTheTop() {
+        let speaker = CGRect(x: 780, y: 20, width: 180, height: 160)
+        let spot = BubblePlacement.place(stage: stage, speaker: speaker, bubble: bubble)
+        #expect(spot.tail == .right)
+        #expect(onStage(spot) && !CGRect(origin: spot.origin, size: bubble).intersects(speaker))
+    }
+
+    @Test func neverCoversTheSpeaker() {
+        for x in stride(from: 0.0, through: 800, by: 50) {
+            for y in stride(from: 0.0, through: 350, by: 50) {
+                let speaker = CGRect(x: x, y: y, width: 200, height: 250)
+                let spot = BubblePlacement.place(stage: stage, speaker: speaker, bubble: bubble)
+                let box = CGRect(origin: spot.origin, size: bubble)
+                #expect(!box.intersects(speaker), "speaker at \(x),\(y)")
+                #expect(onStage(spot), "speaker at \(x),\(y)")
+            }
+        }
+    }
+
+    @Test func keepsClearOfTheSkipButton() {
+        let skip = CGRect(x: 880, y: 10, width: 110, height: 50)
+        let speaker = CGRect(x: 820, y: 200, width: 160, height: 300)
+        let spot = BubblePlacement.place(stage: stage, speaker: speaker, bubble: bubble, avoid: [skip])
+        let box = CGRect(origin: spot.origin, size: bubble)
+        #expect(!box.intersects(skip) && !box.intersects(speaker))
     }
 }

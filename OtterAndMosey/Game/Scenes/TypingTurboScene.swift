@@ -45,6 +45,16 @@ final class TypingTurboScene: GameScene {
         board?.position = CGPoint(x: play.midX, y: play.maxY - boardSize.height * 0.58)
     }
 
+    /// Otter and Mosey are one picture here, so the snacks go in Otter's paws and by Mosey's mouth.
+    override func snackSpots() -> [SnackSpot] {
+        let width = rider.size.width, height = rider.size.height
+        let side = max(compact ? 40 : 52, width * 0.17)
+        return [
+            SnackSpot(holder: rider, position: CGPoint(x: width * 0.11, y: height * 0.15), side: side, facing: 1),
+            SnackSpot(holder: rider, position: CGPoint(x: width * 0.43, y: -height * 0.02), side: side, facing: 1),
+        ]
+    }
+
     override func caption(for question: Question) -> String {
         options.inputProfile == .hardware ? "Type the words on your keyboard to zoom!" : "Type the words to zoom!"
     }
@@ -101,6 +111,7 @@ final class TypingTurboScene: GameScene {
         meter.record(correct: correct)
         if correct {
             typedIndex += 1
+            updateKeyboardCase(for: question, at: typedIndex)
             streak += 1
             wrongFlash = false
             pace = min(pace + 60, 560)

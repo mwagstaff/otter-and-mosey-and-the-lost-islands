@@ -1,4 +1,5 @@
 import { artURL } from "../assets";
+import { hasGroupPhoto, showGroupPhoto } from "./photo";
 import type { AppModel } from "../app/model";
 import { catalog, hasReward, placeDecoration, wear as putOn, type PlacedDecoration, type Reward, type RewardKind } from "../core";
 import { iconName } from "../engine/art";
@@ -26,7 +27,7 @@ export function collectionScreen(model: AppModel): Screen {
     const owned = hasReward(profile, reward.id);
     const worn = profile.equippedAccessory === reward.id;
     const wearable = owned && kind === "accessory";
-    const subtitle = !owned ? "Keep exploring to find it" : kind !== "accessory" ? "Your friend" : worn ? "Wearing it! Tap to take off" : "Tap to wear";
+    const subtitle = !owned ? "Keep exploring to find it" : kind !== "accessory" ? "Your friend" : worn ? "Both wearing it! Tap to take off" : "Tap for both to wear";
     const made = tile(picture(rewardArt(reward), "glyph"), owned ? reward.name : "???", subtitle, owned, worn);
     if (!wearable) return made;
     const wear = button("tile-button", [made], () => {
@@ -48,6 +49,11 @@ export function collectionScreen(model: AppModel): Screen {
         );
         return tile(shard, island.name, found ? "Fragment found!" : "Still lost…", found);
       }));
+      // The group photo from the finale, once every fragment is home.
+      if (hasGroupPhoto(profile)) {
+        const photo = h("span.photo-tile", {}, h("img", { src: artURL("bg_ending"), alt: "", draggable: "false" }));
+        grid.append(button("tile-button", [tile(photo, "Group photo", "Tap to look at it", true)], () => showGroupPhoto(model, element)));
+      }
     } else if (tab === 1) grid.replaceChildren(...rewards("pet"));
     else grid.replaceChildren(...rewards("accessory"));
   }

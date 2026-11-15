@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finale Mock-up</title>
+<style>
+:root {
+  --ink: #0e3b43; --cream: #fff6e0; --gold: #ffc83d; --coral: #ff6b5e; --teal: #17b8a6;
+  --font: ui-rounded, "SF Pro Rounded", "Nunito Variable", "Arial Rounded MT Bold", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #081a1f; color: var(--ink); font-family: var(--font); font-weight: 800; overflow: hidden; user-select: none; -webkit-user-select: none; }
+.wrap { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 10px 16px; }
+.stage { position: relative; width: min(100%, calc((100vh - 70px) * 1.5)); aspect-ratio: 3 / 2; overflow: hidden; border-radius: 18px; background: #050b1e; cursor: pointer; container-type: size; }
+
+/* ---------- proposal chrome ---------- */
+.chrome { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.chip { font: inherit; font-size: 13px; color: var(--cream); background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.18); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+.chip.on { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.chip.replay { background: var(--teal); border-color: var(--teal); }
+
+/* ---------- layers ---------- */
+.layer { position: absolute; inset: 0; }
+.bg { background: center / cover no-repeat url(/assets/art/bg_title.jpg); filter: saturate(0) brightness(.55); clip-path: circle(0% at 66% 18%); transition: clip-path 1.8s cubic-bezier(.6,0,.3,1), filter 2.6s ease .8s; }
+.bg.open { clip-path: circle(140% at 66% 18%); filter: saturate(1) brightness(1); }
+.night { background: radial-gradient(ellipse at 50% 40%, #23205a 0%, #0b0f2e 55%, #03050f 100%); transition: opacity 1.2s; }
+.night.gone { opacity: 0; }
+.stars { background-image: radial-gradient(1.5px 1.5px at 10% 20%, #fff 50%, transparent), radial-gradient(1px 1px at 30% 70%, #fff 50%, transparent), radial-gradient(2px 2px at 70% 30%, #fff 50%, transparent), radial-gradient(1px 1px at 85% 80%, #fff 50%, transparent), radial-gradient(1.5px 1.5px at 55% 15%, #fff 50%, transparent), radial-gradient(1px 1px at 20% 50%, #fff 50%, transparent), radial-gradient(1.5px 1.5px at 90% 10%, #fff 50%, transparent); background-size: 260px 200px; animation: twinkle 3s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: .5; } to { opacity: 1; } }
+
+.shard { position: absolute; width: 6cqw; left: 47cqw; top: 30cqh; opacity: 0; }
+.crystal { position: absolute; width: 14cqw; left: 43cqw; top: 18cqh; opacity: 0; transform: scale(.3); transition: transform .9s cubic-bezier(.2,1.6,.4,1), opacity .4s; filter: drop-shadow(0 0 3cqw rgba(255,255,255,.8)); }
+.crystal.on { opacity: 1; transform: scale(1); animation: bob 3s ease-in-out infinite 1s; }
+.crystal.home { left: 62.6cqw; top: 3cqh; width: 5.5cqw; opacity: 0; transition: left 1.6s cubic-bezier(.5,0,.3,1), top 1.6s cubic-bezier(.5,0,.3,1), width 1.6s, opacity .6s ease 1.4s; animation: none; }
+.rays.home { left: 65cqw; top: 14cqh; opacity: .55; transition: left 1.6s, top 1.6s, opacity 1s; }
+@keyframes bob { 50% { translate: 0 -1.5cqh; } }
+.rays { position: absolute; left: 50cqw; top: 36cqh; width: 160cqw; aspect-ratio: 1; translate: -50% -50%; opacity: 0; transition: opacity 1s;
+  background: repeating-conic-gradient(from 0deg, rgba(255,90,90,.35) 0 6deg, transparent 6deg 15deg, rgba(255,210,60,.35) 15deg 21deg, transparent 21deg 30deg, rgba(80,220,140,.35) 30deg 36deg, transparent 36deg 45deg, rgba(80,170,255,.35) 45deg 51deg, transparent 51deg 60deg, rgba(180,110,255,.35) 60deg 66deg, transparent 66deg 75deg);
+  mask: radial-gradient(circle, #000 0, transparent 60%); -webkit-mask: radial-gradient(circle, #000 0, transparent 60%); animation: spin 18s linear infinite; }
+.rays.on { opacity: 1; }
+@keyframes spin { to { rotate: 360deg; } }
+.flash { background: #fff; opacity: 0; pointer-events: none; }
+.flash.go { animation: flash 1.1s ease-out; }
+@keyframes flash { 0% { opacity: 0; } 12% { opacity: .95; } 100% { opacity: 0; } }
+
+/* ---------- characters ---------- */
+.char { position: absolute; translate: -50% 0; opacity: 0; transform-origin: 50% 100%; filter: drop-shadow(0 .6cqh .6cqh rgba(0,0,0,.25)); }
+.char img { display: block; height: 100%; width: auto; }
+.char.in { opacity: 1; }
+.char.instant { animation: none !important; }
+.enter-grow.in { animation: grow .9s cubic-bezier(.2,1.5,.4,1) both; }
+.enter-splash.in { animation: splash .9s cubic-bezier(.2,1.4,.4,1) both; }
+.enter-swoop.in { animation: swoop 1s cubic-bezier(.2,1.2,.4,1) both; }
+.enter-float.in { animation: floatin 1.3s ease-out both; }
+.enter-bounce.in { animation: bouncein 1s both; }
+.enter-sparkle.in { animation: sparklein 1.1s ease-out both; }
+.enter-run.in { animation: runin .9s cubic-bezier(.2,1.2,.4,1) both; }
+.enter-swim.in { animation: swimin 1.1s cubic-bezier(.2,1.2,.4,1) both; }
+@keyframes grow { from { transform: scaleY(0) scaleX(.6); } }
+@keyframes splash { from { transform: translateY(70%); } }
+@keyframes swoop { from { transform: translate(60cqw, -50cqh) rotate(-25deg) scale(.6); } }
+@keyframes floatin { from { transform: translateY(-50cqh); opacity: 0; } }
+@keyframes bouncein { 0% { transform: translateX(30cqw) translateY(0); } 25% { transform: translateX(20cqw) translateY(-20%); } 50% { transform: translateX(10cqw) translateY(0) scaleY(.85); } 75% { transform: translateX(4cqw) translateY(-10%); } 100% { transform: none; } }
+@keyframes sparklein { from { transform: scale(0) rotate(-40deg); opacity: 0; filter: brightness(3); } }
+@keyframes runin { from { transform: translateX(-60cqw); } }
+@keyframes swimin { from { transform: translateX(50cqw) translateY(20%); } }
+.char.talk img { animation: talk .35s ease-in-out infinite alternate; }
+@keyframes talk { to { transform: scaleY(1.03) translateY(-1%); } }
+.char.jump { animation: jump .7s cubic-bezier(.3,0,.5,1) both; }
+@keyframes jump { 40% { transform: translateY(-18%) scaleY(1.05); } 70% { transform: translateY(0) scaleY(.9); } 100% { transform: none; } }
+.char.dim { filter: brightness(.75) saturate(.8); transition: filter .4s; }
+
+/* ---------- speech + captions ---------- */
+.bubble { position: absolute; z-index: 30; max-width: 34cqw; background: var(--cream); border: .35cqw solid var(--ink); border-radius: 2.2cqw; box-shadow: 0 .5cqw 0 var(--ink); padding: 1.2cqw 1.6cqw; font-size: 2.2cqw; line-height: 1.25; translate: -50% -100%; opacity: 0; transform: scale(.6); transform-origin: 50% 100%; transition: transform .35s cubic-bezier(.2,1.6,.4,1), opacity .2s; }
+.bubble.on { opacity: 1; transform: none; }
+.bubble.below { translate: -50% 0; transform-origin: 50% 0; }
+.bubble.below::after { bottom: auto; top: 0; rotate: 225deg; }
+.bubble b { display: block; font-size: 1.5cqw; letter-spacing: .04em; text-transform: uppercase; opacity: .65; margin-bottom: .3cqw; }
+.bubble::after { content: ""; position: absolute; left: var(--tail, 50%); bottom: -1.6cqw; width: 2cqw; height: 2cqw; background: var(--cream); border-right: .35cqw solid var(--ink); border-bottom: .35cqw solid var(--ink); rotate: 45deg; translate: -50% -50%; z-index: -1; }
+.caption { position: absolute; z-index: 40; left: 50%; top: 6cqh; translate: -50% 0; color: #fff; font-size: 4cqw; text-align: center; white-space: nowrap; text-shadow: 0 .4cqw 0 var(--ink), 0 0 2cqw rgba(0,0,0,.6); -webkit-text-stroke: .12cqw var(--ink); opacity: 0; transition: opacity .6s, translate .6s; }
+.caption.on { opacity: 1; translate: -50% 1cqh; }
+.hooray { position: absolute; z-index: 45; left: 50%; top: 30cqh; translate: -50% -50%; font-size: 11cqw; color: var(--gold); -webkit-text-stroke: .3cqw var(--ink); text-shadow: 0 .8cqw 0 var(--ink); opacity: 0; pointer-events: none; }
+.sash { position: absolute; z-index: 44; left: 50%; top: 6cqh; translate: -50% 0; background: var(--coral); color: #fff; font-size: 4cqw; padding: .8cqw 4cqw; border: .4cqw solid var(--ink); border-radius: 1.4cqw; box-shadow: 0 .5cqw 0 var(--ink); white-space: nowrap; opacity: 0; transform: translateY(-6cqh); transition: .5s cubic-bezier(.2,1.5,.4,1); }
+.sash.on { opacity: 1; transform: none; }
+.hooray.go { animation: hooray 1.1s cubic-bezier(.2,1.6,.4,1); }
+@keyframes hooray { 0% { opacity: 0; transform: scale(.3) rotate(-8deg); } 30% { opacity: 1; transform: scale(1.1) rotate(3deg); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
+
+/* ---------- panels ---------- */
+.panel { position: absolute; z-index: 50; background: var(--cream); border: .4cqw solid var(--ink); border-radius: 2.4cqw; box-shadow: 0 .6cqw 0 var(--ink); opacity: 0; transform: translateY(8cqh) scale(.92); transition: transform .6s cubic-bezier(.2,1.4,.4,1), opacity .4s; pointer-events: none; }
+.panel.on { opacity: 1; transform: none; pointer-events: auto; }
+.veil { z-index: 48; background: rgba(8, 26, 31, .45); opacity: 0; transition: opacity .5s; pointer-events: none; }
+.veil.on { opacity: 1; }
+.stats { left: 50%; top: 50%; translate: -50% -50%; width: 62cqw; padding: 2.4cqw 3cqw; text-align: center; }
+.stats h2 { margin: 0 0 1.6cqw; font-size: 3.6cqw; }
+.tally { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2cqw; }
+.tally div { background: #fff; border: .3cqw solid var(--ink); border-radius: 1.6cqw; padding: 1.2cqw .6cqw; opacity: 0; transform: translateY(2cqh); transition: .4s cubic-bezier(.2,1.6,.4,1); }
+.tally div.on { opacity: 1; transform: none; }
+.tally img { height: 5.5cqw; display: block; margin: 0 auto .6cqw; }
+.tally strong { display: block; font-size: 3.4cqw; font-variant-numeric: tabular-nums; }
+.tally span { font-size: 1.5cqw; opacity: .7; }
+.medal { position: absolute; z-index: 60; left: 50%; top: 50%; width: 46cqw; translate: -50% -50%; text-align: center; opacity: 0; pointer-events: none; }
+.medal img { width: 22cqw; filter: drop-shadow(0 0 3cqw rgba(255, 220, 90, .9)); }
+.medal .ribbon { display: inline-block; margin-top: -1cqw; background: var(--coral); color: #fff; font-size: 3cqw; padding: .8cqw 3cqw; border: .35cqw solid var(--ink); border-radius: 1.2cqw; box-shadow: 0 .5cqw 0 var(--ink); }
+.medal .who { color: #fff; font-size: 2.6cqw; margin-top: 1cqw; text-shadow: 0 .3cqw 0 var(--ink); }
+.medal.go { animation: stamp .8s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes stamp { 0% { opacity: 0; transform: scale(3) rotate(-12deg); } 60% { opacity: 1; transform: scale(.92) rotate(2deg); } 100% { opacity: 1; transform: none; } }
+.medal.out { animation: medalOut .5s ease-in forwards; }
+@keyframes medalOut { from { opacity: 1; } to { opacity: 0; transform: scale(.9); } }
+
+.countdown { position: absolute; z-index: 55; left: 50%; top: 40%; translate: -50% -50%; font-size: 16cqw; color: #fff; -webkit-text-stroke: .35cqw var(--ink); text-shadow: 0 .8cqw 0 var(--ink); opacity: 0; }
+.countdown.go { animation: count .8s ease-out; }
+@keyframes count { 0% { opacity: 0; transform: scale(2); } 30% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.8); } }
+.polaroid { position: absolute; z-index: 58; left: 50%; top: 47%; width: 56cqw; translate: -50% -50%; background: #fff; padding: 1.4cqw 1.4cqw 0; box-shadow: 0 2cqw 4cqw rgba(0,0,0,.45); opacity: 0; transform: translateY(-80cqh) rotate(14deg); transition: transform 1s cubic-bezier(.2,1.2,.4,1), opacity .3s; }
+.polaroid.on { opacity: 1; transform: rotate(-3deg); }
+.polaroid img { display: block; width: 100%; aspect-ratio: 3/2; object-fit: cover; filter: sepia(.15); }
+.polaroid p { margin: 0; padding: 1.3cqw 0 1.6cqw; text-align: center; font-family: "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; font-size: 2.6cqw; }
+.saved { position: absolute; z-index: 59; right: 5cqw; bottom: 6cqh; background: var(--teal); color: #fff; border: .35cqw solid var(--ink); border-radius: 999px; padding: .9cqw 2cqw; font-size: 2cqw; box-shadow: 0 .4cqw 0 var(--ink); display: flex; align-items: center; gap: .8cqw; opacity: 0; transform: translateX(20cqw); transition: .5s cubic-bezier(.2,1.4,.4,1); }
+.saved img { height: 3cqw; }
+.saved.on { opacity: 1; transform: none; }
+
+.next { left: 50%; bottom: 4cqh; translate: -50% 0; width: 70cqw; padding: 2.2cqw 3cqw 2.6cqw; text-align: center; }
+.next h2 { margin: 0 0 .6cqw; font-size: 3.4cqw; }
+.next p { margin: 0 0 1.6cqw; font-size: 1.9cqw; opacity: .8; }
+.left { display: flex; justify-content: center; gap: 1.4cqw; margin-bottom: 2cqw; }
+.left div { display: flex; align-items: center; gap: .8cqw; background: #fff; border: .3cqw solid var(--ink); border-radius: 999px; padding: .6cqw 1.6cqw .6cqw .8cqw; font-size: 1.9cqw; }
+.left img { height: 3.4cqw; }
+.buttons { display: flex; justify-content: center; gap: 1.6cqw; }
+.btn { font: inherit; font-size: 2.4cqw; color: var(--ink); background: var(--cream); border: .35cqw solid var(--ink); border-radius: 999px; box-shadow: 0 .5cqw 0 var(--ink); padding: 1cqw 2.6cqw; display: inline-flex; align-items: center; gap: .8cqw; cursor: pointer; }
+.btn img { height: 3cqw; }
+.btn.teal { background: var(--teal); color: #fff; }
+.btn.gold { background: var(--gold); }
+.btn:active { transform: translateY(.4cqw); box-shadow: 0 .1cqw 0 var(--ink); }
+.skip { position: absolute; z-index: 70; right: 2cqw; top: 2cqw; font-size: 1.7cqw; padding: .6cqw 1.6cqw; }
+.tap { position: absolute; z-index: 70; left: 2cqw; bottom: 2cqh; color: rgba(255,255,255,.75); font-size: 1.5cqw; text-shadow: 0 .2cqw 0 rgba(0,0,0,.5); }
+canvas.confetti { position: absolute; inset: 0; z-index: 46; pointer-events: none; width: 100%; height: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .3s !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage" id="stage" aria-live="polite">
+    <div class="layer night" id="night"><div class="layer stars"></div></div>
+    <div class="layer bg" id="bg"></div>
+    <div class="rays" id="rays"></div>
+    <div id="shards"></div>
+    <img class="crystal" id="crystal" src="/assets/art/crystal_whole.png" alt="">
+    <div id="cast"></div>
+    <canvas class="confetti" id="confetti"></canvas>
+    <div class="layer veil" id="veil"></div>
+    <div class="caption" id="caption"></div>
+    <div class="hooray" id="hooray">Hooray!</div>
+    <div class="sash" id="sash"></div>
+
+    <div class="panel stats" id="stats">
+      <h2 id="statsTitle">Your adventure</h2>
+      <div class="tally">
+        <div><img src="/assets/art/icon_2728.png" alt=""><strong data-to="1284">0</strong><span>questions answered</span></div>
+        <div><img src="/assets/art/icon_2b50.png" alt=""><strong data-to="74">0</strong><span>stars won</span></div>
+        <div><img src="/assets/art/icon_1f3c5.png" alt=""><strong data-to="31">0</strong><span>trophies</span></div>
+        <div><img src="/assets/art/icon_1f392.png" alt=""><strong data-to="19">0</strong><span>treasures</span></div>
+        <div><img src="/assets/art/icon_1f525.png" alt=""><strong data-to="14">0</strong><span>best streak</span></div>
+      </div>
+    </div>
+    <div class="medal" id="medal">
+      <img src="/assets/art/trophy_champion.png" alt="">
+      <div class="ribbon">Rainbow Crystal Champion</div>
+      <div class="who" id="medalName"></div>
+    </div>
+
+    <div class="countdown" id="countdown"></div>
+    <div class="polaroid" id="polaroid"><img src="/assets/art/bg_ending.jpg" alt=""><p id="polaroidCaption"></p></div>
+    <div class="saved" id="saved"><img src="/assets/art/icon_1f392.png" alt="">Photo saved to Treasures</div>
+
+    <div class="panel next" id="next">
+      <h2>The adventure goes on!</h2>
+      <p>Every island is open. Play any level again to find what's still hiding.</p>
+      <div class="left">
+        <div><img src="/assets/art/icon_1f3c5.png" alt="">16 trophies to find</div>
+        <div><img src="/assets/art/icon_2b50.png" alt="">16 more stars to win</div>
+        <div><img src="/assets/art/icon_1f43e.png" alt="">4 pets waiting</div>
+      </div>
+      <div class="buttons">
+        <button class="btn teal"><img src="/assets/art/icon_1f5fa.png" alt="">Back to the map</button>
+        <button class="btn gold"><img src="/assets/art/trophy_cabinet.png" alt="">See my trophies</button>
+      </div>
+    </div>
+
+    <button class="btn skip" id="skip">Skip</button>
+    <div class="tap" id="tapHint">Tap to speed up</div>
+  </div>
+  <div class="chrome" id="chrome"></div>
+</div>
+
+<script>
+const NAME = new URLSearchParams(location.search).get("name") || "Sam";
+const $ = (id) => document.getElementById(id);
+const stage = $("stage");
+const art = (n) => `/assets/art/${n}.png`;
+
+// Centre x, bottom and height are percentages of the stage.
+const CAST = {
+  tree:   { img: "guardian_tree_happy", name: "Old Grumblebark", x: 12, b: 16, h: 56, enter: "grow", z: 1 },
+  octo:   { img: "guardian_octopus_happy", name: "Inky", x: 24, b: 4, h: 30, enter: "splash", z: 4 },
+  shadow: { img: "guardian_shadow_happy", name: "Umbra", x: 34, b: 3, h: 20, enter: "sparkle", z: 6 },
+  otter:  { img: "otter_cheer", talk: "otter_talk", name: "Otter", x: 45, b: 3, h: 36, enter: "run", z: 7 },
+  mosey:  { img: "mosey_cheer", talk: "mosey_talk", name: "Mosey", x: 60, b: 1, h: 34, enter: "swim", z: 7 },
+  dragon: { img: "guardian_dragon_happy", name: "Sir Scorch", x: 75, b: 9, h: 42, enter: "swoop", z: 3 },
+  wizard: { img: "guardian_wizard_happy", name: "Nimbus", x: 84, b: 60, h: 26, enter: "float", z: 2 },
+  puff:   { img: "guardian_marshmallow_happy", name: "Puff", x: 89, b: 2, h: 32, enter: "bounce", z: 5 },
+};
+const ISLANDS = ["#3FBF6B", "#29B6E8", "#F2683C", "#8FA8FF", "#FF7EB6", "#9B6BFF"];
+
+const els = {};
+for (const [id, c] of Object.entries(CAST)) {
+  const d = document.createElement("div");
+  d.className = `char enter-${c.enter}`;
+  d.style.cssText = `left:${c.x}%;bottom:${c.b}%;height:${c.h}%;z-index:${c.z}`;
+  d.innerHTML = `<img src="${art(c.img)}" alt="">`;
+  $("cast").append(d);
+  els[id] = d;
+}
+const bubble = document.createElement("div");
+bubble.className = "bubble";
+$("cast").append(bubble);
+
+// ---------- timeline plumbing ----------
+let run = 0, skipWait = null;
+class Cancelled extends Error {}
+function wait(ms, token) {
+  return new Promise((res, rej) => {
+    const t = setTimeout(done, ms);
+    skipWait = done;
+    function done() { clearTimeout(t); skipWait = null; token === run ? res() : rej(new Cancelled()); }
+  });
+}
+stage.addEventListener("click", (e) => { if (!e.target.closest("button")) skipWait?.(); });
+
+function say(id, text, token, ms) {
+  const c = CAST[id], el = els[id];
+  Object.keys(els).forEach((k) => els[k].classList.toggle("talk", k === id));
+  if (c.talk) el.querySelector("img").src = art(c.talk);
+  const top = 100 - c.b - c.h * (id === "tree" ? .78 : 1) - 2;
+  const below = top < 30;
+  const x = Math.min(Math.max(below ? c.x - 10 : c.x, 19), 81);
+  bubble.classList.toggle("below", below);
+  bubble.style.left = x + "%";
+  bubble.style.top = (below ? 100 - c.b + 3 : top) + "%";
+  bubble.style.setProperty("--tail", `${50 + (c.x - x) * 2.6}%`);
+  bubble.innerHTML = `<b>${c.name}</b>${text.replaceAll("{name}", NAME)}`;
+  bubble.classList.remove("on"); void bubble.offsetWidth; bubble.classList.add("on");
+  return wait(ms ?? 1400 + text.length * 45, token).finally(() => {
+    el.classList.remove("talk");
+    if (c.talk) el.querySelector("img").src = art(c.img);
+  });
+}
+const hush = () => bubble.classList.remove("on");
+function caption(text) { const c = $("caption"); c.classList.remove("on"); if (text) { c.textContent = text; void c.offsetWidth; c.classList.add("on"); } }
+function enter(id) { els[id].classList.add("in"); }
+function jumpAll() {
+  Object.values(els).forEach((el, i) => { el.classList.remove("jump", "instant"); el.style.animationDelay = ""; void el.offsetWidth; el.style.animationDelay = `${i * 40}ms`; el.classList.add("jump"); });
+}
+function retrigger(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+// ---------- confetti ----------
+const cv = $("confetti"), cx = cv.getContext("2d");
+let bits = [];
+function confetti(n = 140, x = .5, y = .35) {
+  const r = stage.getBoundingClientRect();
+  cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio;
+  const cols = [...ISLANDS, "#FFC83D", "#ffffff"];
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, s = (4 + Math.random() * 9) * devicePixelRatio;
+    bits.push({ x: x * cv.width, y: y * cv.height, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 6 * devicePixelRatio, r: Math.random() * 6, vr: Math.random() * .3 - .15, w: (6 + Math.random() * 6) * devicePixelRatio, c: cols[i % cols.length], life: 1 });
+  }
+}
+(function tick() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  bits = bits.filter((b) => b.y < cv.height + 40 && b.life > 0);
+  for (const b of bits) {
+    b.vy += .25 * devicePixelRatio; b.vx *= .985; b.x += b.vx; b.y += b.vy; b.r += b.vr; b.life -= .004;
+    cx.save(); cx.translate(b.x, b.y); cx.rotate(b.r); cx.globalAlpha = Math.min(1, b.life * 2);
+    cx.fillStyle = b.c; cx.fillRect(-b.w / 2, -b.w / 4, b.w, b.w / 2); cx.restore();
+  }
+  requestAnimationFrame(tick);
+})();
+
+// ---------- reset to a given beat ----------
+function reset(beat) {
+  hush(); caption(""); bits = [];
+  $("shards").innerHTML = "";
+  ["veil", "stats", "next", "saved", "sash"].forEach((id) => $(id).classList.remove("on"));
+  $("polaroid").classList.remove("on");
+  $("medal").className = "medal";
+  document.querySelectorAll(".tally div").forEach((d) => { d.classList.remove("on"); d.querySelector("strong").textContent = "0"; });
+  const after = (n) => beat > n;
+  $("night").classList.toggle("gone", after(1));
+  $("bg").classList.toggle("open", after(1));
+  $("crystal").classList.toggle("on", after(0));
+  $("rays").classList.toggle("on", after(0));
+  $("crystal").classList.toggle("home", after(1));
+  $("rays").classList.toggle("home", after(1));
+  const order = ["tree", "octo", "dragon", "wizard", "puff", "shadow"];
+  Object.keys(els).forEach((k) => els[k].classList.remove("in", "jump", "talk", "dim"));
+  Object.values(els).forEach((e) => e.classList.remove("instant"));
+  if (after(2)) order.forEach((k) => els[k].classList.add("in", "instant"));
+  if (after(3)) ["otter", "mosey"].forEach((k) => els[k].classList.add("in", "instant"));
+}
+
+// ---------- beats ----------
+const BEATS = [
+  ["The crystal comes home", async (t) => {
+    caption("The six crystal pieces are home…");
+    await wait(1200, t);
+    const box = $("shards");
+    const starts = [[-10, 10], [110, 5], [-10, 70], [110, 75], [30, 115], [70, -15]];
+    const shards = ISLANDS.map((col, i) => {
+      const img = document.createElement("img");
+      img.src = art("crystal_shard"); img.className = "shard";
+      img.style.filter = `drop-shadow(0 0 1.2cqw ${col}) drop-shadow(0 0 2.4cqw ${col})`;
+      box.append(img);
+      const [sx, sy] = starts[i];
+      const ang = (i / 6) * Math.PI * 2, ox = Math.cos(ang) * 14, oy = Math.sin(ang) * 18;
+      img.animate([
+        { left: sx + "cqw", top: sy + "cqh", opacity: 0, rotate: "-160deg" },
+        { left: (47 + ox) + "cqw", top: (30 + oy) + "cqh", opacity: 1, rotate: "0deg", offset: .55 },
+        { left: (47 + Math.cos(ang + 2) * 8) + "cqw", top: (30 + Math.sin(ang + 2) * 10) + "cqh", opacity: 1, rotate: "220deg", offset: .85 },
+        { left: "47cqw", top: "30cqh", opacity: 0, rotate: "360deg", scale: .4 },
+      ], { duration: 3000, delay: i * 120, easing: "cubic-bezier(.45,0,.4,1)", fill: "forwards" });
+      return img;
+    });
+    await wait(3600, t);
+    retrigger($("flash") ?? document.body, "go");
+    shards.forEach((s) => s.remove());
+    $("crystal").classList.add("on"); $("rays").classList.add("on");
+    confetti(90, .5, .3);
+    caption("The Rainbow Crystal is whole again!");
+    await wait(2600, t);
+  }],
+  ["Colour returns", async (t) => {
+    caption("");
+    $("night").classList.add("gone");
+    $("bg").classList.add("open");
+    $("crystal").classList.add("home");
+    $("rays").classList.add("home");
+    await wait(1600, t);
+    caption("Every island is full of colour again!");
+    await wait(2600, t);
+    caption("");
+  }],
+  ["Friends arrive", async (t) => {
+    const lines = [
+      ["tree", "You gave me back my laugh! Ha ha! I'm saving my very best story just for you."],
+      ["octo", "Eight arms, and I'd use every single one to give you a hug!"],
+      ["dragon", "Trousers dry, pocket not itchy. You're a proper hero!"],
+      ["wizard", "Best playmate the sky's ever had. Come back and play any time!"],
+      ["puff", "Puff saved you the biggest marshmallow. Fair shares!"],
+      ["shadow", "You helped me find the light. I'll never forget that."],
+    ];
+    for (const [id, text] of lines) {
+      enter(id);
+      if (id === "octo" || id === "shadow") confetti(30, CAST[id].x / 100, .8);
+      await wait(700, t);
+      await say(id, text, t);
+      hush();
+      await wait(250, t);
+    }
+  }],
+  ["Otter and Mosey say thank you", async (t) => {
+    enter("otter"); await wait(500, t); enter("mosey"); await wait(1000, t);
+    await say("otter", "We couldn't have done any of this without you!", t);
+    await say("mosey", "All those spellings and all those sums, and you never gave up!", t);
+    $("sash").textContent = `★ ${NAME} ★`; $("sash").classList.add("on");
+    await say("otter", "Three cheers for our champion! Hip hip…", t, 2200);
+    hush();
+    for (let i = 0; i < 3; i++) {
+      retrigger($("hooray"), "go"); jumpAll(); confetti(120, .2 + i * .3, .4);
+      await wait(1150, t);
+    }
+    await wait(600, t);
+    $("sash").classList.remove("on");
+  }],
+  ["Your adventure", async (t) => {
+    $("veil").classList.add("on");
+    $("statsTitle").textContent = `${NAME}'s adventure`;
+    $("stats").classList.add("on");
+    await wait(600, t);
+    for (const d of document.querySelectorAll(".tally div")) {
+      d.classList.add("on");
+      const el = d.querySelector("strong"), to = +el.dataset.to, t0 = performance.now();
+      const step = (now) => { const p = Math.min(1, (now - t0) / 900); el.textContent = Math.round(to * (1 - (1 - p) ** 3)).toLocaleString("en-GB"); if (p < 1 && run === t) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+      setTimeout(() => { if (run === t) el.textContent = to.toLocaleString("en-GB"); }, 1000);
+      await wait(450, t);
+    }
+    await wait(2000, t);
+    $("stats").classList.remove("on");
+    $("medalName").textContent = `Awarded to ${NAME}`;
+    retrigger($("medal"), "go");
+    confetti(160, .5, .45);
+    await wait(3400, t);
+    $("medal").classList.add("out");
+    $("veil").classList.remove("on");
+    await wait(500, t);
+  }],
+  ["Group photo", async (t) => {
+    await say("mosey", "Everyone squeeze in for a photo! Say cheese!", t, 2600);
+    hush();
+    for (const n of ["3", "2", "1"]) { $("countdown").textContent = n; retrigger($("countdown"), "go"); await wait(800, t); }
+    const f = document.createElement("div"); f.className = "layer flash"; f.style.zIndex = 57; stage.append(f); retrigger(f, "go");
+    setTimeout(() => f.remove(), 1200);
+    $("veil").classList.add("on");
+    $("polaroidCaption").textContent = `${NAME}, Otter, Mosey and friends`;
+    $("polaroid").classList.add("on");
+    await wait(1200, t);
+    $("saved").classList.add("on");
+    await wait(3200, t);
+    $("polaroid").classList.remove("on"); $("saved").classList.remove("on"); $("veil").classList.remove("on");
+    await wait(600, t);
+  }],
+  ["The adventure goes on", async (t) => {
+    await say("otter", "Every island's open now, so you can play any level again, whenever you like!", t);
+    await say("mosey", "And there are still trophies hiding out there, and stars to win, and pets to find!", t);
+    hush();
+    Object.values(els).forEach((e) => e.classList.add("dim"));
+    $("next").classList.add("on");
+  }],
+];
+
+// The flash layer used by beat 1.
+const flash = document.createElement("div"); flash.className = "layer flash"; flash.id = "flash"; flash.style.zIndex = 20; stage.append(flash);
+
+const chrome = $("chrome");
+BEATS.forEach(([title], i) => {
+  const b = document.createElement("button"); b.className = "chip"; b.textContent = `${i + 1}. ${title}`;
+  b.onclick = () => play(i); chrome.append(b);
+});
+const replay = document.createElement("button"); replay.className = "chip replay"; replay.textContent = "Play from the start"; replay.onclick = () => play(0); chrome.append(replay);
+$("skip").onclick = () => play(BEATS.length - 1);
+
+async function play(from) {
+  const t = ++run;
+  skipWait?.();
+  reset(from);
+  for (let i = from; i < BEATS.length; i++) {
+    [...chrome.children].forEach((c, j) => c.classList.toggle("on", j === i));
+    $("skip").style.display = i === BEATS.length - 1 ? "none" : "";
+    $("tapHint").style.display = $("skip").style.display;
+    try { await BEATS[i][1](t); } catch (e) { if (e instanceof Cancelled) return; throw e; }
+    if (t !== run) return;
+  }
+}
+play(+(new URLSearchParams(location.search).get("beat") || 1) - 1);
+</script>
+</body>
+</html>

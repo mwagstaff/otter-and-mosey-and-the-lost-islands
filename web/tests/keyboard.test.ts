@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from "vitest";
-import { editName, keyboardRows } from "../src/ui/keyboard";
+import { bindNameKeyboard, editName, keyboardRows, setKeyboardUppercase } from "../src/ui/keyboard";
+import { capitalizesName, capitalizesTarget } from "../src/core/keyboardCase";
 
 function nameField(value = "") {
   const input = document.createElement("input");
@@ -11,6 +12,55 @@ function nameField(value = "") {
 }
 
 describe("explorer name keyboard", () => {
+  it("updates labels and inserted letters after typing, spaces, hyphens, deletion and caret changes", () => {
+    const input = nameField();
+    const keyboard = document.createElement("div");
+    keyboard.append(...keyboardRows({ kind: "qwerty", space: true }, key => editName(input, key), () => editName(input, "Backspace")));
+    document.body.append(input, keyboard);
+    bindNameKeyboard(input, keyboard);
+    const n = keyboard.querySelector<HTMLButtonElement>('[data-letter="n"]')!;
+    expect(n.textContent).toBe("N");
+    n.click();
+    expect(input.value).toBe("N");
+    expect(n.textContent).toBe("n");
+    editName(input, "-");
+    expect(n.textContent).toBe("N");
+    n.click();
+    expect(input.value).toBe("N-N");
+    editName(input, "Backspace");
+    expect(n.textContent).toBe("N");
+    input.value = "Nova ";
+    input.setSelectionRange(5, 5);
+    input.dispatchEvent(new Event("input"));
+    expect(n.getAttribute("aria-label")).toBe("N");
+    input.setSelectionRange(2, 4);
+    input.dispatchEvent(new Event("select"));
+    expect(n.textContent).toBe("n");
+    n.click();
+    expect(input.value).toBe("Non ");
+    input.setSelectionRange(0, input.value.length);
+    editName(input, "Backspace");
+    expect(n.textContent).toBe("N");
+    expect(document.activeElement).toBe(input);
+    input.remove();
+    keyboard.remove();
+  });
+
+  it("switches letter trays in place, retaining focus and emitting the displayed case", () => {
+    const onKey = vi.fn();
+    const keyboard = document.createElement("div");
+    keyboard.append(...keyboardRows({ kind: "tray", letters: ["a", "b"] }, onKey, () => {}, true));
+    document.body.append(keyboard);
+    const a = keyboard.querySelector<HTMLButtonElement>('[data-letter="a"]')!;
+    a.focus();
+    a.click();
+    setKeyboardUppercase(keyboard, false);
+    expect(document.activeElement).toBe(a);
+    expect(a.getAttribute("aria-label")).toBe("a");
+    a.click();
+    expect(onKey.mock.calls).toEqual([["A"], ["a"]]);
+    keyboard.remove();
+  });
   it("mixes physical text with on-screen insertion, selection replacement and deletion", () => {
     const input = nameField("Nova");
     input.setSelectionRange(1, 3);
@@ -52,5 +102,26 @@ describe("explorer name keyboard", () => {
     root.querySelector<HTMLButtonElement>('button[aria-label="Delete"]')!.click();
     expect(onKey.mock.calls).toEqual([["q"], [" "]]);
     expect(onDelete).toHaveBeenCalledOnce();
+  });
+});
+
+describe("shared capitalization rules", () => {
+  it("capitalizes name starts, spaces and hyphens without capitalizing every letter", () => {
+    for (const prefix of ["", "Nova ", "Anne-", " "]) expect(capitalizesName(prefix)).toBe(true);
+    for (const prefix of ["N", "Nova", "Anne-M", "O’"]) expect(capitalizesName(prefix)).toBe(false);
+  });
+  it("follows sentence starts and proper names throughout an exercise", () => {
+    const target = "Hi Nova. I am Otter";
+    expect([...target].flatMap((_, index) => capitalizesTarget(target, index) ? [index] : [])).toEqual([0, 3, 9, 14]);
+    expect(capitalizesTarget(target, -1)).toBe(false);
+    expect(capitalizesTarget(target, target.length)).toBe(false);
+  });
+  it("keeps lowercase spelling, missing letters and numeric answers unchanged", () => {
+    for (const target of ["sun", "u", "42", " ", ""]) expect(capitalizesTarget(target, 0)).toBe(false);
+    expect(capitalizesTarget("Élan", 0)).toBe(true);
+    expect(capitalizesTarget("Élan", 1)).toBe(false);
+    const keyboard = document.createElement("div");
+    keyboard.append(...keyboardRows({ kind: "numbers" }, () => {}, () => {}, true));
+    expect(keyboard.textContent).toBe("1234567890⌫");
   });
 });

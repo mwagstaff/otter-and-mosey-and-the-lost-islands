@@ -211,6 +211,7 @@ export class GuardianScene extends GameScene {
   private typeNext(character: string, question: Question, slots: WordSlots): void {
     slots.fillNext(character);
     this.typedIndex += 1;
+    this.updateKeyboardCase(question, this.typedIndex);
     audio.play("key", 0.6);
     if (this.typedIndex >= [...question.typingTarget].length) this.answered(this.signX, this.signY);
   }

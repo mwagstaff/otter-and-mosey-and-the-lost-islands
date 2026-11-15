@@ -6,7 +6,7 @@ import { GameLabel } from "../engine/label";
 import type { Emitter } from "../engine/particles";
 import { audio } from "./audio";
 import { floatText, trail } from "./effects";
-import { GameScene } from "./gameScene";
+import { GameScene, type SnackSpot } from "./gameScene";
 import { options } from "./options";
 
 /** One character of the text to type: its label, and a visible mark for a space when it is next. */
@@ -61,6 +61,17 @@ export class TypingTurboScene extends GameScene {
     this.rider.setSize(width, (width * this.rider.texture.height) / this.rider.texture.width);
     this.rider.position.set(this.riderX, this.riderY);
     this.board?.position.set(this.play.midX, this.boardY);
+  }
+
+  /** Otter and Mosey are one picture here, so the snacks go in Otter's paws and by Mosey's mouth. */
+  protected override snackSpots(): SnackSpot[] {
+    // The rider is scaled to fit, so its spots are in picture pixels and the size is undone.
+    const { width, height } = this.rider.texture;
+    const side = Math.max(this.compact ? 40 : 52, this.rider.width * 0.17) / this.rider.scale.x;
+    return [
+      { holder: this.rider, x: width * 0.11, y: -height * 0.15, side, facing: 1 },
+      { holder: this.rider, x: width * 0.43, y: height * 0.02, side, facing: 1 },
+    ];
   }
 
   protected override caption(): string {
@@ -173,6 +184,7 @@ export class TypingTurboScene extends GameScene {
     this.meter.record(correct);
     if (correct) {
       this.typedIndex += 1;
+      this.updateKeyboardCase(question, this.typedIndex);
       this.streak += 1;
       this.wrongFlash = false;
       this.pace = Math.min(this.pace + 60, 560);

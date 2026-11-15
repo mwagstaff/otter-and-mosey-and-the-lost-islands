@@ -16,6 +16,8 @@ public struct RewardSummary: Equatable, Sendable {
     public var trophyTotal = 0
     public var decorations: [Reward] = []
     public var gameComplete = false
+    /// Set when a guardian is beaten again after the game is complete, so the finale can be watched again.
+    public var endingReplay = false
 
     public init(stars: Int = 0) { self.stars = stars }
 }
@@ -80,6 +82,8 @@ public enum Progression {
             profile.crystals.append(island.id)
             summary.crystalIsland = island
             summary.gameComplete = profile.crystals.count == catalog.islands.count
+        } else if level.mode == .guardian, profile.crystals.count == catalog.islands.count {
+            summary.endingReplay = true
         }
         for (needed, id) in Catalog.starDecorations {
             if profile.totalStars >= needed, !profile.has(id), let reward = catalog.reward(id) {

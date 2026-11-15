@@ -5,6 +5,7 @@ import SwiftUI
 struct CollectionView: View {
     @Environment(AppModel.self) private var model
     @State private var tab = 0
+    @State private var showingPhoto = false
     private let tabs = [("💎", "Crystals"), ("🐾", "Pets"), ("🎩", "Hats")]
 
     var body: some View {
@@ -27,6 +28,7 @@ struct CollectionView: View {
                     .panel(fill: Palette.cream.opacity(0.96))
                 }
                 .padding(compact ? 8 : 24)
+                if showingPhoto { GroupPhotoViewer { showingPhoto = false } }
             }
             .screenBackground("bg_title", blur: 8, dim: 0.4)
             .environment(\.compact, compact)
@@ -45,6 +47,19 @@ struct CollectionView: View {
                         Image("crystal_shard").resizable().scaledToFit().colorMultiply(Palette.hex(island.colour)).saturation(found ? 1 : 0).opacity(found ? 1 : 0.35)
                     }
                 }
+                // The group photo from the finale, once every fragment is home. Tapping it plays the ending again.
+                if let profile, profile.crystals.count == model.catalog.islands.count {
+                    Button(action: tapped { showingPhoto = true }) {
+                        tile(compact: compact, title: "Group photo", subtitle: "Tap to look at it", earned: true) {
+                            Image("bg_ending").resizable().aspectRatio(1.5, contentMode: .fill)
+                                .frame(width: compact ? 66 : 96, height: compact ? 44 : 64).clipped()
+                                .padding(3).padding(.bottom, 4).background(.white)
+                                .shadow(color: .black.opacity(0.3), radius: 3, y: 2)
+                                .rotationEffect(.degrees(-3))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         case 1: rewardGrid(.pet, columns: columns, compact: compact)
         default: rewardGrid(.accessory, columns: columns, compact: compact)
@@ -62,7 +77,7 @@ struct CollectionView: View {
                     model.update { $0.wear(worn ? nil : reward.id) }
                 }) {
                     tile(compact: compact, title: owned ? reward.name : "???",
-                         subtitle: !owned ? "Keep exploring to find it" : (kind == .accessory ? (worn ? "Wearing it! Tap to take off" : "Tap to wear") : "Your friend"),
+                         subtitle: !owned ? "Keep exploring to find it" : (kind == .accessory ? (worn ? "Both wearing it! Tap to take off" : "Tap for both to wear") : "Your friend"),
                          earned: owned, highlight: worn) {
                         Glyph(reward.emoji, size: compact ? 50 : 70, art: reward.art).saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.25)
                     }

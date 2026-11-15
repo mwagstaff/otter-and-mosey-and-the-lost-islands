@@ -25,6 +25,7 @@ export class GameBridge {
   toastID = 0;
   usedOnScreenKeyboard = false;
   keyboard: KeyboardKind = { kind: "none" };
+  keyboardUppercase = false;
   /** Friendship Power charge from 0 to 1, or undefined when the meter is hidden. */
   friendship?: number;
   friendshipUses = 0;
@@ -48,7 +49,7 @@ export class GameBridge {
   }
 
   set(changes: Partial<Pick<GameBridge,
-    "completed" | "total" | "combo" | "multiplier" | "score" | "caption" | "hintText" | "keyboard" | "friendship" | "result" | "canSpeak">>): void {
+    "completed" | "total" | "combo" | "multiplier" | "score" | "caption" | "hintText" | "keyboard" | "keyboardUppercase" | "friendship" | "result" | "canSpeak">>): void {
     Object.assign(this, changes);
     this.notify();
   }

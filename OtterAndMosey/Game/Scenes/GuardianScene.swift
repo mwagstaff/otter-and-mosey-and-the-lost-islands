@@ -180,6 +180,7 @@ final class GuardianScene: GameScene {
     private func typeNext(_ character: Character, question: Question, slots: WordSlotsNode) {
         slots.fillNext(with: character)
         typedIndex += 1
+        updateKeyboardCase(for: question, at: typedIndex)
         AudioManager.shared.play(.key, volume: 0.6)
         if typedIndex >= question.typingTarget.count { answered(at: signPosition) }
     }

@@ -60,6 +60,77 @@ import Testing
         }
     }
 
+    @Test func switchedOffTablesNeverAppearOnEitherSide() {
+        var rng = SeededGenerator(seed: 21)
+        let tables = [2, 3, 5, 10]
+        for skill in [Skill.multiplication, .division, .wordProblems, .sequences] {
+            for level in 1...5 {
+                for _ in 0..<200 {
+                    let question = MathsGenerator.make(skill: skill, level: level, tables: tables, using: &rng)
+                    let numbers = question.prompt.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+                    if skill == .multiplication, question.prompt.contains("0 ×") {
+                        // "40 × 3": the tens extension must not lean on a switched-off table either.
+                        #expect(!numbers.contains(40) && !numbers.contains(80), "\(question.prompt)")
+                    }
+                    if question.key.hasPrefix("mul:") || question.key.hasPrefix("div:") {
+                        #expect(MathsGenerator.allows(factKey: question.key, tables: tables), "\(question.key)")
+                    }
+                    if skill == .sequences, numbers.count >= 2 {
+                        let step = abs(numbers[1] - numbers[0])
+                        #expect(step != 4 && step != 8, "\(question.prompt)")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test func chosenMultipliersAreTheOnlyOnesUsed() {
+        var rng = SeededGenerator(seed: 22)
+        let chosen = [2, 5, 6, 7]
+        for skill in [Skill.multiplication, .division] {
+            for level in 1...4 {
+                for _ in 0..<300 {
+                    let question = MathsGenerator.make(skill: skill, level: level, multipliers: chosen, using: &rng)
+                    let factor = Int(question.key.split(separator: "x").last ?? "") ?? 0
+                    #expect(chosen.contains(factor), "\(question.prompt)")
+                }
+            }
+        }
+        // Only big multipliers chosen: the grown-up's choice wins over level 1's usual 1 to 6.
+        for _ in 0..<50 {
+            let question = MathsGenerator.make(skill: .multiplication, level: 1, multipliers: [11, 12], using: &rng)
+            #expect(question.key.hasSuffix("x11") || question.key.hasSuffix("x12"), "\(question.key)")
+        }
+    }
+
+    @Test func reviewFactsRespectTablesAndMultipliers() {
+        #expect(MathsGenerator.allows(factKey: "mul:3x7", tables: [2, 3]))
+        #expect(!MathsGenerator.allows(factKey: "mul:8x3", tables: [2, 3]))
+        #expect(!MathsGenerator.allows(factKey: "mul:3x8", tables: [2, 3]))
+        #expect(!MathsGenerator.allows(factKey: "div:3x11", tables: [2, 3], multipliers: Array(1...10)))
+        #expect(MathsGenerator.allows(factKey: "word:because", tables: [2], multipliers: [5]))
+    }
+
+    @Test func fractionsUseOnlyChosenDenominators() {
+        var rng = SeededGenerator(seed: 23)
+        for chosen in [[2], [3], [2, 4], [10], [5, 8], [3, 6, 9]] {
+            for level in 1...5 {
+                for _ in 0..<150 {
+                    let question = MathsGenerator.make(skill: .fractions, level: level, denominators: chosen, using: &rng)
+                    let prompt = question.prompt
+                    let used = prompt.hasPrefix("Half") ? 2
+                        : Int(prompt.split(separator: "/")[1].prefix { $0.isNumber }) ?? 0
+                    #expect(chosen.contains(used), "\(chosen): \(prompt)")
+                }
+            }
+        }
+    }
+
+    @Test func olderSettingsKeepEveryMultiplierAndFraction() throws {
+        let decoded = try JSONDecoder().decode(ParentSettings.self, from: Data(#"{"tables":[2,5]}"#.utf8))
+        #expect(decoded.multipliers == Array(1...12) && decoded.denominators == Array(2...10) && decoded.tables == [2, 5])
+    }
+
     @Test func missingFactorAnswersAreConsistent() {
         var rng = SeededGenerator(seed: 11)
         for _ in 0..<400 {
@@ -214,8 +285,14 @@ import Testing
             #expect(!phone.answer.contains(" "), "phones get single words at low levels")
             let keyboard = SpellingGenerator.typing(level: 2, profile: .hardware, using: &rng)
             #expect(keyboard.answer.contains(" "), "hardware keyboards get sentences")
+            #expect(keyboard.typingTarget.first?.isUppercase == true)
         }
-        #expect(bank.sentences.allSatisfy { $0.text.allSatisfy { $0 == " " || ($0.isLetter && $0.isLowercase) } })
+        for sentence in bank.sentences {
+            #expect(sentence.text.first?.isUppercase == true)
+            #expect(sentence.text.allSatisfy { $0 == " " || $0.isLetter })
+            #expect(!sentence.text.split(separator: " ").contains("i"))
+            #expect(!sentence.text.split(separator: " ").contains("mosey"))
+        }
     }
 }
 
@@ -369,5 +446,72 @@ import Testing
     }
     @Test func subtractionCanCrossZeroDigits() {
         #expect(MathsGenerator.subtractionHint(402, 178) == "Start at 402. 402 − 100 = 302. 302 − 70 = 232. Then take away 8.")
+    }
+}
+
+@Suite struct SettingsSummaryTests {
+    private func values(_ settings: ParentSettings) -> [String: String] {
+        Dictionary(uniqueKeysWithValues: settings.summary.map { ($0.label, $0.value.replacingOccurrences(of: "\u{00A0}", with: " ")) })
+    }
+
+    private func changed(_ settings: ParentSettings) -> [String] {
+        settings.summary.filter(\.changed).map(\.label)
+    }
+
+    @Test func newPlayerSettingsReadAsEverything() {
+        let fresh = ParentSettings()
+        #expect(values(fresh) == [
+            "Difficulty": "Adaptive",
+            "Times tables": "2, 3, 4, 5, 8 and 10",
+            "Multiply and divide by": "Everything from × 1 to × 12",
+            "Fractions": "Halves to tenths",
+            "Spelling": "All 5 topics",
+        ])
+        #expect(changed(fresh).isEmpty)
+    }
+
+    @Test func switchedOffTableDropsOutOfMultipliers() {
+        var settings = ParentSettings()
+        settings.tables = [2, 3, 4, 5, 10]
+        settings.multipliers = Array(1...10)
+        #expect(values(settings)["Times tables"] == "2, 3, 4, 5 and 10")
+        #expect(values(settings)["Multiply and divide by"] == "× 1 to × 10, but not × 8")
+        #expect(changed(settings) == ["Times tables", "Multiply and divide by"])
+    }
+
+    @Test func multipliersAndFractionsUseRangesGapsAndLists() {
+        func multiply(_ values: [Int]) -> String? {
+            var settings = ParentSettings()
+            settings.multipliers = values
+            return self.values(settings)["Multiply and divide by"]
+        }
+        func fractions(_ values: [Int]) -> String? {
+            var settings = ParentSettings()
+            settings.denominators = values
+            return self.values(settings)["Fractions"]
+        }
+        #expect(multiply(Array(1...10)) == "× 1 to × 10")
+        #expect(multiply([1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12]) == "All but × 8")
+        #expect(multiply([5]) == "Only × 5")
+        #expect(multiply([2, 5, 10]) == "× 2, × 5 and × 10")
+        #expect(fractions([2, 3, 4, 5, 6, 8, 10]) == "All but sevenths and ninths")
+        #expect(fractions([2, 3, 4]) == "Halves to quarters")
+        #expect(fractions([2, 4, 10]) == "Halves, quarters and tenths")
+        #expect(fractions([2, 3, 5, 6]) == "Halves to sixths, but not quarters")
+    }
+
+    @Test func difficultyAndSpellingReadNaturally() {
+        var settings = ParentSettings()
+        settings.difficulty = .gentle
+        settings.spellingTopics = [.starterWords, .exceptionWords]
+        #expect(values(settings)["Difficulty"] == "Gentle")
+        #expect(values(settings)["Spelling"] == "Warm-up words and tricky words")
+        settings.spellingTopics = [.starterWords, .exceptionWords, .prefixes]
+        #expect(values(settings)["Spelling"] == "All but suffixes and homophones")
+    }
+
+    @Test func olderSavesHaveNotBeenChecked() throws {
+        let profile = try JSONDecoder().decode(Profile.self, from: Data(#"{"nickname":"Skyla"}"#.utf8))
+        #expect(!profile.grownUpChecked)
     }
 }

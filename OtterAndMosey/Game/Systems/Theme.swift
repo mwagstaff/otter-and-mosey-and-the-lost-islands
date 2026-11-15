@@ -36,7 +36,7 @@ struct IslandTheme {
         }
     }
     var snack: String {
-        switch id { case "woods": "🍓"; case "bay": "fish_biscuits"; case "cloud": "🧁"; case "candy": "🍬"; default: "🍪" }
+        switch id { case "woods": "🍓"; case "bay": "fish_biscuits"; case "dragon": "cookie"; case "cloud": "🧁"; case "candy": "🍬"; default: "star_cookie" }
     }
     var snackName: String {
         switch id { case "woods": "berries"; case "bay": "fish biscuits"; case "dragon": "warm cookies"; case "cloud": "cloud cakes"; case "candy": "candies"; default: "star cookies" }

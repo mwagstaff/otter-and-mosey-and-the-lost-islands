@@ -6,7 +6,8 @@
   "scripts": {
     "generate": "node --env-file=../../.env.local generate.mjs",
     "narrate": "node --env-file=../../.env.local narrate.mjs",
-    "music": "node --env-file=../../.env.local music.mjs"
+    "music": "node --env-file=../../.env.local music.mjs",
+    "cheer": "node --env-file=../../.env.local cheer.mjs"
   },
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.77.0"

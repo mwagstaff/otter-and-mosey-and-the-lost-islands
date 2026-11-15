@@ -92,6 +92,8 @@ public struct Profile: Codable, Equatable, Identifiable, Sendable {
     /// Seconds played per local calendar day, keyed `yyyy-MM-dd`. Only recent days are kept.
     public var dailyPlaySeconds: [String: Double] = [:]
     public var seenIntro = false
+    /// Set once a grown-up has looked over this player's settings on the check before their first adventure.
+    public var grownUpChecked = false
     public var decorations: [PlacedDecoration] = []
     public var lastLevelID: String?
     public var bestCombo = 0
@@ -117,6 +119,7 @@ public struct Profile: Codable, Equatable, Identifiable, Sendable {
         playSeconds = c.value(.playSeconds, default: 0)
         dailyPlaySeconds = c.value(.dailyPlaySeconds, default: [:])
         seenIntro = c.value(.seenIntro, default: false)
+        grownUpChecked = c.value(.grownUpChecked, default: false)
         decorations = c.value(.decorations, default: [])
         lastLevelID = c.value(.lastLevelID, default: nil)
         bestCombo = c.value(.bestCombo, default: 0)

@@ -7,6 +7,7 @@ import { IntroScene } from "../game/introScene";
 import { dialogueHeight, showDialogue } from "./dialogue";
 import { button, h, symbol } from "./dom";
 import type { Screen } from "./menus";
+import { keyboardRows } from "./keyboard";
 
 type Step = "loading" | "story" | "tutorial" | "after";
 
@@ -21,11 +22,11 @@ export function introView(model: AppModel, app: Application): Screen {
   const banner = h("p.tutorial-banner.panel", { hidden: true }, "Tap the missing letter to bring the flower back!");
   const skip = button("cream.skip.below-hud", ["Skip", symbol("skip")], () => model.finishIntro());
   skip.hidden = true;
-  const keys = h("div.keys.tray", { hidden: true }, h("div.key-row", {}, ...IntroScene.tutorialLetters.map((letter) => {
-    const key = h("button.key", { type: "button", "aria-label": letter }, letter);
-    key.addEventListener("pointerdown", (event) => { event.preventDefault(); scene.handleKey(letter); });
-    return key;
-  })));
+  // The tutorial fills the lowercase "u" in "sun" using the same accessible keys as levels.
+  const keys = h("div.keys.tray", { hidden: true },
+    ...keyboardRows({ kind: "tray", letters: IntroScene.tutorialLetters }, (letter) => {
+      if (step === "tutorial") scene.handleKey(letter);
+    }, () => {}));
   const overlay = h("div.overlay");
   const element = h("section.screen.game", {}, banner, skip, keys, overlay);
 

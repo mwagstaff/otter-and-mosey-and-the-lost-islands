@@ -49,6 +49,9 @@ struct GameKeyboard: View {
     var width: CGFloat
     var onKey: (Character) -> Void
     var onBackspace: () -> Void
+    /// A form supplies its own panel; gameplay keyboards keep their edge-to-edge backdrop.
+    var embedded = false
+    var uppercase = false
     @Environment(\.compact) private var compact
 
     var body: some View {
@@ -63,7 +66,11 @@ struct GameKeyboard: View {
         .padding(.top, 8)
         .padding(.bottom, 6)
         .frame(maxWidth: .infinity)
-        .background(Palette.ink.opacity(0.82).ignoresSafeArea(edges: [.bottom, .horizontal]))
+        .background {
+            if !embedded {
+                Palette.ink.opacity(0.82).ignoresSafeArea(edges: [.bottom, .horizontal])
+            }
+        }
     }
 
     /// One row of large tiles: the answer's letters mixed with a few others.
@@ -72,7 +79,7 @@ struct GameKeyboard: View {
         let keyWidth = min((width - spacing * CGFloat(letters.count + 1)) / CGFloat(max(letters.count, 1)), compact ? 76 : 96)
         return HStack(spacing: spacing) {
             ForEach(Array(letters.enumerated()), id: \.offset) { _, letter in
-                KeyCap(label: String(letter), width: keyWidth, height: KeyMetrics.trayHeight(compact: compact) - 22) { onKey(letter) }
+                letterCap(letter, width: keyWidth, height: KeyMetrics.trayHeight(compact: compact) - 22)
             }
         }
     }
@@ -87,7 +94,7 @@ struct GameKeyboard: View {
             ForEach(rows, id: \.self) { row in
                 HStack(spacing: spacing) {
                     ForEach(Array(row), id: \.self) { letter in
-                        KeyCap(label: String(letter), width: keyWidth, height: keyHeight) { onKey(letter) }
+                        letterCap(letter, width: keyWidth, height: keyHeight)
                     }
                     if row == "zxcvbnm", space {
                         KeyCap(label: "␣", width: keyWidth * 2.6, height: keyHeight, fill: Palette.gold) { onKey(" ") }
@@ -95,6 +102,11 @@ struct GameKeyboard: View {
                 }
             }
         }
+    }
+
+    private func letterCap(_ letter: Character, width: CGFloat, height: CGFloat) -> some View {
+        let label = uppercase ? letter.uppercased() : letter.lowercased()
+        return KeyCap(label: label, width: width, height: height) { onKey(label.first ?? letter) }
     }
 
     private var numbers: some View {

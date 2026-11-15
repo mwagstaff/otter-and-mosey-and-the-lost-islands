@@ -98,7 +98,7 @@ class GameScene: SKScene {
         backdrop.setRestoration(options.startRestoration, duration: 0)
         backdrop.resize(to: size, groundY: insets.bottom)
         otter = CharacterNode(kind: .otter, size: 100, accessory: options.accessory)
-        mosey = CharacterNode(kind: .mosey, size: 160, accessory: nil)
+        mosey = CharacterNode(kind: .mosey, size: 160, accessory: options.accessory)
         build()
         layout()
         otter.startIdle()
@@ -157,6 +157,7 @@ class GameScene: SKScene {
         bridge.hintText = nil
         bridge.caption = caption(for: question)
         bridge.keyboard = keyboard(for: question)
+        updateKeyboardCase(for: question, at: 0)
         let spoken = shouldSpeak(question)
         bridge.speakable = spoken ? question.spoken : ""
         bridge.speakableKey = spoken ? question.audioKey : nil
@@ -166,6 +167,10 @@ class GameScene: SKScene {
     }
 
     func shouldSpeak(_ question: Question) -> Bool { true }
+
+    func updateKeyboardCase(for question: Question, at index: Int) {
+        bridge.keyboardUppercase = KeyboardCapitalization.target(question.typingTarget, at: index)
+    }
 
     func keyboard(for question: Question) -> KeyboardKind {
         guard question.format == .typed else { return .none }
@@ -311,19 +316,16 @@ class GameScene: SKScene {
         // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
         // (or flippers) until the level closes, so the snack is still there during the chat
         // that follows and nobody misses it.
-        for (index, hero) in [otter, mosey].compactMap({ $0 }).enumerated() {
-            let snack = SKSpriteNode(texture: packet ? Art.fishBiscuit : Art.emoji(theme.snack))
-            let side = max(compact ? 40 : 52, hero.size * 0.34)
+        for (index, spot) in snackSpots().enumerated() {
+            let snack = SKSpriteNode(texture: Art.snack(packet ? "fish_biscuits" : theme.snack))
             let textureSize = snack.texture!.size()
-            let ratio = side / max(textureSize.width, textureSize.height)
+            let ratio = spot.side / max(textureSize.width, textureSize.height)
             snack.size = CGSize(width: textureSize.width * ratio, height: textureSize.height * ratio)
-            let facing: CGFloat = hero.facingLeft ? -1 : 1
-            snack.position = hero === otter
-                ? CGPoint(x: facing * hero.size * 0.14, y: hero.size * 0.62)
-                : CGPoint(x: facing * hero.size * 0.36, y: hero.size * 0.08)
+            snack.position = spot.position
             snack.zPosition = 50
             snack.setScale(0)
-            hero.addChild(snack)
+            spot.holder.addChild(snack)
+            let facing = spot.facing
             let bite = SKAction.run { [weak self, weak snack] in
                 guard let self, let snack, snack.parent != nil else { return }
                 AudioManager.shared.play(.pop, volume: 0.35)
@@ -339,6 +341,26 @@ class GameScene: SKScene {
                 .wait(forDuration: 0.9),
                 nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48),
             ]))
+        }
+    }
+
+    /// Where a hero holds a snack: the node it rides on, its spot there, its size, and which way it faces.
+    struct SnackSpot {
+        let holder: SKNode
+        let position: CGPoint
+        let side: CGFloat
+        let facing: CGFloat
+    }
+
+    /// Where the end-of-level snacks go. By default Otter's paws and Mosey's flippers, for whichever
+    /// of them is on screen. Modes that draw the heroes some other way say where instead.
+    func snackSpots() -> [SnackSpot] {
+        [otter, mosey].compactMap { $0 }.filter { $0.scene != nil }.map { hero in
+            let facing: CGFloat = hero.facingLeft ? -1 : 1
+            let position = hero === otter
+                ? CGPoint(x: facing * hero.size * 0.14, y: hero.size * 0.62)
+                : CGPoint(x: facing * hero.size * 0.36, y: hero.size * 0.08)
+            return SnackSpot(holder: hero, position: position, side: max(compact ? 40 : 52, hero.size * 0.34), facing: facing)
         }
     }
 

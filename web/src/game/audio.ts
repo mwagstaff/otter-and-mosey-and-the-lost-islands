@@ -5,7 +5,7 @@ import { options } from "./options";
 /** Every sound effect in the game. The names are file names in the iOS project's Resources/Audio. */
 export type SFX =
   | "tap" | "nav" | "correct" | "combo" | "wrong" | "pop" | "crystal" | "star" | "jump" | "swim" | "crack" | "chirp"
-  | "portal" | "guardian" | "friendship" | "levelComplete" | "unlock" | "victory" | "key" | "whoosh" | "plank";
+  | "portal" | "guardian" | "friendship" | "levelComplete" | "unlock" | "victory" | "key" | "whoosh" | "plank" | "cheer";
 
 const quiet = (promise: Promise<void> | undefined) => void promise?.catch(() => {});
 
@@ -136,6 +136,11 @@ class Narrator {
   private player?: HTMLAudioElement;
   private ticker?: number;
   private gate = new MouthGate();
+
+  /** Whether a recording is still playing, so a scene can wait for the line to finish. */
+  get speaking(): boolean {
+    return this.player !== undefined && !this.player.ended && !this.player.paused;
+  }
 
   private get volume(): number {
     return options.settings.muted ? 0 : Math.min(1, Math.max(options.settings.effectsVolume, 0.3));

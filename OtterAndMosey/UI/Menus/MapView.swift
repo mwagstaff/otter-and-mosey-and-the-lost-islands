@@ -7,6 +7,7 @@ struct MapView: View {
     @Environment(AppModel.self) private var model
     @State private var scene = WorldMapScene()
     @State private var selected: String?
+    @State private var showingPhoto = false
     /// The name of an island that has just been unlocked, shown in a banner for a few seconds.
     @State private var unlockBanner: String?
 
@@ -29,13 +30,25 @@ struct MapView: View {
                 VStack(spacing: 0) {
                     HStack(spacing: compact ? 8 : 12) {
                         RoundButton(symbol: "house.fill", label: "Title screen") { model.route = .title }
-                        CountChip(emoji: model.profile?.avatar ?? "🙂", text: model.profile?.nickname ?? "")
+                        CountChip(emoji: model.profile?.avatar ?? "🙂", text: model.profile?.nickname ?? "").fixedSize()
                         Spacer()
-                        CountChip(emoji: "⭐️", text: "\(model.profile?.totalStars ?? 0)")
-                        CountChip(emoji: "💎", text: "\(model.profile?.crystals.count ?? 0)/6")
+                        CountChip(emoji: "⭐️", text: "\(model.profile?.totalStars ?? 0)").fixedSize()
+                        CountChip(emoji: "💎", text: "\(model.profile?.crystals.count ?? 0)/6").fixedSize()
                         TrophiesButton(size: compact ? 16 : 20, showsTitle: !compact)
-                        Button(action: tapped { model.route = .collection }) { IconLabel("Treasures", emoji: "🎒", size: compact ? 16 : 20) }
-                            .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 16 : 20))
+                        let hasPhoto = GroupPhoto.isUnlocked(model.profile, catalog: model.catalog)
+                        if hasPhoto {
+                            GroupPhotoButton(size: compact ? 16 : 20, showsTitle: !compact) { showingPhoto = true }
+                        }
+                        // On a phone the bar is short of room once the photo is there, so Treasures shows just its picture.
+                        Button(action: tapped { model.route = .collection }) {
+                            if compact && hasPhoto {
+                                Glyph("🎒", size: 16 * 1.35).padding(.vertical, -16 * 0.2)
+                            } else {
+                                IconLabel("Treasures", emoji: "🎒", size: compact ? 16 : 20)
+                            }
+                        }
+                        .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 16 : 20))
+                        .accessibilityLabel("Treasures")
                         Button(action: tapped { model.route = .home }) { IconLabel("Home", emoji: "🏝", size: compact ? 16 : 20) }
                             .buttonStyle(ChunkyButtonStyle(fill: Palette.cream, size: compact ? 16 : 20))
                     }
@@ -69,6 +82,7 @@ struct MapView: View {
                 }
                 .animation(.spring(duration: 0.3), value: selected)
                 .animation(.spring(duration: 0.4), value: unlockBanner)
+                if showingPhoto { GroupPhotoViewer { showingPhoto = false } }
             }
             .environment(\.compact, compact)
         }

@@ -169,13 +169,27 @@ final class CharacterNode: SKNode {
             ? CGPoint(x: side * size * 0.12, y: sprite.size.height * 0.98)
             : CGPoint(x: side * sprite.size.width * 0.3, y: sprite.size.height * 0.36)
         guard let accessory else { return }
-        accessory.size = CGSize(width: size * 0.3, height: size * 0.3)
         if kind == .otter {
+            accessory.size = CGSize(width: size * 0.3, height: size * 0.3)
             accessory.position = CGPoint(x: side * size * 0.04, y: sprite.size.height * 0.97)
         } else {
-            accessory.position = CGPoint(x: side * sprite.size.width * 0.3, y: sprite.size.height * 0.38)
+            let hat = size * 0.2
+            let head = Self.moseyHead(pose)
+            accessory.size = CGSize(width: hat, height: hat)
+            accessory.position = CGPoint(x: side * sprite.size.width * head.x, y: sprite.size.height * head.y + hat * 0.3)
         }
         accessory.isHidden = pose == .move && kind == .otter
+    }
+
+    /// The top of Mosey's head in each painted pose, as a fraction of the sprite from its centre.
+    private static func moseyHead(_ pose: Pose) -> CGPoint {
+        switch pose {
+        case .idle, .blink: CGPoint(x: 0.32, y: 0.31)
+        case .cheer: CGPoint(x: 0.3, y: 0.45)
+        case .think: CGPoint(x: 0.28, y: 0.46)
+        case .oops: CGPoint(x: 0.26, y: 0.46)
+        case .move: CGPoint(x: 0.36, y: 0.22)
+        }
     }
 
     private func applyFacing() {

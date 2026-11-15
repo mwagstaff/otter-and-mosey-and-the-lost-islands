@@ -14,6 +14,8 @@ scripts in `tools/sfx`. The app never calls ElevenLabs.
 | Guardian voices | Done and bundled: all 41 lines, six designed voices. |
 | Music (7 loops) | Done and bundled: one for the menus, one per island. See section 4. |
 | "Story" lines (4 clips) | Done and bundled, read by Alice with her question settings and no tag. Copies in `docs/voice-poc/story/`. |
+| Finale (15 clips, scene `finale`) | Done and bundled (15 November 2026): 3 story captions read by Alice, 6 Otter and Mosey lines, and one thank-you from each guardian with their "befriended" tag. Recorded with `npm run narrate -- --dialogue finale`. No line uses the player's name, so none needs per-child recording. |
+| Finale countdown (3 clips) and group cheer | Done and bundled. Otter says "Three!", "Two!", "One!" before the photo (scene `finale`). The group "Hooray!" is every character (Otter, Mosey and the six guardians) shouting "[cheering loudly] Hooray!" in their own voice, mixed into one sound effect, `OtterAndMosey/Resources/Audio/cheer.m4a`, by `npm run cheer` (`tools/sfx/cheer.mjs`). The takes are kept in `tools/sfx/raw/cheer`; the mix uses macOS `afconvert`, not ffmpeg. |
 
 ## Setup
 

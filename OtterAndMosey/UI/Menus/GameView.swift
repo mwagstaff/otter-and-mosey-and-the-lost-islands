@@ -38,7 +38,7 @@ struct GameView: View {
                         Spacer(minLength: 0)
                         if !hardware, stage == .playing, bridge.dialogue.isEmpty {
                             GameKeyboard(kind: bridge.keyboard, width: geometry.size.width - 16,
-                                         onKey: { bridge.key($0) }, onBackspace: { bridge.backspace() })
+                                         onKey: { bridge.key($0) }, onBackspace: { bridge.backspace() }, uppercase: bridge.keyboardUppercase)
                         } else if hardware, bridge.keyboard != .none, stage == .playing {
                             IconLabel("Type on your keyboard", symbol: "keyboard.fill", size: compact ? 15 : 19)
                                 .font(.game(compact ? 15 : 19, weight: .bold))
@@ -531,6 +531,11 @@ struct LevelCompleteView: View {
                     }) { IconLabel("Next adventure", symbol: "play.fill", size: compact ? 20 : 26, trailing: true) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))
                 } else if model.playtest == nil {
+                    // Beating a guardian again once every fragment is home: the finale can be watched again.
+                    if summary.endingReplay {
+                        Button(action: tapped { model.route = .ending }) { IconLabel("Watch the ending", emoji: "🌈", size: compact ? 17 : 22) }
+                            .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 17 : 22))
+                    }
                     // Replaying the end of an island already finished: nothing new to unlock, so head back to the map.
                     Button(action: tapped { model.route = .map }) { IconLabel("Continue to map", symbol: "arrow.right", size: compact ? 20 : 26, trailing: true) }
                         .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26, minWidth: 150))

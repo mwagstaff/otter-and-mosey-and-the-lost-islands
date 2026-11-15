@@ -926,5 +926,101 @@
 "scene": "star-5",
 "text": "I… I'd like that. Here. I kept it safe for you.",
 "mood": "befriended"
+},
+"line_7557f3e8": {
+"speaker": "narrator",
+"scene": "finale",
+"text": "The six crystal fragments are home…"
+},
+"line_acc96d56": {
+"speaker": "narrator",
+"scene": "finale",
+"text": "The Rainbow Crystal is whole again!"
+},
+"line_e9571da6": {
+"speaker": "narrator",
+"scene": "finale",
+"text": "Every island is full of colour again!"
+},
+"line_463819c9": {
+"speaker": "otter",
+"scene": "finale",
+"text": "We couldn't have done any of this without you!"
+},
+"line_7b685f45": {
+"speaker": "mosey",
+"scene": "finale",
+"text": "All those spellings and all those sums, and you never gave up!"
+},
+"line_1a408b07": {
+"speaker": "otter",
+"scene": "finale",
+"text": "Three cheers for our champion! Hip hip…"
+},
+"line_4905b29a": {
+"speaker": "mosey",
+"scene": "finale",
+"text": "Everyone squeeze in for a photo! Say cheese!"
+},
+"line_a4c3241f": {
+"speaker": "otter",
+"scene": "finale",
+"text": "Three!"
+},
+"line_26414be5": {
+"speaker": "otter",
+"scene": "finale",
+"text": "Two!"
+},
+"line_0d1182e3": {
+"speaker": "otter",
+"scene": "finale",
+"text": "One!"
+},
+"line_1f797c00": {
+"speaker": "otter",
+"scene": "finale",
+"text": "Every island's open now, so you can play any level again, whenever you like!"
+},
+"line_bf21d787": {
+"speaker": "mosey",
+"scene": "finale",
+"text": "And there are still trophies hiding out there, and stars to win, and pets to find!"
+},
+"line_c0186ec8": {
+"speaker": "tree",
+"scene": "finale",
+"text": "You gave me back my laugh! Ha ha! I'm saving my very best story just for you.",
+"mood": "befriended"
+},
+"line_21c74152": {
+"speaker": "octopus",
+"scene": "finale",
+"text": "Eight arms, and I'd use every single one to give you a hug!",
+"mood": "befriended"
+},
+"line_7d8a19f3": {
+"speaker": "dragon",
+"scene": "finale",
+"text": "Trousers dry, pocket not itchy. You're a proper hero!",
+"mood": "befriended"
+},
+"line_6889d8ba": {
+"speaker": "wizard",
+"scene": "finale",
+"text": "Best playmate the sky's ever had. Come back and play any time!",
+"mood": "befriended"
+},
+"line_ae8bbb1d": {
+"speaker": "marshmallow",
+"scene": "finale",
+"text": "Puff saved you the biggest marshmallow. Fair shares!",
+"mood": "befriended"
+},
+"line_5da96d7f": {
+"speaker": "shadow",
+"scene": "finale",
+"text": "You helped me find the light. I'll never forget that.",
+"mood": "befriended"
 }
 }

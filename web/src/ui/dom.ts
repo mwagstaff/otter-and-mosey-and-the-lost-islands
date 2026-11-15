@@ -31,6 +31,7 @@ const shapes: Record<string, string> = {
   arrow: '<path d="M4 12a1.3 1.3 0 0 1 1.3-1.3h10.2l-4.2-4.2a1.3 1.3 0 0 1 1.84-1.84l6.4 6.4a1.3 1.3 0 0 1 0 1.84l-6.4 6.4a1.3 1.3 0 0 1-1.84-1.84l4.2-4.2H5.3A1.3 1.3 0 0 1 4 12z"/>',
   skip: '<path d="M4 5.5v13a1 1 0 0 0 1.6.8l9-6.5a1 1 0 0 0 0-1.6l-9-6.5A1 1 0 0 0 4 5.5z"/><rect x="17" y="4.5" width="3.5" height="15" rx="1.5"/>',
   gear: '<path fill-rule="evenodd" d="M10.3 2.6a1 1 0 0 1 1-.8h1.4a1 1 0 0 1 1 .8l.3 1.7 1.3.6 1.5-1a1 1 0 0 1 1.3.2l1 1a1 1 0 0 1 .1 1.3l-1 1.5.6 1.3 1.7.3a1 1 0 0 1 .8 1v1.4a1 1 0 0 1-.8 1l-1.7.3-.6 1.3 1 1.5a1 1 0 0 1-.1 1.3l-1 1a1 1 0 0 1-1.3.1l-1.5-1-1.3.6-.3 1.7a1 1 0 0 1-1 .8h-1.4a1 1 0 0 1-1-.8l-.3-1.7-1.3-.6-1.5 1a1 1 0 0 1-1.3-.1l-1-1a1 1 0 0 1-.1-1.3l1-1.5-.6-1.3-1.7-.3a1 1 0 0 1-.8-1v-1.4a1 1 0 0 1 .8-1l1.7-.3.6-1.3-1-1.5a1 1 0 0 1 .1-1.3l1-1a1 1 0 0 1 1.3-.1l1.5 1 1.3-.6zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>',
+  tick: '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>',
   close: '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>',
   plus: '<path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>',
   home: '<path d="M11.3 3.3a1 1 0 0 1 1.4 0l8 7.6a1 1 0 0 1-.7 1.7H19v6.9a1 1 0 0 1-1 1h-3.5v-5.5h-5V20.5H6a1 1 0 0 1-1-1v-6.9H4a1 1 0 0 1-.7-1.7z"/>',

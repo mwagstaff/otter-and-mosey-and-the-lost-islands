@@ -939,5 +939,37 @@
   "m:This one's a bit tricky. How about asking a grown-up to help us?",
   "o:You're trying really hard! Shall we get a grown-up to help with this one?",
   "m:Even the best explorers ask for help. Why don't you find a grown-up?"
- ]
+ ],
+ "finale": {
+  "opening": [
+   "n:The six crystal fragments are home…",
+   "n:The Rainbow Crystal is whole again!",
+   "n:Every island is full of colour again!"
+  ],
+  "guardians": {
+   "woods": "g:You gave me back my laugh! Ha ha! I'm saving my very best story just for you.",
+   "bay": "g:Eight arms, and I'd use every single one to give you a hug!",
+   "dragon": "g:Trousers dry, pocket not itchy. You're a proper hero!",
+   "cloud": "g:Best playmate the sky's ever had. Come back and play any time!",
+   "candy": "g:Puff saved you the biggest marshmallow. Fair shares!",
+   "star": "g:You helped me find the light. I'll never forget that."
+  },
+  "thanks": [
+   "o:We couldn't have done any of this without you!",
+   "m:All those spellings and all those sums, and you never gave up!",
+   "o:Three cheers for our champion! Hip hip…"
+  ],
+  "photo": [
+   "m:Everyone squeeze in for a photo! Say cheese!"
+  ],
+  "countdown": [
+   "o:Three!",
+   "o:Two!",
+   "o:One!"
+  ],
+  "after": [
+   "o:Every island's open now, so you can play any level again, whenever you like!",
+   "m:And there are still trophies hiding out there, and stars to win, and pets to find!"
+  ]
+ }
 }

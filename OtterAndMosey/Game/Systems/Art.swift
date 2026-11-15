@@ -172,6 +172,52 @@ enum Art {
         }
     }
 
+    /// The picture for an island's snack: drawn here for the fish biscuits and cookies, which have
+    /// no painted art (the system cookie emoji renders as an empty box on iPad), otherwise its icon.
+    static func snack(_ key: String) -> SKTexture {
+        switch key {
+        case "fish_biscuits": fishBiscuit
+        case "cookie": cookie(star: false)
+        case "star_cookie": cookie(star: true)
+        default: emoji(key)
+        }
+    }
+
+    /// A chunky golden cookie with chocolate chips: round for the dragons, star-shaped for Star Island.
+    static func cookie(star: Bool) -> SKTexture {
+        drawn(star ? "star-cookie" : "cookie", size: CGSize(width: 120, height: 120)) { context, rect in
+            let c = rect.center
+            let shape: UIBezierPath
+            if star {
+                shape = UIBezierPath()
+                for index in 0..<10 {
+                    let angle = -CGFloat.pi / 2 + CGFloat(index) * .pi / 5
+                    let radius: CGFloat = index.isMultiple(of: 2) ? 56 : 27
+                    let point = CGPoint(x: c.x + cos(angle) * radius, y: c.y + 3 + sin(angle) * radius)
+                    index == 0 ? shape.move(to: point) : shape.addLine(to: point)
+                }
+                shape.close()
+                shape.lineJoinStyle = .round
+            } else {
+                shape = UIBezierPath(ovalIn: rect.insetBy(dx: 8, dy: 8))
+            }
+            UIColor(hex: "#E2A85A").setFill(); shape.fill()
+            context.saveGState()
+            shape.addClip()
+            UIColor(hex: "#F4C987").setFill()
+            UIBezierPath(ovalIn: CGRect(x: c.x - 36, y: c.y - 40, width: 50, height: 34)).fill()
+            context.restoreGState()
+            UIColor(hex: "#7A4A22").setStroke(); shape.lineWidth = 6; shape.stroke()
+            let chips: [CGPoint] = star
+                ? [CGPoint(x: -10, y: -6), CGPoint(x: 12, y: 4), CGPoint(x: -4, y: 18), CGPoint(x: 0, y: -28)]
+                : [CGPoint(x: -22, y: -14), CGPoint(x: 14, y: -22), CGPoint(x: 22, y: 10), CGPoint(x: -14, y: 20), CGPoint(x: 2, y: 0)]
+            UIColor(hex: "#4A2A16").setFill()
+            for chip in chips {
+                UIBezierPath(roundedRect: CGRect(x: c.x + chip.x - 6, y: c.y + chip.y - 5, width: 12, height: 10), cornerRadius: 4).fill()
+            }
+        }
+    }
+
     /// A soft round glow, used for particles.
     static var glow: SKTexture {
         drawn("glow", size: CGSize(width: 48, height: 48)) { context, rect in
