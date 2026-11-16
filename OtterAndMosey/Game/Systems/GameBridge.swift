@@ -72,7 +72,13 @@ final class GameBridge {
 }
 
 enum InputDetector {
-    static var hasHardwareKeyboard: Bool { GCKeyboard.coalesced != nil }
+    static var hasHardwareKeyboard: Bool {
+        #if DEBUG
+        // UI automation exercises the on-screen keyboard even when Simulator connects the Mac keyboard.
+        if ProcessInfo.processInfo.arguments.contains("-debugAutomation") { return false }
+        #endif
+        return GCKeyboard.coalesced != nil
+    }
 
     static func profile(compact: Bool) -> InputProfile {
         if hasHardwareKeyboard { return .hardware }

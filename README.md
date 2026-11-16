@@ -51,20 +51,53 @@ xcodebuild -project OtterAndMosey.xcodeproj -scheme OtterAndMosey -destination '
 If several simulators share a name, pass `id=<UDID>` from `xcrun simctl list devices` instead.
 Bundle ID: `otter-and-mosey-and-the-lost-islands.dev.skynolimit`.
 
+## Regression play-testing
+
+Run from this game directory:
+
+```sh
+./tools/playtest
+./tools/playtest --full
+```
+
+First-time web setup: `cd web`, `npm ci`, then `npx playwright install chromium webkit`.
+Xcode and available iPhone/iPad simulator runtimes are required. The runner creates fresh temporary
+simulators and deletes only those devices; browser tests use disposable contexts.
+Real-device checks are deferred. No deployment takes place.
+
+Normal coverage includes Swift and web unit tests, cross-language level/star/trophy
+and 30-level progression contracts, packaged media byte comparisons, six-mode browser
+play-throughs in Chromium and mobile-sized WebKit, and app integration/UI tests on
+an iPhone and iPad simulator. Browser tests use real keyboard, touch and pointer input;
+read-only scene diagnostics exist only in the dedicated `playtest` build. Native
+diagnostics require a Debug build and `-debugAutomation`.
+
+`--full` runs all 30 browser and native levels and adds tablet WebKit. Levels use three questions
+to keep interaction runs bounded; the core suites exercise full question counts.
+This is not yet an uninterrupted UI campaign or a comprehensive visual regression suite.
+Actual Safari and physical-device testing are not represented by WebKit emulation.
+
+Results and stage logs live in `playtest-results/<timestamp>/index.html` and `report.json`, alongside
+browser HTML reports/traces and Xcode `.xcresult` bundles. Failed or missing required
+checks give a nonzero exit status; `--only core|browser|simulator` reruns a single layer and labels that narrower scope in its report; retries are disabled. Consult `deferred` in the
+report for coverage not yet implemented. Runtime depends on simulator cold starts;
+5–10 minutes is a design target, not an enforced limit. Test builds use
+`web/dist-playtest`, separate from production output, at `/play/lost-islands/`.
+
 ## Tests
 
 ```bash
 cd Packages/LostIslandsCore && swift test
 ```
 
-66 tests cover question correctness, the word bank, adaptive difficulty, spaced repetition,
+The core tests cover question correctness, the word bank, adaptive difficulty, spaced repetition,
 sessions, progression, trophies and save files. They run on macOS in under a second.
 
 ```bash
 xcodebuild -project OtterAndMosey.xcodeproj -scheme OtterAndMosey -destination 'platform=iOS Simulator,id=<UDID>' test
 ```
 
-5 app tests check that all art and audio is bundled, that progress survives a relaunch and that
+App integration tests check that all art and audio is bundled, that progress survives a relaunch and that
 every game mode builds a scene and asks a question.
 
 ## Project layout

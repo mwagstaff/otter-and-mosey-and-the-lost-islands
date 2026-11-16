@@ -15,3 +15,8 @@ __pycache__/
 node_modules/
 tools/sfx/raw/
 tools/sfx/samples/
+
+playtest-results/
+web/playtest-report/
+web/test-results/
+web/dist-playtest/

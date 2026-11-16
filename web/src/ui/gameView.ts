@@ -70,10 +70,14 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   };
   const short = new URLSearchParams(location.search).has("short");
   const session = new ChallengeSession({
+    seed: import.meta.env.MODE === "playtest" ? 42 : undefined,
     level, learner: profile.learner, settings: profile.parent, inputProfile: input, questionLimit: short ? 3 : undefined,
   });
   bridge.onLearnerChanged = (learner) => model.updateLearner(learner);
   const scene = new scenes[level.mode](session, bridge, sceneOptions);
+  if (import.meta.env.MODE === "playtest") {
+    void import("../testing/observe").then(({ observe }) => observe(scene));
+  }
 
   // The page over the scene
 

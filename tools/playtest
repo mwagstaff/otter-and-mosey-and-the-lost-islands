@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+"""Local regression runner. Never uses existing browser profiles or simulator devices."""
+import argparse, datetime, json, os, pathlib, signal, subprocess, sys, time
+root = pathlib.Path(__file__).resolve().parent.parent
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--full", action="store_true", help="all levels and additional browser/tablet coverage")
+parser.add_argument("--only", choices=["core", "browser", "simulator"], help="rerun one layer while developing tests")
+args = parser.parse_args()
+out = root / "playtest-results" / datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+out.mkdir(parents=True)
+env = dict(os.environ, PLAYTEST_OUTPUT=str(out), TZ="UTC")
+env.pop("PLAYTEST_FULL", None)
+if args.full: env["PLAYTEST_FULL"] = "1"
+results = []
+completed = False
+def run(name, command, cwd=root, timeout=900):
+    print(f"▶ {name}", flush=True)
+    started = time.monotonic()
+    with (out / f"{name}.log").open("w") as log:
+        p = subprocess.Popen(command, cwd=cwd, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+        try: code = p.wait(timeout=timeout)
+        except (subprocess.TimeoutExpired, KeyboardInterrupt) as error:
+            os.killpg(p.pid, signal.SIGTERM)
+            try: p.wait(timeout=10)
+            except subprocess.TimeoutExpired: os.killpg(p.pid, signal.SIGKILL); p.wait()
+            if isinstance(error, KeyboardInterrupt):
+                results.append(dict(check=name, status="interrupted", log=f"{name}.log"))
+                raise
+            code = 124
+    results.append(dict(check=name, status="passed" if code == 0 else "failed", seconds=round(time.monotonic()-started, 1), log=f"{name}.log"))
+    print(f"  {results[-1]['status']} ({results[-1]['seconds']}s)", flush=True)
+    return code == 0
+try:
+    if args.only in (None, "core"):
+        core = run("swift-core", ["swift", "test"], root / "Packages/LostIslandsCore")
+        if core: run("web-core-parity", ["npm", "test"], root / "web")
+        else: results.append(dict(check="web-core-parity", status="not run", reason="Swift contract export failed"))
+    if args.only in (None, "browser"):
+        if run("web-build", ["npm", "run", "build", "--", "--mode", "playtest", "--outDir", "dist-playtest", "--base", "/play/lost-islands/"], root / "web"):
+            run("asset-parity", [sys.executable, "tools/check_playtest_assets.py"])
+            run("browser-playthroughs", ["npx", "playwright", "test"], root / "web", 3600 if args.full else 1200)
+    if args.only in (None, "simulator"):
+        try:
+            inventory = json.loads(subprocess.check_output(["xcrun", "simctl", "list", "devices", "available", "-j"], timeout=45))
+            devices = [dict(d, runtime=runtime) for runtime, group in inventory["devices"].items() for d in group]
+            for family in ["iPhone", "iPad"]:
+                template = next((d for d in devices if family in d["name"]), None)
+                if not template: raise RuntimeError(f"No available {family} simulator")
+                clone = subprocess.check_output(["xcrun", "simctl", "create", "Lost Islands Playtest", template["deviceTypeIdentifier"], template["runtime"]], timeout=60).decode().strip()
+                try:
+                    run(f"simulator-{family}", ["xcodebuild", "-project", "OtterAndMosey.xcodeproj", "-scheme", "OtterAndMosey", "-parallel-testing-enabled", "NO", "-destination", f"platform=iOS Simulator,id={clone}", "-resultBundlePath", str(out / f"{family}.xcresult"), "-skip-testing:OtterAndMoseyUITests/PlaythroughTests/" + ("testSixModesThroughControls" if args.full else "testAllLevelsThroughControls"), "test"], timeout=3600 if args.full else 1200)
+                finally:
+                    subprocess.run(["xcrun", "simctl", "shutdown", clone], capture_output=True, timeout=30)
+                    subprocess.run(["xcrun", "simctl", "delete", clone], capture_output=True, timeout=30)
+        except (subprocess.SubprocessError, RuntimeError) as e:
+            results.append(dict(check="simulator-coverage", status="not run", reason=str(e)))
+
+    completed = True
+finally:
+    import shutil, html
+    for folder in ["playtest-report", "test-results"]:
+        if any(r["check"] == "browser-playthroughs" for r in results) and (root / "web" / folder).exists(): shutil.copytree(root / "web" / folder, out / folder, dirs_exist_ok=True)
+    report = dict(status=("passed" if completed and results and all(r["status"] == "passed" for r in results) else "failed" if any(r["status"] == "failed" for r in results) else "incomplete"), scope=args.only or "all", full=args.full, checks=results, deferred=["physical devices", "actual Safari", "campaign UI journey", "additional learning-rule parity scenarios", "visual baselines", "additional recovery UI journeys"])
+    (out / "report.json").write_text(json.dumps(report, indent=2))
+    rows = "".join(f"<tr><td>{html.escape(r['check'])}</td><td>{html.escape(r['status'])}</td><td>{r.get('seconds', '')}</td><td>{html.escape(r.get('reason', ''))}</td><td>" + (f"<a href=\"{r['log']}\">Log</a>" if 'log' in r else "") + "</td></tr>" for r in results)
+    (out / "index.html").write_text("<!doctype html><meta charset=utf-8><title>Lost Islands regression report</title><style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:20px}td,th{padding:12px;text-align:left;border-bottom:1px solid #ddd}</style><h1>Lost Islands regression report</h1><p>Scope: " + html.escape(args.only or "all") + (" · Full" if args.full else " · Normal") + "</p><table><tr><th>Check</th><th>Result</th><th>Seconds</th><th>Reason</th><th>Evidence</th></tr>" + rows + "</table><h2>Coverage still deferred</h2><ul>" + "".join("<li>"+html.escape(x)+"</li>" for x in report["deferred"]) + "</ul><p><a href=report.json>JSON report</a></p>")
+    print(f"Report: {out / 'index.html'}")
+sys.exit(0 if results and all(r["status"] == "passed" for r in results) else 1)

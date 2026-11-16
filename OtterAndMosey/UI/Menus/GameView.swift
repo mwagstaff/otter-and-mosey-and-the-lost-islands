@@ -55,6 +55,13 @@ struct GameView: View {
                         .allowsHitTesting(false)
                 }
                 overlays(geometry: geometry, compact: compact)
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-debugAutomation"), let scene {
+                    PlaytestProbe(scene: scene)
+                        .frame(width: 1, height: 1)
+                        .allowsHitTesting(false)
+                }
+                #endif
             }
             .environment(\.compact, compact)
             .environment(\.uiScale, ScreenMetrics.scale(geometry))
@@ -83,7 +90,7 @@ struct GameView: View {
         .onChange(of: bridge.result) { _, newValue in
             if let newValue { finish(with: newValue) }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidConnect)) { _ in hardware = true }
+        .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidConnect)) { _ in hardware = InputDetector.hasHardwareKeyboard }
         .onReceive(NotificationCenter.default.publisher(for: .GCKeyboardDidDisconnect)) { _ in hardware = InputDetector.hasHardwareKeyboard }
     }
 
@@ -156,11 +163,13 @@ struct GameView: View {
             endRestoration: isGuardian ? 1 : CGFloat(min(1, base * 0.75 + 0.5))
         )
         var limit: Int?
+        var seed = UInt64.random(in: 0...UInt64.max)
         #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-debugAutomation") { seed = 42 }
         if ProcessInfo.processInfo.arguments.contains("-debugShort") { limit = 3 }
         #endif
         let session = ChallengeSession(level: level, learner: profile.learner, settings: profile.parent,
-                                       inputProfile: options.inputProfile, questionLimit: limit)
+                                       inputProfile: options.inputProfile, seed: seed, questionLimit: limit)
         bridge.onLearnerChanged = { [model] learner in model.updateLearner(learner) }
         let made: GameScene
         switch level.mode {
