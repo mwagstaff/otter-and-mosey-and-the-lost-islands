@@ -247,6 +247,10 @@ export function mapScreen(model: AppModel): Screen {
       () => model.go({ name: "island", id: island.id }), { disabled: !unlocked });
   });
   const chip = (key: string, text: string) => h("span.count-chip", {}, picture(key), text);
+  // The player's own island, with their decorations, pets and trophy cabinet. It sits in the corner
+  // of the sea like a landmark, so it is easy to find without knowing about the Home button.
+  const homeLandmark = button("home-landmark", [art("island_home", "home-landmark-art"), h("span.home-landmark-name", {}, "Rainbow Island")],
+    () => model.go({ name: "home" }), { "aria-label": "Rainbow Island, your own island to decorate" });
   const element: HTMLElement = h("section.screen.map", { style: backdrop("bg_map") },
     h("header.bar.map-bar", {},
       roundButton("home", "Title screen", () => model.go({ name: "title" })),
@@ -261,9 +265,12 @@ export function mapScreen(model: AppModel): Screen {
     ),
     unlockedName && h("p.map-note.unlocked", {}, picture("✨"), `New island to explore: ${unlockedName}!`),
     h("div.islands", {}, ...cards),
-    model.breakSuggested
-      ? h("p.map-note.break", {}, picture("🌙"), "Great playing today! This is a good moment for a break.")
-      : h("p.map-note", {}, current && profile && isIslandUnlocked(current, profile) ? `Tap ${current.name} to play!` : "Tap an island to explore"),
+    h("div.map-foot", {},
+      model.breakSuggested
+        ? h("p.map-note.break", {}, picture("🌙"), "Great playing today! This is a good moment for a break.")
+        : h("p.map-note", {}, current && profile && isIslandUnlocked(current, profile) ? `Tap ${current.name} to play!` : "Tap an island to explore"),
+      homeLandmark,
+    ),
   );
   return { element };
 }

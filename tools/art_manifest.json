@@ -333,6 +333,11 @@
    "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a deep-purple crystal island with glowing stars, a ringed planet floating above and a round portal."
   },
   {
+   "name": "island_home",
+   "quality": "high",
+   "prompt": "A tiny game world-map island seen from a high three-quarter angle: one small round chunk of land with a sandy rim, nothing around it. It is a cosy home island: a little round thatched hut with a bright red door and a flag on top, one palm tree, a small rainbow arching over it, and an open treasure chest spilling gold coins and gems on the sand."
+  },
+  {
    "name": "crystal_whole",
    "quality": "high",
    "prompt": "The Great Rainbow Crystal: a large magnificent faceted crystal that shimmers with every colour of the rainbow, glowing softly, floating upright."

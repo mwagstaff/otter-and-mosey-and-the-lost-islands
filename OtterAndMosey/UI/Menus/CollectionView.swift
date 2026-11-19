@@ -104,6 +104,8 @@ struct CollectionView: View {
 struct HomeIslandView: View {
     @Environment(AppModel.self) private var model
     @State private var dragging: UUID?
+    /// The last quick tap on a decoration, so a second one soon after puts it away.
+    @State private var lastTap: (id: UUID, time: Date)?
 
     var body: some View {
         GeometryReader { geometry in
@@ -120,16 +122,23 @@ struct HomeIslandView: View {
                         Glyph(reward.emoji, size: itemSize * 1.25, art: reward.art)
                             .scaleEffect(dragging == placed.id ? 1.2 : 1)
                             .position(x: placed.x * geometry.size.width, y: placed.y * geometry.size.height)
+                            // One gesture does both, because a drag that starts on touch-down swallows the
+                            // taps a separate double-tap would need: a real drag moves the decoration,
+                            // and two quick taps that barely move put it away.
                             .gesture(DragGesture(minimumDistance: 0)
                                 .onChanged { value in
+                                    guard hypot(value.translation.width, value.translation.height) > 6 else { return }
                                     dragging = placed.id
                                     move(placed.id, to: value.location, in: geometry.size, persist: false)
                                 }
                                 .onEnded { value in
                                     dragging = nil
+                                    guard hypot(value.translation.width, value.translation.height) > 6 else {
+                                        tap(placed.id)
+                                        return
+                                    }
                                     move(placed.id, to: value.location, in: geometry.size, persist: true)
                                 })
-                            .onTapGesture(count: 2) { model.update { $0.decorations.removeAll { $0.id == placed.id } } }
                     }
                 }
                 // The trophy cabinet stands on the island too.
@@ -188,6 +197,17 @@ struct HomeIslandView: View {
             profile.decorations.append(PlacedDecoration(reward: reward.id, x: .random(in: 0.25...0.75), y: .random(in: 0.4...0.65)))
         }
         AudioManager.shared.play(.pop, volume: 0.6)
+    }
+
+    /// A second quick tap on the same decoration puts it away.
+    private func tap(_ id: UUID) {
+        if let last = lastTap, last.id == id, Date().timeIntervalSince(last.time) < 0.45 {
+            lastTap = nil
+            model.update { $0.decorations.removeAll { $0.id == id } }
+            AudioManager.shared.play(.pop, volume: 0.5)
+        } else {
+            lastTap = (id, Date())
+        }
     }
 
     private func move(_ id: UUID, to point: CGPoint, in size: CGSize, persist: Bool) {

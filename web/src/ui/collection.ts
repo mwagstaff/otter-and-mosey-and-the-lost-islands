@@ -92,8 +92,13 @@ export function homeScreen(model: AppModel): Screen {
       item.style.top = `${placed.y * 100}%`;
     };
     position();
+    // pointerdown cancels the browser's own click and dblclick (so dragging never scrolls the
+    // page), so a double tap is spotted here instead: two quick taps that barely move.
+    let downAt = { x: 0, y: 0 };
+    let lastTap = 0;
     item.addEventListener("pointerdown", (event) => {
       event.preventDefault();
+      downAt = { x: event.clientX, y: event.clientY };
       item.setPointerCapture(event.pointerId);
       item.classList.add("dragging");
     });
@@ -108,13 +113,19 @@ export function homeScreen(model: AppModel): Screen {
       item.classList.remove("dragging");
       model.persist();
     };
-    item.addEventListener("pointerup", drop);
-    item.addEventListener("pointercancel", drop);
-    item.addEventListener("dblclick", () => {
+    const putAway = () => {
       profile.decorations = profile.decorations.filter((each) => each.id !== placed.id);
       model.persist();
       item.remove();
+    };
+    item.addEventListener("pointerup", (event) => {
+      drop();
+      if (Math.hypot(event.clientX - downAt.x, event.clientY - downAt.y) > 6) return;
+      const now = performance.now();
+      if (now - lastTap < 450) putAway();
+      lastTap = now;
     });
+    item.addEventListener("pointercancel", drop);
     return item;
   }
 

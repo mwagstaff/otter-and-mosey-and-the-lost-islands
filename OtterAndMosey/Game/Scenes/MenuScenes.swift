@@ -120,12 +120,19 @@ final class WorldMapScene: CoverScene {
     private var selected: String?
     private let boat = SKSpriteNode(texture: Art.texture("duo_ride"))
     private let pathLayer = SKNode()
+    private let home = SKNode()
 
     /// Island positions as fractions of the play area, laid out as a winding voyage.
     private let spots: [CGPoint] = [
         CGPoint(x: 0.11, y: 0.38), CGPoint(x: 0.27, y: 0.7), CGPoint(x: 0.44, y: 0.36),
         CGPoint(x: 0.6, y: 0.7), CGPoint(x: 0.76, y: 0.38), CGPoint(x: 0.9, y: 0.72),
     ]
+    /// The player's own island sits in the open sea of the bottom-right corner, clear of the voyage.
+    private let homeSpot = CGPoint(x: 0.925, y: 0.2)
+
+    /// The id `onSelect` reports when the player's own island is tapped.
+    static let homeID = "home"
+    static let homeName = "Rainbow Island"
 
     init() { super.init(background: "bg_map") }
 
@@ -137,6 +144,8 @@ final class WorldMapScene: CoverScene {
 
     override func build() {
         addChild(pathLayer)
+        home.zPosition = 10
+        addChild(home)
         boat.zPosition = 30
         addChild(boat)
         let glints = Effects.ambient(.sparkles, size: size)
@@ -235,12 +244,39 @@ final class WorldMapScene: CoverScene {
                 }
             }
         }
+        buildHome()
         layoutBoat(animated: false)
         if let selected { highlight(selected) }
     }
 
     override func layout() {
         if !states.isEmpty { rebuild() }
+    }
+
+    /// Rainbow Island, the player's own island, where their decorations, pets and trophy cabinet are.
+    /// It is always in full colour and always open, so it is easy to find from the very first visit.
+    private func buildHome() {
+        home.removeAllChildren()
+        home.position = CGPoint(x: play.minX + play.width * homeSpot.x, y: play.minY + play.height * homeSpot.y)
+        let texture = Art.texture("island_home")
+        let width = islandSize * 0.8
+        let spriteSize = CGSize(width: width, height: width * texture.size().height / max(texture.size().width, 1))
+        let island = SKSpriteNode(texture: texture, size: spriteSize)
+        home.addChild(island)
+        let fontSize = max(12, islandSize * 0.11)
+        let label = GameLabel(Self.homeName, size: fontSize, colour: UIColor(hex: "#0E3B43"))
+        let plateSize = CGSize(width: label.frame.width + fontSize * 2.2, height: fontSize * 2.1)
+        let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
+        // The name is wider than the island, so the plate is nudged in from the edge to stay on screen.
+        let rightmost = play.maxX - plateSize.width / 2 - 4
+        plate.position = CGPoint(x: min(0, rightmost - home.position.x), y: -spriteSize.height * 0.58)
+        plate.zPosition = 4
+        label.zPosition = 1
+        plate.addChild(label)
+        home.addChild(plate)
+        if !Effects.reducedMotion {
+            island.run(.repeatForever(SKAction.sequence([.moveBy(x: 0, y: 6, duration: 1.8), .moveBy(x: 0, y: -6, duration: 1.8)]).eased()))
+        }
     }
 
     /// Picks out the island to play next: a pulsing gold glow and a bouncing "Play here!" sign.
@@ -314,7 +350,7 @@ final class WorldMapScene: CoverScene {
     }
 
     private func highlight(_ id: String) {
-        for (key, node) in islands {
+        for (key, node) in islands.merging([Self.homeID: home], uniquingKeysWith: { first, _ in first }) {
             node.removeAction(forKey: "select")
             node.run(SKAction.scale(to: key == id ? 1.14 : 1, duration: 0.2).eased(), withKey: "select")
             node.zPosition = key == id ? 12 : 10
@@ -341,8 +377,9 @@ final class WorldMapScene: CoverScene {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
-        // Forgiving touch: the nearest island within a generous radius.
-        let nearest = islands.min { $0.value.position.distance(to: point) < $1.value.position.distance(to: point) }
+        // Forgiving touch: the nearest island (the player's own one included) within a generous radius.
+        let targets = islands.merging([Self.homeID: home], uniquingKeysWith: { first, _ in first })
+        let nearest = targets.min { $0.value.position.distance(to: point) < $1.value.position.distance(to: point) }
         guard let nearest, nearest.value.position.distance(to: point) < islandSize * 0.75 else { return }
         AudioManager.shared.play(.tap)
         Haptics.shared.tap()

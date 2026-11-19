@@ -68,7 +68,12 @@ struct MapView: View {
                             .padding(.horizontal, 14).padding(.vertical, 6).panel(fill: Palette.gold, radius: 16)
                             .padding(.bottom, 6)
                     }
-                    if let island = selected.flatMap({ model.catalog.island($0) }), let profile = model.profile {
+                    if selected == WorldMapScene.homeID, let profile = model.profile {
+                        homeCard(profile: profile, compact: compact)
+                            .scaleEffect(ScreenMetrics.scale(geometry), anchor: .bottom)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .padding(.bottom, compact ? 6 : 24)
+                    } else if let island = selected.flatMap({ model.catalog.island($0) }), let profile = model.profile {
                         card(island, profile: profile, compact: compact)
                             .scaleEffect(ScreenMetrics.scale(geometry), anchor: .bottom)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -101,6 +106,29 @@ struct MapView: View {
                 }
             }
         }
+    }
+
+    /// Rainbow Island: the player's own island, with the way in and the way to the treasures.
+    private func homeCard(profile: Profile, compact: Bool) -> some View {
+        let onShow = profile.decorations.count
+        return HStack(spacing: compact ? 12 : 20) {
+            Image("island_home").resizable().scaledToFit().frame(height: compact ? 64 : 100)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(WorldMapScene.homeName).font(.game(compact ? 22 : 30)).foregroundStyle(Palette.ink)
+                Text(onShow == 0 ? "Your own island to decorate" : "Your own island · \(onShow) \(onShow == 1 ? "treasure" : "treasures") on show")
+                    .font(.game(compact ? 14 : 18, weight: .bold)).foregroundStyle(Palette.ink.opacity(0.7))
+            }
+            Spacer(minLength: 8)
+            Button(action: tapped { model.route = .collection }) { IconLabel("Treasures", emoji: "🎒", size: compact ? 17 : 22) }
+                .buttonStyle(ChunkyButtonStyle(fill: Palette.gold, size: compact ? 17 : 22))
+            Button(action: tapped { model.route = .home }) { IconLabel("Visit", symbol: "play.fill", size: compact ? 20 : 26, trailing: true) }
+                .buttonStyle(ChunkyButtonStyle(fill: Palette.teal, ink: .white, size: compact ? 20 : 26))
+        }
+        .padding(.horizontal, compact ? 14 : 22)
+        .padding(.vertical, compact ? 8 : 14)
+        .panel()
+        .frame(maxWidth: 780)
+        .padding(.horizontal, 16)
     }
 
     private func card(_ island: Island, profile: Profile, compact: Bool) -> some View {
