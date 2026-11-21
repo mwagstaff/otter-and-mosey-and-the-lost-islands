@@ -1,5 +1,7 @@
 import { ColorMatrixFilter, Container, Sprite } from "pixi.js";
 import { everyFrame, run } from "../engine/actions";
+import { levelPainting } from "./islandAtmosphere";
+import { options } from "./options";
 import { texture } from "../engine/art";
 import type { Emitter } from "../engine/particles";
 import { ambient } from "./effects";
@@ -37,7 +39,10 @@ export function applyWash(target: Container, wash: ColorMatrixFilter, colour: nu
 export class Backdrop extends Container {
   private readonly scenery = new Container();
   private readonly wash = new ColorMatrixFilter();
-  private farTiles: Sprite[] = [];
+  private farTiles: Container[] = [];
+  private painting?: ReturnType<typeof levelPainting>;
+  answering = false;
+  private strength = 1;
   private nearTiles: Sprite[] = [];
   private farWidth = 1;
   private nearWidth = 1;
@@ -59,7 +64,7 @@ export class Backdrop extends Container {
   showsForeground = true;
 
   /** @param scrolling whether this level's scenery moves sideways (see `scroll`). */
-  constructor(private readonly theme: IslandTheme, private readonly scrolling = false) {
+  constructor(private readonly theme: IslandTheme, private readonly scrolling = false, private readonly shaderAvailable = true) {
     super();
     this.zIndex = -100;
     this.addChild(this.scenery);
@@ -93,7 +98,15 @@ export class Backdrop extends Container {
     const farScale = this.scrolling ? height / far.height : Math.max(width / far.width, height / far.height);
     this.farWidth = far.width * farScale - 1;
     const farCount = this.scrolling ? evenCount(this.farWidth) : 1;
-    this.farTiles = Array.from({ length: farCount }, (_, index) => tile(this.theme.background, farScale, 0.5, index));
+    this.painting?.destroy();
+    const painting = this.painting = this.shaderAvailable ? levelPainting(far, this.theme.background) : undefined;
+    this.farTiles = Array.from({ length: farCount }, (_, index) => {
+      if (!painting) return tile(this.theme.background, farScale, 0.5, index);
+      const mesh = painting.tile();
+      mesh.scale.set(index % 2 === 1 ? -farScale : farScale, farScale);
+      this.scenery.addChild(mesh);
+      return mesh;
+    });
 
     this.nearTiles = [];
     this.foregroundHeight = 0;
@@ -126,7 +139,7 @@ export class Backdrop extends Container {
   /** Moves the world left by `distance`; the far layer follows more slowly. */
   scroll(distance: number): void {
     if (!this.scrolling) return;
-    this.farOffset = (this.farOffset + distance * 0.35) % (this.farWidth * 2);
+    this.farOffset = (this.farOffset + distance * 0.35 * (options.reducedMotion ? 0 : this.strength)) % (this.farWidth * 2);
     this.nearOffset = (this.nearOffset + distance) % (this.nearWidth * 2);
     this.place();
   }
@@ -140,7 +153,22 @@ export class Backdrop extends Container {
     if (duration <= 0) this.show(this.restoration);
   }
 
+  override destroy(options?: Parameters<Container["destroy"]>[0]): void {
+    super.destroy(options);
+    this.painting?.destroy();
+  }
+
   private advance(dt: number): void {
+    const target = options.reducedMotion ? 0 : this.answering ? 0.18 : 1;
+    this.strength += (target - this.strength) * Math.min(1, dt * 6);
+    if (this.painting) {
+      this.painting.uniforms.u_time += dt;
+      this.painting.uniforms.u_strength = options.reducedMotion ? 0 : this.strength;
+    }
+    if (this.motes) {
+      this.motes.birthRate = options.reducedMotion ? 0 : (0.6 + 9 * this.shown) * this.strength;
+      this.motes.alpha = options.reducedMotion ? 0 : this.answering ? 0.35 : 1;
+    }
     if (this.shown === this.restoration) return;
     this.fadeTime += dt;
     const progress = this.fadeLength <= 0 ? 1 : Math.min(this.fadeTime / this.fadeLength, 1);
@@ -149,7 +177,6 @@ export class Backdrop extends Container {
 
   private show(colour: number): void {
     this.shown = colour;
-    if (this.motes) this.motes.birthRate = 0.6 + 9 * colour;
     applyWash(this.scenery, this.wash, colour);
   }
 }

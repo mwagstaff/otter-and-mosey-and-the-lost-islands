@@ -1,3 +1,4 @@
+import { animateLagoon } from "./lagoon";
 import { artURL } from "../assets";
 import { playableModes, type AppModel } from "../app/model";
 import { catalog, gameModeTitles, isIslandUnlocked, isLevelUnlocked, nextLevelFor, starsFor, totalStars, type Island, type LevelDef, type Profile } from "../core";
@@ -73,7 +74,7 @@ export function titleScreen(model: AppModel): Screen {
       button("cream.small", [symbol("gear"), "Grown-ups"], () => model.go({ name: "parent" })),
     ),
   );
-  return { element };
+  return { element, destroy: animateLagoon(element) };
 }
 
 const avatars = ["🦦", "🐬", "🦄", "🦖", "👾", "👻", "👸", "🐢", "🦀", "🐲", "🦉", "🦋", "🐰", "⭐️", "🌈", "🚀", "🎨"];
@@ -247,8 +248,8 @@ export function mapScreen(model: AppModel): Screen {
       () => model.go({ name: "island", id: island.id }), { disabled: !unlocked });
   });
   const chip = (key: string, text: string) => h("span.count-chip", {}, picture(key), text);
-  // The player's own island, with their decorations, pets and trophy cabinet. It sits in the corner
-  // of the sea like a landmark, so it is easy to find without knowing about the Home button.
+  // The player's own island, with their decorations, pets and trophy cabinet. It sits in the middle
+  // of the map with the six islands ringed around it, so it is easy to find without knowing about the Home button.
   const homeLandmark = button("home-landmark", [art("island_home", "home-landmark-art"), h("span.home-landmark-name", {}, "Rainbow Island")],
     () => model.go({ name: "home" }), { "aria-label": "Rainbow Island, your own island to decorate" });
   const element: HTMLElement = h("section.screen.map", { style: backdrop("bg_map") },
@@ -264,15 +265,14 @@ export function mapScreen(model: AppModel): Screen {
       button("cream", [picture("🏝️"), "Home"], () => model.go({ name: "home" })),
     ),
     unlockedName && h("p.map-note.unlocked", {}, picture("✨"), `New island to explore: ${unlockedName}!`),
-    h("div.islands", {}, ...cards),
+    h("div.islands", {}, ...cards, homeLandmark),
     h("div.map-foot", {},
       model.breakSuggested
         ? h("p.map-note.break", {}, picture("🌙"), "Great playing today! This is a good moment for a break.")
         : h("p.map-note", {}, current && profile && isIslandUnlocked(current, profile) ? `Tap ${current.name} to play!` : "Tap an island to explore"),
-      homeLandmark,
     ),
   );
-  return { element };
+  return { element, destroy: animateLagoon(element, "bg_map") };
 }
 
 export function islandScreen(model: AppModel, island: Island): Screen {
@@ -306,5 +306,5 @@ export function islandScreen(model: AppModel, island: Island): Screen {
     ),
     h("div.levels", {}, ...island.levels.map(node)),
   );
-  return { element };
+  return { element, destroy: animateLagoon(element, theme.background) };
 }

@@ -183,6 +183,7 @@ export class MathsSplashScene extends GameScene {
   }
 
   private collect(item: Sprite): void {
+    if (this.theme.id === "woods" || this.theme.id === "candy") this.mosey.chew(0.44, this.theme.id === "woods");
     this.pearlsScooped += 1;
     audio.play("pop", 0.6);
     burst(this.world, item.x, item.y, this.theme.tint, 8);

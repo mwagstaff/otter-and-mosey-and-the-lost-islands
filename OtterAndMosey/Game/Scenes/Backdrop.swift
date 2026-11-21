@@ -12,6 +12,34 @@ final class Backdrop: SKNode {
 
     private let theme: IslandTheme
     private let scrolling: Bool
+    private lazy var sceneryShader = IslandAtmosphere.shader(for: theme.background)
+    private var answering = false
+    var reduceMotion = UIAccessibility.isReduceMotionEnabled || Effects.reducedMotion {
+        didSet {
+            for tile in farTiles {
+                (tile.node.children.first as? SKSpriteNode)?.shader = reduceMotion ? nil : sceneryShader
+                tile.grey.shader = reduceMotion ? nil : sceneryShader
+            }
+            updateMotes()
+        }
+    }
+
+    func setAnswering(_ value: Bool) {
+        answering = value
+        let target: Float = value ? 0.18 : 1
+        if let uniform = sceneryShader?.uniformNamed("u_strength") {
+            let from = uniform.floatValue
+            run(.customAction(withDuration: 0.4) { _, elapsed in
+                uniform.floatValue = from + (target - from) * Float(min(1, elapsed / 0.4))
+            }, withKey: "questionMotion")
+        }
+        updateMotes()
+    }
+
+    private func updateMotes() {
+        ambient?.particleBirthRate = reduceMotion ? 0 : (0.6 + 9 * restoration) * (answering ? 0.18 : 1)
+        ambient?.alpha = answering ? 0.35 : 1
+    }
     private var farTiles: [Tile] = []
     private var nearTiles: [Tile] = []
     private var farWidth: CGFloat = 1
@@ -40,6 +68,10 @@ final class Backdrop: SKNode {
         let node = SKNode()
         let colour = SKSpriteNode(texture: Art.texture(name), size: size)
         let grey = SKSpriteNode(texture: Art.greyTexture(name), size: size)
+        if name == theme.background, !reduceMotion {
+            colour.shader = sceneryShader
+            grey.shader = sceneryShader
+        }
         colour.anchorPoint = anchor
         grey.anchorPoint = anchor
         grey.zPosition = 0.5
@@ -115,7 +147,8 @@ final class Backdrop: SKNode {
     /// Moves the world left by `distance` points; the far layer follows more slowly.
     func scroll(by distance: CGFloat) {
         guard scrolling else { return }
-        farOffset = (farOffset + distance * 0.35).truncatingRemainder(dividingBy: farWidth * 2)
+        let drift = reduceMotion ? 0 : CGFloat(sceneryShader?.uniformNamed("u_strength")?.floatValue ?? 1)
+        farOffset = (farOffset + distance * 0.35 * drift).truncatingRemainder(dividingBy: farWidth * 2)
         nearOffset = (nearOffset + distance).truncatingRemainder(dividingBy: nearWidth * 2)
         place()
     }
@@ -126,11 +159,11 @@ final class Backdrop: SKNode {
             tile.grey.removeAllActions()
             tile.grey.run(.fadeAlpha(to: 1 - restoration, duration: duration))
         }
-        ambient?.particleBirthRate = 0.6 + 9 * restoration
+        updateMotes()
     }
 
     private func applyRestoration() {
         (farTiles + nearTiles).forEach { $0.grey.alpha = 1 - restoration }
-        ambient?.particleBirthRate = 0.6 + 9 * restoration
+        updateMotes()
     }
 }

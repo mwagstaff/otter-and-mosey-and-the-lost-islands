@@ -67,6 +67,22 @@ final class TitleScene: CoverScene {
 
     init() { super.init(background: "bg_title") }
 
+    private var wildlife: IslandWildlife?
+
+    func setSceneryMotion(_ enabled: Bool) {
+        cover.shader = enabled ? RainbowIslandBackdrop.shader(saturation: 1) : nil
+        wildlife?.removeFromParent()
+        wildlife = nil
+        if enabled {
+            let layer = IslandWildlife()
+            layer.zPosition = 1
+            cover.addChild(layer)
+            layer.fit(to: cover)
+            layer.start()
+            wildlife = layer
+        }
+    }
+
     override func build() {
         addChild(Effects.ambient(.sparkles, size: size))
         addChild(otter)
@@ -82,6 +98,7 @@ final class TitleScene: CoverScene {
     }
 
     override func layout() {
+        wildlife?.fit(to: cover)
         otter.resize(min(play.height * 0.5, 300))
         mosey.resize(min(play.height * 0.72, 420))
         otter.position = CGPoint(x: play.minX + play.width * 0.13, y: play.minY + play.height * 0.04)
@@ -97,6 +114,7 @@ final class TitleScene: CoverScene {
             Haptics.shared.tap()
             return
         }
+        if let wildlife, wildlife.greet(at: wildlife.convert(point, from: self)) { return }
         Effects.burst(at: point, colour: .white, count: 10, in: self)
     }
 }
@@ -112,7 +130,8 @@ struct IslandState: Equatable {
     var isCurrent: Bool
 }
 
-/// The archipelago map. Islands bob on the sea; locked ones are grey, restored ones glow.
+/// The archipelago map: Rainbow Island in the middle with the six islands ringed around it.
+/// Islands bob on the sea; locked ones are grey, restored ones glow.
 final class WorldMapScene: CoverScene {
     var onSelect: ((String) -> Void)?
     private var states: [IslandState] = []
@@ -122,13 +141,14 @@ final class WorldMapScene: CoverScene {
     private let pathLayer = SKNode()
     private let home = SKNode()
 
-    /// Island positions as fractions of the play area, laid out as a winding voyage.
+    /// Island positions as fractions of the play area, in a ring around Rainbow Island: up the left,
+    /// across the top and down the right, so the voyage circles the player's own island.
     private let spots: [CGPoint] = [
-        CGPoint(x: 0.11, y: 0.38), CGPoint(x: 0.27, y: 0.7), CGPoint(x: 0.44, y: 0.36),
-        CGPoint(x: 0.6, y: 0.7), CGPoint(x: 0.76, y: 0.38), CGPoint(x: 0.9, y: 0.72),
+        CGPoint(x: 0.12, y: 0.22), CGPoint(x: 0.16, y: 0.7), CGPoint(x: 0.34, y: 0.8),
+        CGPoint(x: 0.66, y: 0.8), CGPoint(x: 0.84, y: 0.7), CGPoint(x: 0.88, y: 0.22),
     ]
-    /// The player's own island sits in the open sea of the bottom-right corner, clear of the voyage.
-    private let homeSpot = CGPoint(x: 0.925, y: 0.2)
+    /// The player's own island sits in the middle of the ring.
+    private var homeCentre: CGPoint { CGPoint(x: play.midX, y: play.minY + play.height * 0.3) }
 
     /// The id `onSelect` reports when the player's own island is tapped.
     static let homeID = "home"
@@ -171,7 +191,7 @@ final class WorldMapScene: CoverScene {
         return CGPoint(x: play.minX + play.width * spot.x, y: play.minY + play.height * spot.y)
     }
 
-    private var islandSize: CGFloat { min(play.width * 0.17, play.height * 0.44) }
+    private var islandSize: CGFloat { min(play.width * 0.15, play.height * 0.36) }
 
     private func rebuild() {
         islands.values.forEach { $0.removeFromParent() }
@@ -220,7 +240,7 @@ final class WorldMapScene: CoverScene {
             plate.addChild(label)
             node.addChild(plate)
             if isNext {
-                addPlayHereMarker(to: node, at: point(index), spriteSize: spriteSize, plateBottom: plate.position.y - plateSize.height / 2)
+                addPlayHereMarker(to: node, spot: spots[index % spots.count], spriteSize: spriteSize, plateBottom: plate.position.y - plateSize.height / 2)
             }
             node.position = point(index)
             node.zPosition = 10
@@ -257,9 +277,9 @@ final class WorldMapScene: CoverScene {
     /// It is always in full colour and always open, so it is easy to find from the very first visit.
     private func buildHome() {
         home.removeAllChildren()
-        home.position = CGPoint(x: play.minX + play.width * homeSpot.x, y: play.minY + play.height * homeSpot.y)
+        home.position = homeCentre
         let texture = Art.texture("island_home")
-        let width = islandSize * 0.8
+        let width = islandSize * 1.15
         let spriteSize = CGSize(width: width, height: width * texture.size().height / max(texture.size().width, 1))
         let island = SKSpriteNode(texture: texture, size: spriteSize)
         home.addChild(island)
@@ -267,9 +287,7 @@ final class WorldMapScene: CoverScene {
         let label = GameLabel(Self.homeName, size: fontSize, colour: UIColor(hex: "#0E3B43"))
         let plateSize = CGSize(width: label.frame.width + fontSize * 2.2, height: fontSize * 2.1)
         let plate = SKSpriteNode(texture: Art.panel(size: plateSize, fill: UIColor(hex: "#FFF6E0"), radius: 10, lineWidth: 3), size: plateSize)
-        // The name is wider than the island, so the plate is nudged in from the edge to stay on screen.
-        let rightmost = play.maxX - plateSize.width / 2 - 4
-        plate.position = CGPoint(x: min(0, rightmost - home.position.x), y: -spriteSize.height * 0.58)
+        plate.position = CGPoint(x: 0, y: -spriteSize.height * 0.58)
         plate.zPosition = 4
         label.zPosition = 1
         plate.addChild(label)
@@ -280,8 +298,9 @@ final class WorldMapScene: CoverScene {
     }
 
     /// Picks out the island to play next: a pulsing gold glow and a bouncing "Play here!" sign.
-    /// The sign sits above the island, or under its name when an island near the top has no room.
-    private func addPlayHereMarker(to node: SKNode, at position: CGPoint, spriteSize: CGSize, plateBottom: CGFloat) {
+    /// The two bottom corner islands have open sea towards Rainbow Island, so their sign sits beside
+    /// them on that side; every other island has its sign under its name, clear of its neighbours.
+    private func addPlayHereMarker(to node: SKNode, spot: CGPoint, spriteSize: CGSize, plateBottom: CGFloat) {
         let glow = SKSpriteNode(texture: Art.glow, size: CGSize(width: islandSize * 1.7, height: islandSize * 1.7))
         glow.color = UIColor(hex: "#FFC83D")
         glow.colorBlendFactor = 1
@@ -297,26 +316,34 @@ final class WorldMapScene: CoverScene {
         let signSize = CGSize(width: label.frame.width + fontSize * 1.8, height: fontSize * 2.1)
         let sign = SKSpriteNode(texture: Art.panel(size: signSize, fill: UIColor(hex: "#FFC83D"), stroke: ink, radius: 12, lineWidth: 3), size: signSize)
         sign.addChild(label)
-        // A little pointer under the sign, aimed at the island.
+        // A little pointer on the sign's near edge, aimed back at the island.
         let tip = fontSize * 0.7
+        let beside = spot.y < 0.5
+        // Beside: +1 points the sign right (towards the middle from the left), -1 left.
+        let side: CGFloat = spot.x < 0.5 ? 1 : -1
         let path = CGMutablePath()
-        let above = position.y + spriteSize.height * 0.5 + signSize.height + tip * 2 < play.maxY
-        let direction: CGFloat = above ? -1 : 1
-        path.move(to: CGPoint(x: -tip, y: 0))
-        path.addLine(to: CGPoint(x: tip, y: 0))
-        path.addLine(to: CGPoint(x: 0, y: tip * direction))
+        if beside {
+            path.move(to: CGPoint(x: 0, y: -tip))
+            path.addLine(to: CGPoint(x: 0, y: tip))
+            path.addLine(to: CGPoint(x: -tip * side, y: 0))
+        } else {
+            path.move(to: CGPoint(x: -tip, y: 0))
+            path.addLine(to: CGPoint(x: tip, y: 0))
+            path.addLine(to: CGPoint(x: 0, y: tip))
+        }
         path.closeSubpath()
         let pointer = SKShapeNode(path: path)
         pointer.fillColor = UIColor(hex: "#FFC83D")
         pointer.strokeColor = ink
         pointer.lineWidth = 3
-        pointer.position = CGPoint(x: 0, y: (signSize.height / 2 - 1.5) * direction)
+        pointer.position = beside ? CGPoint(x: -(signSize.width / 2 - 1.5) * side, y: 0) : CGPoint(x: 0, y: signSize.height / 2 - 1.5)
         pointer.zPosition = -1
         sign.addChild(pointer)
 
         let marker = SKNode()
-        let offset = signSize.height * 0.5 + tip
-        marker.position = CGPoint(x: 0, y: above ? spriteSize.height * 0.5 + offset : plateBottom - offset)
+        marker.position = beside
+            ? CGPoint(x: side * (spriteSize.width * 0.5 + tip + signSize.width * 0.5), y: spriteSize.height * 0.08)
+            : CGPoint(x: 0, y: plateBottom - signSize.height * 0.5 - tip)
         marker.zPosition = 6
         marker.addChild(sign)
         node.addChild(marker)
@@ -326,7 +353,10 @@ final class WorldMapScene: CoverScene {
             .group([.scale(to: 1.12, duration: 0.8), .fadeAlpha(to: 0.95, duration: 0.8)]),
             .group([.scale(to: 0.94, duration: 0.8), .fadeAlpha(to: 0.6, duration: 0.8)]),
         ]).eased()))
-        marker.run(.repeatForever(.sequence([.moveBy(x: 0, y: 10, duration: 0.45), .moveBy(x: 0, y: -10, duration: 0.45)]).eased()))
+        let bounce = beside
+            ? SKAction.sequence([.moveBy(x: 8 * side, y: 0, duration: 0.45), .moveBy(x: -8 * side, y: 0, duration: 0.45)])
+            : SKAction.sequence([.moveBy(x: 0, y: -8, duration: 0.45), .moveBy(x: 0, y: 8, duration: 0.45)])
+        marker.run(.repeatForever(bounce.eased()))
     }
 
     private func layoutBoat(animated: Bool) {

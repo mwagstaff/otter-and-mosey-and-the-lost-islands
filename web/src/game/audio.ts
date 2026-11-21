@@ -4,7 +4,7 @@ import { options } from "./options";
 
 /** Every sound effect in the game. The names are file names in the iOS project's Resources/Audio. */
 export type SFX =
-  | "tap" | "nav" | "correct" | "combo" | "wrong" | "pop" | "crystal" | "star" | "jump" | "swim" | "crack" | "chirp"
+  | "glub" | "tap" | "nav" | "correct" | "combo" | "wrong" | "pop" | "crystal" | "star" | "jump" | "swim" | "crack" | "chirp"
   | "portal" | "guardian" | "friendship" | "levelComplete" | "unlock" | "victory" | "key" | "whoosh" | "plank" | "cheer";
 
 const quiet = (promise: Promise<void> | undefined) => void promise?.catch(() => {});

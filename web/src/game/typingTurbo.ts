@@ -6,7 +6,7 @@ import { GameLabel } from "../engine/label";
 import type { Emitter } from "../engine/particles";
 import { audio } from "./audio";
 import { floatText, trail } from "./effects";
-import { GameScene, type SnackSpot } from "./gameScene";
+import { GameScene } from "./gameScene";
 import { options } from "./options";
 
 /** One character of the text to type: its label, and a visible mark for a space when it is next. */
@@ -60,18 +60,21 @@ export class TypingTurboScene extends GameScene {
     const width = Math.min(this.play.height * 0.75, 330);
     this.rider.setSize(width, (width * this.rider.texture.height) / this.rider.texture.width);
     this.rider.position.set(this.riderX, this.riderY);
+    if (!this.rider.visible) {
+      this.otter.resize(width * 0.5);
+      this.mosey.resize(width * 0.7);
+      this.otter.position.set(this.riderX - width * 0.24, this.riderY + width * 0.16);
+      this.mosey.position.set(this.riderX + width * 0.28, this.riderY);
+    }
     this.board?.position.set(this.play.midX, this.boardY);
   }
 
-  /** Otter and Mosey are one picture here, so the snacks go in Otter's paws and by Mosey's mouth. */
-  protected override snackSpots(): SnackSpot[] {
-    // The rider is scaled to fit, so its spots are in picture pixels and the size is undone.
-    const { width, height } = this.rider.texture;
-    const side = Math.max(this.compact ? 40 : 52, this.rider.width * 0.17) / this.rider.scale.x;
-    return [
-      { holder: this.rider, x: width * 0.11, y: -height * 0.15, side, facing: 1 },
-      { holder: this.rider, x: width * 0.43, y: height * 0.02, side, facing: 1 },
-    ];
+  protected override prepareHeroesForSnack(): void {
+    this.rider.visible = false;
+    this.stream.visible = false;
+    this.otter.zIndex = this.mosey.zIndex = 20;
+    this.world.addChild(this.otter, this.mosey);
+    this.layout();
   }
 
   protected override caption(): string {

@@ -44,14 +44,11 @@ struct ParentGateView: View {
             HStack(spacing: 8) {
                 ForEach(Array("1234567890"), id: \.self) { digit in
                     Button(String(digit)) { if entry.count < 3 { entry.append(digit) } }
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .frame(width: 48, height: 48)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(.white).shadow(radius: 1))
                 }
                 Button { if !entry.isEmpty { entry.removeLast() } } label: { Image(systemName: "delete.left") }
-                    .frame(width: 48, height: 48)
+                    .accessibilityLabel("Delete")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ParentKeyStyle())
             HStack(spacing: 16) {
                 Button("Back", action: onCancel).buttonStyle(.bordered)
                 Button("Continue") {
@@ -70,6 +67,22 @@ struct ParentGateView: View {
             .controlSize(.large)
         }
         .padding(30)
+    }
+}
+
+private struct ParentKeyStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 22, weight: .bold, design: .rounded))
+            .foregroundStyle(configuration.isPressed ? Color(uiColor: .systemBackground) : .primary)
+            .frame(width: 48, height: 48)
+            .background {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(configuration.isPressed ? Color.primary : Color(uiColor: .secondarySystemGroupedBackground))
+                    .shadow(radius: 1)
+            }
+            .contentShape(Rectangle())
+            .animation(configuration.isPressed ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

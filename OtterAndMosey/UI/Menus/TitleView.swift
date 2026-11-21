@@ -27,6 +27,7 @@ struct SceneBackdrop<S: CoverScene>: View {
 
 struct TitleView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var scene = TitleScene()
     @State private var logoIn = false
 
@@ -35,6 +36,9 @@ struct TitleView: View {
             let compact = geometry.size.height < 480
             ZStack {
                 SceneBackdrop(scene: scene)
+                    .onChange(of: !reduceMotion && !model.settings.reducedMotion, initial: true) { _, animate in
+                        scene.setSceneryMotion(animate)
+                    }
                 VStack(spacing: 0) {
                     Image("logo")
                         .resizable()

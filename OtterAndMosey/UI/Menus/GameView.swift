@@ -10,6 +10,7 @@ struct GameView: View {
 
     private enum Stage { case intro, playing, outro, results }
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(AppModel.self) private var model
     @State private var bridge = GameBridge()
     @State private var scene: GameScene?
@@ -26,6 +27,9 @@ struct GameView: View {
             ZStack {
                 if let scene {
                     SpriteView(scene: scene, isPaused: paused, preferredFramesPerSecond: 60)
+                        .onChange(of: reduceMotion || model.settings.reducedMotion, initial: true) { _, reduced in
+                            scene.backdrop?.reduceMotion = reduced
+                        }
                         .ignoresSafeArea()
                 }
                 if stage == .playing || stage == .outro {

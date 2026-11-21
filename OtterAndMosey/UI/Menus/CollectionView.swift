@@ -103,6 +103,7 @@ struct CollectionView: View {
 /// The home island, which the player decorates with things earned on the adventure.
 struct HomeIslandView: View {
     @Environment(AppModel.self) private var model
+    @GestureState private var cabinetOffset = CGSize.zero
     @State private var dragging: UUID?
     /// The last quick tap on a decoration, so a second one soon after puts it away.
     @State private var lastTap: (id: UUID, time: Date)?
@@ -112,20 +113,15 @@ struct HomeIslandView: View {
             let compact = geometry.size.height < 480
             let itemSize: CGFloat = compact ? 54 : 84 * ScreenMetrics.scale(geometry)
             ZStack {
-                // Pets the player has rescued wander along the beach.
-                ForEach(Array(pets.enumerated()), id: \.element.id) { index, pet in
-                    Glyph(pet.emoji, size: itemSize * 0.85, art: pet.art)
-                        .position(x: geometry.size.width * (0.12 + 0.76 * Double(index) / Double(max(pets.count - 1, 1))), y: geometry.size.height * (index.isMultiple(of: 2) ? 0.8 : 0.72))
-                }
                 ForEach(model.profile?.decorations ?? []) { placed in
                     if let reward = model.catalog.reward(placed.reward) {
                         Glyph(reward.emoji, size: itemSize * 1.25, art: reward.art)
                             .scaleEffect(dragging == placed.id ? 1.2 : 1)
-                            .position(x: placed.x * geometry.size.width, y: placed.y * geometry.size.height)
+                            .contentShape(Rectangle())
                             // One gesture does both, because a drag that starts on touch-down swallows the
                             // taps a separate double-tap would need: a real drag moves the decoration,
                             // and two quick taps that barely move put it away.
-                            .gesture(DragGesture(minimumDistance: 0)
+                            .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("island"))
                                 .onChanged { value in
                                     guard hypot(value.translation.width, value.translation.height) > 6 else { return }
                                     dragging = placed.id
@@ -139,19 +135,33 @@ struct HomeIslandView: View {
                                     }
                                     move(placed.id, to: value.location, in: geometry.size, persist: true)
                                 })
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(reward.name)
+                            .position(x: placed.x * geometry.size.width, y: placed.y * geometry.size.height)
                     }
                 }
-                // The trophy cabinet stands on the island too.
-                Button(action: tapped { model.openTrophies() }) {
+                if let origin = model.profile?.cabinetPosition {
+                    let position = cabinetPosition(origin, offset: cabinetOffset, in: geometry.size)
                     VStack(spacing: 2) {
                         Image("trophy_cabinet").resizable().scaledToFit().frame(height: itemSize * 2)
                         Text("Trophies").font(.game(compact ? 12 : 16)).foregroundStyle(Palette.ink)
                             .padding(.horizontal, 10).padding(.vertical, 2).panel(radius: 10)
                     }
+                    .fixedSize()
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 6, coordinateSpace: .named("island"))
+                        .updating($cabinetOffset) { drag, offset, _ in offset = drag.translation }
+                        .onEnded { drag in
+                            let drop = cabinetPosition(origin, offset: drag.translation, in: geometry.size)
+                            model.update { $0.cabinetPosition = drop }
+                        }
+                        .exclusively(before: TapGesture().onEnded { tapped { model.openTrophies() }() }))
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Trophy cabinet")
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { model.openTrophies() }
+                    .position(x: position.x * geometry.size.width, y: position.y * geometry.size.height)
                 }
-                .buttonStyle(.plain)
-                .position(x: geometry.size.width * 0.88, y: geometry.size.height * 0.4)
-                .accessibilityLabel("Trophy cabinet")
                 VStack {
                     HStack {
                         RoundButton(symbol: "chevron.left", label: "Back to map") { model.route = .map }
@@ -164,31 +174,47 @@ struct HomeIslandView: View {
                     HStack(spacing: 10) {
                         Text("Tap to add. Drag to move. Double-tap to put away.")
                             .font(.game(compact ? 12 : 16, weight: .bold)).foregroundStyle(Palette.ink)
-                        ForEach(decorations) { reward in
-                            Button(action: tapped { add(reward) }) {
-                                Glyph(reward.emoji, size: compact ? 38 : 52, art: reward.art)
-                                    .frame(width: compact ? 52 : 68, height: compact ? 52 : 68)
-                                    .background(Circle().fill(.white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 10) {
+                                ForEach(islandRewards) { reward in
+                                    Button(action: tapped { add(reward) }) {
+                                        Glyph(reward.emoji, size: compact ? 38 : 52, art: reward.art)
+                                            .frame(width: compact ? 52 : 68, height: compact ? 52 : 68)
+                                            .background(Circle().fill(.white).overlay(Circle().strokeBorder(Palette.ink, lineWidth: 3)))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel("Add \(reward.name)")
+                                }
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Add \(reward.name)")
                         }
+                        .frame(height: compact ? 56 : 72)
                     }
                     .padding(.horizontal, 14).padding(.vertical, 8)
                     .panel(fill: Palette.cream.opacity(0.95))
                 }
                 .padding(compact ? 8 : 24)
             }
-            .screenBackground("bg_title", saturation: 0.35 + 0.65 * Double(model.profile?.crystals.count ?? 0) / 6)
+            .coordinateSpace(name: "island")
+            .background {
+                RainbowIslandBackdrop(
+                    saturation: 0.35 + 0.65 * Double(model.profile?.crystals.count ?? 0) / 6,
+                    calmerMotion: model.settings.reducedMotion
+                )
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+            }
         }
     }
 
-    private var pets: [Reward] {
-        model.catalog.rewards.filter { $0.kind == .pet && (model.profile?.has($0.id) ?? false) }
+    private func cabinetPosition(_ origin: IslandPosition, offset: CGSize, in size: CGSize) -> IslandPosition {
+        IslandPosition(x: min(max(origin.x + offset.width / max(size.width, 1), 0.1), 0.9),
+                       y: min(max(origin.y + offset.height / max(size.height, 1), 0.3), 0.68))
     }
 
-    private var decorations: [Reward] {
-        model.catalog.rewards.filter { $0.kind == .decoration && (model.profile?.has($0.id) ?? false) }
+    private var islandRewards: [Reward] {
+        model.catalog.rewards.filter {
+            ($0.kind == .decoration || $0.kind == .pet) && (model.profile?.has($0.id) ?? false)
+        }
     }
 
     private func add(_ reward: Reward) {

@@ -2,7 +2,7 @@ import { Container, Sprite } from "pixi.js";
 import { hasArt } from "../assets";
 import type { Speaker } from "../core";
 import {
-  call, easeIn, easeInOut, easeOut, everyFrame, group, isRunning, moveBy, repeatForever, rotateTo, run, scaleTo, scaleToXY,
+  call, easeIn, easeInOut, easeOut, everyFrame, group, isRunning, moveBy, repeat, repeatForever, rotateTo, run, scaleTo, scaleToXY,
   sequence, stop, wait, wobble,
 } from "../engine/actions";
 import { circle, iconSprite, palette, speechBubble, texture } from "../engine/art";
@@ -72,7 +72,7 @@ export class SpeechBadge extends Container {
 }
 
 export type CharacterKind = "otter" | "mosey";
-export type Pose = "idle" | "blink" | "cheer" | "think" | "oops" | "move";
+export type Pose = "idle" | "blink" | "cheer" | "think" | "oops" | "move" | "munch" | "yum";
 
 /** The top of Mosey's head in each painted pose, as a fraction of the sprite from its centre. */
 const moseyHead: Record<Pose, { x: number; y: number }> = {
@@ -81,12 +81,14 @@ const moseyHead: Record<Pose, { x: number; y: number }> = {
   cheer: { x: 0.3, y: 0.45 },
   think: { x: 0.28, y: 0.46 },
   oops: { x: 0.26, y: 0.46 },
+  munch: { x: 0.3, y: 0.42 },
+  yum: { x: 0.3, y: 0.42 },
   move: { x: 0.36, y: 0.22 },
 };
 
 /** Every picture a character can show, for loading before a level starts. */
 export function characterArt(kind: CharacterKind): string[] {
-  return ["idle", "blink", "cheer", "think", "oops", "talk", kind === "otter" ? "run" : "swim"].map((pose) => `${kind}_${pose}`);
+  return ["idle", "blink", "cheer", "think", "oops", "munch", "yum", "talk", kind === "otter" ? "run" : "swim"].map((pose) => `${kind}_${pose}`);
 }
 
 /**
@@ -225,6 +227,14 @@ export class CharacterNode extends Container {
   react(reaction: Pose, hold = 1): void {
     this.set(reaction);
     run(this, sequence(wait(hold), call(() => this.set(this.restPose))), "react");
+  }
+
+  chew(duration: number, berry: boolean): void {
+    // The munch painting has a berry in the character’s mouth.
+    this.react(berry ? "munch" : "yum", duration);
+    if (options.reducedMotion) return;
+    const chomp = sequence(scaleToXY(1.03, 0.94, 0.11), scaleToXY(1, 1, 0.11));
+    run(this.body, repeat(chomp, Math.max(1, Math.floor(duration / 0.22))), "chew");
   }
 
   celebrate(): void {

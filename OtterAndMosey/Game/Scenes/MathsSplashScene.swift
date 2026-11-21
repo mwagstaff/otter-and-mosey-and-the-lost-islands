@@ -171,6 +171,7 @@ final class MathsSplashScene: GameScene {
 
     private func collect(_ item: SKSpriteNode) {
         guard item.parent != nil else { return }
+        if theme.id == "woods" || theme.id == "candy" { mosey.chew(for: 0.44, berry: theme.id == "woods") }
         pearlsScooped += 1
         AudioManager.shared.play(.pop, volume: 0.6)
         Effects.burst(at: item.position, colour: theme.tint, count: 8, in: self)

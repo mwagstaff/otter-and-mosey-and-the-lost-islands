@@ -81,7 +81,7 @@ final class SpeechBadge: SKNode {
 /// (breathing, bobbing, fidgets, jumps and pose changes).
 final class CharacterNode: SKNode {
     enum Kind: String { case otter, mosey }
-    enum Pose: String { case idle, blink, cheer, think, oops, move }
+    enum Pose: String { case idle, blink, cheer, think, oops, move, munch, yum }
 
     let kind: Kind
     private let body = SKNode()
@@ -188,6 +188,7 @@ final class CharacterNode: SKNode {
         case .cheer: CGPoint(x: 0.3, y: 0.45)
         case .think: CGPoint(x: 0.28, y: 0.46)
         case .oops: CGPoint(x: 0.26, y: 0.46)
+        case .munch, .yum: CGPoint(x: 0.3, y: 0.42)
         case .move: CGPoint(x: 0.36, y: 0.22)
         }
     }
@@ -243,6 +244,16 @@ final class CharacterNode: SKNode {
             guard let self else { return }
             self.set(self.restPose)
         }]), withKey: "react")
+    }
+
+    /// Munches happily for `duration` seconds: the munching picture with a little chomp in its step.
+    func chew(for duration: TimeInterval, berry: Bool) {
+        // The munch painting has a berry in the character’s mouth.
+        react(berry ? .munch : .yum, hold: duration)
+        guard !Effects.reducedMotion else { return }
+        body.removeAction(forKey: "chew")
+        let chomp = SKAction.sequence([.scaleX(to: 1.03, y: 0.94, duration: 0.11), .scaleX(to: 1, y: 1, duration: 0.11)])
+        body.run(.repeat(chomp, count: max(Int(duration / 0.22), 1)), withKey: "chew")
     }
 
     func celebrate() {

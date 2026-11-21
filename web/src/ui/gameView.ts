@@ -1,4 +1,4 @@
-import type { Application } from "pixi.js";
+import { RendererType, type Application } from "pixi.js";
 import { playableModes, type AppModel } from "../app/model";
 import {
   catalog, ChallengeSession, counterUnits, isLevelUnlocked, subjectOf, type DialogueLine, type GameMode, type InputProfile, type Island,
@@ -64,6 +64,7 @@ export function gameView(model: AppModel, app: Application, level: LevelDef, isl
   const sceneOptions: SceneOptions = {
     accessory: hat && (iconName(`reward_${hat.id}`) ?? hat.emoji),
     island,
+    sceneryShader: app.renderer.type === RendererType.WEBGL,
     inputProfile: input,
     startRestoration: base * 0.75,
     endRestoration: level.mode === "guardian" ? 1 : Math.min(1, base * 0.75 + 0.5),

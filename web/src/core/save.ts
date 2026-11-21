@@ -90,6 +90,7 @@ export interface Profile {
   seenIntro: boolean;
   /** Set once a grown-up has looked over this player's settings on the check before their first adventure. */
   grownUpChecked: boolean;
+  cabinetPosition: { x: number; y: number };
   decorations: PlacedDecoration[];
   lastLevelID?: string;
   bestCombo: number;
@@ -124,6 +125,7 @@ function readProfile(value: unknown): Profile {
     dailyPlaySeconds: record(raw.dailyPlaySeconds, (entry) => num(entry, 0)),
     seenIntro: bool(raw.seenIntro, false),
     grownUpChecked: bool(raw.grownUpChecked, false),
+    cabinetPosition: { x: num(asObject(raw.cabinetPosition).x, 0.88), y: num(asObject(raw.cabinetPosition).y, 0.4) },
     decorations: (Array.isArray(raw.decorations) ? raw.decorations : []).flatMap((entry) => {
       const placed = asObject(entry);
       if (!isString(placed.reward)) return [];

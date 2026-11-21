@@ -42,17 +42,23 @@ final class TypingTurboScene: GameScene {
         let width = min(play.height * 0.75, 330)
         rider.size = CGSize(width: width, height: width * texture.height / texture.width)
         rider.position = riderHome
+        if rider.isHidden {
+            otter.resize(width * 0.5)
+            mosey.resize(width * 0.7)
+            otter.position = CGPoint(x: riderHome.x - width * 0.24, y: riderHome.y - width * 0.16)
+            mosey.position = CGPoint(x: riderHome.x + width * 0.28, y: riderHome.y)
+        }
         board?.position = CGPoint(x: play.midX, y: play.maxY - boardSize.height * 0.58)
     }
 
-    /// Otter and Mosey are one picture here, so the snacks go in Otter's paws and by Mosey's mouth.
-    override func snackSpots() -> [SnackSpot] {
-        let width = rider.size.width, height = rider.size.height
-        let side = max(compact ? 40 : 52, width * 0.17)
-        return [
-            SnackSpot(holder: rider, position: CGPoint(x: width * 0.11, y: height * 0.15), side: side, facing: 1),
-            SnackSpot(holder: rider, position: CGPoint(x: width * 0.43, y: -height * 0.02), side: side, facing: 1),
-        ]
+    override func prepareHeroesForSnack() {
+        rider.isHidden = true
+        trail.isHidden = true
+        otter.zPosition = 20
+        mosey.zPosition = 20
+        addChild(otter)
+        addChild(mosey)
+        layout()
     }
 
     override func caption(for question: Question) -> String {

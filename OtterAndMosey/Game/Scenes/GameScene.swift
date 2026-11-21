@@ -149,6 +149,7 @@ class GameScene: SKScene {
 
     func askNext() {
         guard !finished, let question = session.next() else { return }
+        backdrop.setAnswering(true)
         current = question
         firstTry = true
         usedHint = false
@@ -222,6 +223,7 @@ class GameScene: SKScene {
     @discardableResult
     func succeed(at point: CGPoint) -> AnswerOutcome? {
         guard let question = current else { return nil }
+        backdrop.setAnswering(false)
         current = nil
         let outcome = session.complete(question, firstTry: firstTry, seconds: Date().timeIntervalSince(questionStart), usedHint: usedHint)
         AudioManager.shared.play(outcome.combo >= 3 ? .combo : .correct)
@@ -286,11 +288,12 @@ class GameScene: SKScene {
                 Haptics.shared.crescendo()
                 self.cameraPunch(scale: 0.94, hold: 1.2)
                 self.bloom(count: 6)
+                self.prepareHeroesForSnack()
                 self.otter.celebrate()
                 self.mosey.celebrate()
                 self.shareSnack()
             },
-            .wait(forDuration: 4),
+            .wait(forDuration: 4.8),
             .run { [weak self] in
                 guard let self else { return }
                 var result = self.session.result
@@ -313,9 +316,9 @@ class GameScene: SKScene {
             addChild(bag)
             bag.run(.sequence([.wait(forDuration: 6), .fadeOut(withDuration: 0.3), .removeFromParent()]))
         }
-        // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
-        // (or flippers) until the level closes, so the snack is still there during the chat
-        // that follows and nobody misses it.
+        let berry = !packet && theme.snack == "🍓"
+        // Each hero eats their snack: it pops up at their mouth, they munch it bite by bite (with
+        // chomps and crumbs) until it's gone, lick their lips, and finish with a happy cheer.
         for (index, spot) in snackSpots().enumerated() {
             let snack = SKSpriteNode(texture: Art.snack(packet ? "fish_biscuits" : theme.snack))
             let textureSize = snack.texture!.size()
@@ -325,44 +328,64 @@ class GameScene: SKScene {
             snack.zPosition = 50
             snack.setScale(0)
             spot.holder.addChild(snack)
-            let facing = spot.facing
-            let bite = SKAction.run { [weak self, weak snack] in
-                guard let self, let snack, snack.parent != nil else { return }
-                AudioManager.shared.play(.pop, volume: 0.35)
-                Effects.burst(at: self.convert(.zero, from: snack), colour: UIColor(hex: "#E8B46A"), count: 8, in: self, z: 70)
-            }
-            let nibble = { (to: CGFloat) -> SKAction in
-                .sequence([bite, .group([.scale(to: to * 0.88, duration: 0.08), .rotate(toAngle: 0.12 * facing, duration: 0.08)]),
-                           .group([.scale(to: to, duration: 0.12), .rotate(toAngle: 0, duration: 0.12)]), .wait(forDuration: 0.9)])
-            }
-            snack.run(.sequence([
+            let crumbs = berry ? UIColor(hex: "#E8524A") : UIColor(hex: "#E8B46A")
+            let start = 0.7 + 0.15 * Double(index)
+            // Berries are painted into the munch pose. Other foods stay in view until the last bite.
+            var bites: [SKAction] = [
                 .wait(forDuration: 0.15 * Double(index)),
                 SKAction.scale(to: 1, duration: 0.25).eased(),
-                .wait(forDuration: 0.9),
-                nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48),
-            ]))
+                .wait(forDuration: 0.45),
+            ]
+            if !berry {
+                bites += [.wait(forDuration: 0.3), .scale(to: 0.7, duration: 0.12), .wait(forDuration: 0.43),
+                          .scale(to: 0.45, duration: 0.12), .wait(forDuration: 0.43)]
+            }
+            bites += [.group([.scale(to: 0.2, duration: 0.15), .fadeOut(withDuration: 0.15)]), .removeFromParent()]
+            snack.run(.sequence(bites))
+            let mouth = spot.position
+            let bite = SKAction.run { [weak self, weak holder = spot.holder] in
+                guard let self, let holder, holder.scene != nil else { return }
+                AudioManager.shared.play(.pop, volume: 0.35)
+                Effects.burst(at: self.convert(mouth, from: holder), colour: crumbs, count: 8, in: self, z: 70)
+            }
+            let hero = spot.holder
+            hero.run(.sequence([
+                .wait(forDuration: start),
+                .run { [weak hero] in hero?.chew(for: 2.05, berry: berry) },
+                .wait(forDuration: 0.3), bite, .wait(forDuration: 0.55), bite, .wait(forDuration: 0.55), bite,
+                .wait(forDuration: 0.65),
+                .run { [weak self, weak hero] in
+                    guard let self, let hero else { return }
+                    hero.react(.yum, hold: 1.2)
+                    let top = self.convert(CGPoint(x: 0, y: hero.footprint.height * 0.9), from: hero)
+                    Effects.floatPicture("😋", at: top, size: min(self.play.height * 0.14, 64), in: self)
+                },
+                .wait(forDuration: 1.25),
+                .run { [weak hero] in hero?.celebrate() },
+            ]), withKey: "snack")
         }
     }
 
-    /// Where a hero holds a snack: the node it rides on, its spot there, its size, and which way it faces.
-    struct SnackSpot {
-        let holder: SKNode
+    /// Where a hero holds a snack: the node it rides on, its spot there, and its size.
+    private struct SnackSpot {
+        let holder: CharacterNode
         let position: CGPoint
         let side: CGFloat
-        let facing: CGFloat
     }
 
     /// Where the end-of-level snacks go. By default Otter's paws and Mosey's flippers, for whichever
-    /// of them is on screen. Modes that draw the heroes some other way say where instead.
-    func snackSpots() -> [SnackSpot] {
+    /// of them is on screen.
+    private func snackSpots() -> [SnackSpot] {
         [otter, mosey].compactMap { $0 }.filter { $0.scene != nil }.map { hero in
             let facing: CGFloat = hero.facingLeft ? -1 : 1
             let position = hero === otter
                 ? CGPoint(x: facing * hero.size * 0.14, y: hero.size * 0.62)
                 : CGPoint(x: facing * hero.size * 0.36, y: hero.size * 0.08)
-            return SnackSpot(holder: hero, position: position, side: max(compact ? 40 : 52, hero.size * 0.34), facing: facing)
+            return SnackSpot(holder: hero, position: position, side: max(compact ? 40 : 52, hero.size * 0.34))
         }
     }
+
+    func prepareHeroesForSnack() {}
 
     // MARK: - Helpers
 

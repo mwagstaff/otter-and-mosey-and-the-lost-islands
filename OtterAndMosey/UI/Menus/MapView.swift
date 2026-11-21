@@ -4,6 +4,7 @@ import SwiftUI
 
 /// The archipelago. Tap an island to see it, then explore.
 struct MapView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(AppModel.self) private var model
     @State private var scene = WorldMapScene()
     @State private var selected: String?
@@ -27,6 +28,9 @@ struct MapView: View {
             let compact = geometry.size.height < 480
             ZStack {
                 SceneBackdrop(scene: scene, extraTop: compact ? 50 : 80, extraBottom: compact ? 84 : 130)
+                    .onChange(of: !reduceMotion && !model.settings.reducedMotion, initial: true) { _, active in
+                        scene.cover.shader = active ? IslandAtmosphere.shader(for: "bg_map") : nil
+                    }
                 VStack(spacing: 0) {
                     HStack(spacing: compact ? 8 : 12) {
                         RoundButton(symbol: "house.fill", label: "Title screen") { model.route = .title }
@@ -204,7 +208,10 @@ struct IslandView: View {
                 }
                 .padding(compact ? 8 : 24)
             }
-            .screenBackground(theme.background, saturation: 0.08 + 0.92 * model.restoration(of: island))
+            .background {
+                IslandScenery(art: theme.background, calmerMotion: model.settings.reducedMotion)
+                    .saturation(0.08 + 0.92 * model.restoration(of: island))
+            }
             .environment(\.compact, compact)
         }
     }

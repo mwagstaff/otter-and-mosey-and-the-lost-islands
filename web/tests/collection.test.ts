@@ -5,7 +5,7 @@ vi.mock("../src/game/effects", () => ({ burst: vi.fn() }));
 import { MathsSplashScene } from "../src/game/mathsSplash";
 import { islandTheme } from "../src/game/theme";
 
-function fixture() {
+function fixture(island = "candy") {
   // Exercise the actual scene input and collection path without a GPU or audio device.
   const scene = Object.create(MathsSplashScene.prototype);
   const world = new Container();
@@ -13,9 +13,9 @@ function fixture() {
   item.setSize(30, 30); item.position.set(600, 200); world.addChild(item);
   Object.assign(scene, {
     world, pearls: [item], pearlsScooped: 0, pearlsOffered: 1,
-    theme: islandTheme("candy"), phase: "cruising", targetY: 200,
+    theme: islandTheme(island), phase: "cruising", targetY: 200,
     width: 844, height: 390, insets: { top: 70, bottom: 0, left: 8, right: 8 },
-    mosey: { size: 100 },
+    mosey: { size: 100, chew: vi.fn() },
   });
   return { scene, item };
 }
@@ -28,10 +28,20 @@ describe("themed collection", () => {
     expect(scene.pearlsScooped).toBe(1);
     expect(scene.pearlsOffered).toBe(1);
     expect(scene.pearls).toHaveLength(0);
+    expect(scene.mosey.chew).toHaveBeenCalledOnce();
     expect(item.destroyed).toBe(true);
     scene.phase = "cruising";
     scene.pointerDown(600, 200);
     expect(scene.pearlsScooped).toBe(1);
+  });
+  test.each(["woods", "bay", "dragon", "cloud", "candy", "star"])("Mosey only chews edible pickups on %s", (island) => {
+    const { scene } = fixture(island);
+    scene.pointerDown(600, 200);
+    if (island === "woods" || island === "candy") {
+      expect(scene.mosey.chew).toHaveBeenCalledWith(0.44, island === "woods");
+    } else {
+      expect(scene.mosey.chew).not.toHaveBeenCalled();
+    }
   });
   test("near misses steer without granting a collectible", () => {
     const { scene } = fixture();
@@ -47,13 +57,14 @@ describe("themed collection", () => {
     Object.assign(scene, {
       pace: 120, targetPace: 120,
       backdrop: { scroll: vi.fn() }, stream: { position: { set: vi.fn() } },
-      mosey: { size: 100, y: 200, position: { set: vi.fn() } },
+      mosey: { ...scene.mosey, y: 200, position: { set: vi.fn() } },
     });
     scene.update(0);
     expect(scene.pearlsScooped).toBe(1);
     expect(scene.pearls).toHaveLength(0);
     scene.update(0);
     expect(scene.pearlsScooped).toBe(1);
+    expect(scene.mosey.chew).toHaveBeenCalledOnce();
   });
   test("all six islands have suitable objects, number decorations and snacks", () => {
     const themes = ["woods", "bay", "dragon", "cloud", "candy", "star"].map(islandTheme);

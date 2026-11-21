@@ -2,6 +2,67 @@ import XCTest
 import LostIslandsCore
 
 nonisolated final class PlaythroughTests: XCTestCase {
+    @MainActor func testGrownUpKeypadAcceptsTapsAcrossEachKey() {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let app = XCUIApplication()
+        app.launch()
+        let grownUps = app.buttons["Grown-ups"]
+        app.buttons["Tap to continue"].tap()
+        XCTAssertTrue(grownUps.waitForExistence(timeout: 15))
+        grownUps.tap()
+
+        func showsAnswer(_ answer: String) -> Bool {
+            app.staticTexts.matching(NSPredicate(format: "label ENDSWITH %@", " = " + answer))
+                .firstMatch.waitForExistence(timeout: 3)
+        }
+
+        let edge = CGVector(dx: 0.12, dy: 0.15)
+        app.buttons["1"].coordinate(withNormalizedOffset: edge).tap()
+        XCTAssertTrue(showsAnswer("1"))
+        app.buttons["0"].press(forDuration: 1)
+        XCTAssertTrue(showsAnswer("10"))
+        app.buttons["Delete"].coordinate(withNormalizedOffset: edge).tap()
+        XCTAssertTrue(showsAnswer("1"))
+    }
+
+    @MainActor func testRainbowIslandRemembersCabinetAndPetPlacement() throws {
+        continueAfterFailure = false
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let app = XCUIApplication()
+        app.launchArguments = ["-debugRoute", "home", "-debugUnlock"]
+        app.launch()
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        let cabinet = app.buttons["Trophy cabinet"]
+        XCTAssertTrue(cabinet.waitForExistence(timeout: 10))
+        let start = cabinet.frame.midX
+        let targetX: CGFloat = start > app.frame.midX ? 0.25 : 0.75
+        let target = app.coordinate(withNormalizedOffset: CGVector(dx: targetX, dy: 0.4))
+        cabinet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.15, thenDragTo: target)
+        XCTAssertEqual(cabinet.frame.midX, app.frame.width * targetX, accuracy: 10)
+
+        let name = "Flicker the firefly"
+        let pet = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", name)).firstMatch
+        XCTAssertFalse(pet.exists)
+        app.buttons["Add " + name].tap()
+        XCTAssertTrue(pet.waitForExistence(timeout: 5))
+        let petTarget = app.coordinate(withNormalizedOffset: CGVector(dx: 0.52, dy: 0.34))
+        pet.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.15, thenDragTo: petTarget)
+        app.terminate()
+        app.launch()
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(cabinet.waitForExistence(timeout: 10))
+        XCTAssertEqual(cabinet.frame.midX, app.frame.width * targetX, accuracy: 10)
+        XCTAssertEqual(pet.frame.midX, app.frame.width * 0.52, accuracy: 10)
+        XCTAssertEqual(pet.frame.midY, app.frame.height * 0.34, accuracy: 10)
+        pet.doubleTap()
+        XCTAssertFalse(pet.exists)
+        cabinet.tap()
+        XCTAssertFalse(app.staticTexts["Rainbow Island"].exists)
+    }
+
     @MainActor func testSixModesThroughControls() throws {
         try play(["woods-1", "bay-1", "woods-2", "dragon-1", "woods-3", "woods-5"])
     }

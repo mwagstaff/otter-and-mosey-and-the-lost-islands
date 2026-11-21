@@ -1,14 +1,14 @@
 import { Container, Sprite } from "pixi.js";
 import { catalog, type AnswerOutcome, type ChallengeSession, type InputProfile, type Island, type Question } from "../core";
 import { capitalizesTarget } from "../core/keyboardCase";
-import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, rotateTo, run, scaleTo, sequence, wait } from "../engine/actions";
+import { call, clearActions, easeInOut, everyFrame, fadeOut, group, moveBy, remove, run, scaleTo, sequence, wait } from "../engine/actions";
 import { fishBiscuits, loadArt, iconName, mix, palette, panel, snackSprite } from "../engine/art";
 import { GameLabel } from "../engine/label";
 import { audio, narrator } from "./audio";
 import { Backdrop } from "./backdrop";
 import type { GameBridge, KeyboardKind } from "./bridge";
 import { characterArt, CharacterNode } from "./character";
-import { bloom, burst, confetti, floatText } from "./effects";
+import { bloom, burst, confetti, floatPicture, floatText } from "./effects";
 import { options } from "./options";
 import { islandTheme, type IslandTheme } from "./theme";
 
@@ -16,6 +16,7 @@ import { islandTheme, type IslandTheme } from "./theme";
 export interface SceneOptions {
   /** The picture or emoji for Otter's hat, if one is being worn. */
   accessory?: string;
+  sceneryShader?: boolean;
   island: Island;
   inputProfile: InputProfile;
   /** How colourful the island is when the level starts and ends (0 = grey, 1 = fully restored). */
@@ -24,15 +25,6 @@ export interface SceneOptions {
 }
 
 /** Space taken at each edge by the HUD and the on-screen keys. */
-/** Where a hero holds a snack: the node it rides on, its spot there, its size, and which way it faces. */
-export interface SnackSpot {
-  holder: Container;
-  x: number;
-  y: number;
-  side: number;
-  facing: number;
-}
-
 export interface Insets {
   top: number;
   left: number;
@@ -104,7 +96,7 @@ export abstract class GameScene {
 
   /** The pictures to load before the scene is built. */
   art(): string[] {
-    const blooms = [...this.theme.blooms, this.theme.snack].map(iconName).filter((name) => name !== undefined);
+    const blooms = [...this.theme.blooms, this.theme.snack, "😋"].map(iconName).filter((name) => name !== undefined);
     const hat = this.options.accessory === undefined ? undefined : iconName(this.options.accessory);
     return [this.theme.background, this.theme.foreground, ...characterArt("otter"), ...characterArt("mosey"), ...blooms, ...(hat ? [hat] : [])];
   }
@@ -149,7 +141,7 @@ export abstract class GameScene {
     this.world.position.set(width / 2, height / 2);
     if (!this.built) {
       this.built = true;
-      this.backdrop = new Backdrop(this.theme, this.scrollsBackdrop);
+      this.backdrop = new Backdrop(this.theme, this.scrollsBackdrop, this.options.sceneryShader);
       this.world.addChild(this.backdrop);
       this.backdrop.setRestoration(this.options.startRestoration, 0);
       this.backdrop.resize(width, height, insets.bottom);
@@ -225,6 +217,7 @@ export abstract class GameScene {
     if (this.finished) return;
     const question = this.session.next();
     if (!question) return;
+    this.backdrop.answering = true;
     this.current = question;
     this.firstTry = true;
     this.usedHint = false;
@@ -286,6 +279,7 @@ export abstract class GameScene {
   protected succeed(x: number, y: number): AnswerOutcome | undefined {
     const question = this.current;
     if (!question) return undefined;
+    this.backdrop.answering = false;
     this.current = undefined;
     const seconds = (performance.now() - this.questionStart) / 1000;
     const outcome = this.session.complete(question, this.firstTry, seconds, this.usedHint);
@@ -344,10 +338,11 @@ export abstract class GameScene {
       audio.play("levelComplete");
       this.cameraPunch(0.94, 1.2);
       this.bloom(6);
+      this.prepareHeroesForSnack();
       this.otter.celebrate();
       this.mosey.celebrate();
       this.shareSnack();
-      this.after(4, () => this.bridge.set({ result: { ...this.session.result, pearls: this.pearlsScooped, pearlsOffered: this.pearlsOffered } }));
+      this.after(4.8, () => this.bridge.set({ result: { ...this.session.result, pearls: this.pearlsScooped, pearlsOffered: this.pearlsOffered } }));
     });
   }
 
@@ -364,51 +359,42 @@ export abstract class GameScene {
       this.world.addChild(bag);
       run(bag, sequence(wait(6), fadeOut(0.3), remove()));
     }
-    // Each hero holds a snack and nibbles it bite by bite. The last bite stays in their paws
-    // (or flippers) until the level closes, so the snack is still there during the chat
-    // that follows and nobody misses it.
-    this.snackSpots().forEach((spot, index) => {
-      const snack = snackSprite(packet ? "fish_biscuits" : this.theme.snack, 64);
-      const ratio = spot.side / Math.max(snack.texture.width, snack.texture.height);
-      const facing = spot.facing;
-      snack.position.set(spot.x, spot.y);
+    const berry = !packet && this.theme.snack === "🍓";
+    const heroes = [this.otter, this.mosey].filter((hero) => hero.parent);
+    heroes.forEach((hero, index) => {
+      const facing = hero.facingLeft ? -1 : 1;
+      const mouth = {
+        x: facing * hero.size * (hero === this.otter ? 0.14 : 0.36),
+        y: -hero.size * (hero === this.otter ? 0.62 : 0.08),
+      };
+      const snack = snackSprite(packet ? "fish_biscuits" : this.theme.snack, Math.max(this.compact ? 40 : 52, hero.size * 0.34));
+      const scale = snack.scale.x;
+      snack.position.copyFrom(mouth);
       snack.zIndex = 50;
       snack.scale.set(0);
-      spot.holder.addChild(snack);
+      hero.addChild(snack);
+      const bites = berry ? [] : [wait(0.3), scaleTo(scale * 0.7, 0.12), wait(0.43), scaleTo(scale * 0.45, 0.12), wait(0.43)];
+      run(snack, sequence(wait(0.15 * index), scaleTo(scale, 0.25, easeInOut), wait(0.45), ...bites,
+        group(scaleTo(scale * 0.2, 0.15), fadeOut(0.15)), remove()));
       const bite = call(() => {
-        if (!snack.parent) return;
         audio.play("pop", 0.35);
-        const point = this.world.toLocal(snack.getGlobalPosition());
-        burst(this.world, point.x, point.y, "#E8B46A", 8, 70);
+        const point = this.world.toLocal(mouth, hero);
+        burst(this.world, point.x, point.y, berry ? "#E8524A" : "#E8B46A", 8, 70);
       });
-      const nibble = (to: number) => sequence(
-        bite,
-        group(scaleTo(ratio * to * 0.88, 0.08), rotateTo(0.12 * facing, 0.08)),
-        group(scaleTo(ratio * to, 0.12), rotateTo(0, 0.12)),
-        wait(0.9),
-      );
-      run(snack, sequence(wait(0.15 * index), scaleTo(ratio, 0.25, easeInOut), wait(0.9), nibble(0.85), nibble(0.7), nibble(0.58), nibble(0.48)));
+      run(hero, sequence(
+        wait(0.7 + 0.15 * index), call(() => hero.chew(2.05, berry)),
+        wait(0.3), bite, wait(0.55), bite, wait(0.55), bite, wait(0.65),
+        call(() => {
+          hero.react("yum", 1.2);
+          const top = this.world.toLocal({ x: 0, y: -hero.footprint.height * 0.9 }, hero);
+          floatPicture(this.world, "😋", top.x, top.y, Math.min(this.play.height * 0.14, 64));
+        }),
+        wait(1.25), call(() => hero.celebrate()),
+      ), "snack");
     });
   }
 
-  /**
-   * Where the end-of-level snacks go, in the holder's own units. By default Otter's paws and
-   * Mosey's flippers, for whichever of them is on screen. Modes that draw the heroes some other
-   * way say where instead.
-   */
-  protected snackSpots(): SnackSpot[] {
-    return [this.otter, this.mosey].filter((hero) => hero.parent !== null).map((hero) => {
-      const facing = hero.facingLeft ? -1 : 1;
-      const otter = hero === this.otter;
-      return {
-        holder: hero,
-        x: facing * hero.size * (otter ? 0.14 : 0.36),
-        y: -hero.size * (otter ? 0.62 : 0.08),
-        side: Math.max(this.compact ? 40 : 52, hero.size * 0.34),
-        facing,
-      };
-    });
-  }
+  protected prepareHeroesForSnack(): void {}
 
   // Helpers
 
